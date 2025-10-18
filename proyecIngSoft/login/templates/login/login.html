@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'login/css/styles.css' %}">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>¡Bienvenido a: <br> misión emprende!</h2>
+                <p>Inicia sesión</p>
+            </div>
+            
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <form method="post" class="login-form" id="login-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="user_type">Tipo de Usuario</label>
+                    <select id="user_type" name="user_type" class="user-type-select" required onchange="toggleFormFields()">
+                        <option value="estudiante">Estudiante</option>
+                        <option value="profesor">Profesor</option>
+                        <option value="administrador">Administrador</option>
+                    </select>
+                </div>
+                
+                <div id="profesorAdminFields" class="form-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" id="email" name="email" class="form-field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Contraseña</label>
+                        <input type="password" id="password" name="password" class="form-field">
+                    </div>
+                </div>
+
+                <div id="estudianteFields" class="form-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="nombre_apellido">Nombre y apellido</label>
+                        <input type="text" id="nombre_apellido" name="nombre_apellido" class="form-field">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="carrera">Carrera</label>
+                        <input type="text" id="carrera" name="carrera" class="form-field">
+                    </div>
+                </div>
+                
+                <button type="submit" class="login-btn" id="submitBtn">Iniciar sesión</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleFormFields() {
+            const userType = document.getElementById('user_type').value;
+            const profesorAdminFields = document.getElementById('profesorAdminFields');
+            const estudianteFields = document.getElementById('estudianteFields');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            profesorAdminFields.style.display = 'none';
+            estudianteFields.style.display = 'none';
+            submitBtn.style.display = 'none';
+            
+            if (userType === 'profesor' || userType === 'administrador') {
+                profesorAdminFields.style.display = 'block';
+                submitBtn.style.display = 'block';
+                
+                document.getElementById('email').required = true;
+                document.getElementById('password').required = true;
+                document.getElementById('nombre_apellido').required = false;
+                document.getElementById('carrera').required = false;
+                
+            } else if (userType === 'estudiante') {
+                estudianteFields.style.display = 'block';
+                submitBtn.style.display = 'block';
+                
+                document.getElementById('email').required = false;
+                document.getElementById('password').required = false;
+                document.getElementById('nombre_apellido').required = true;
+                document.getElementById('carrera').required = true;
+            }
+        }
+        
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            const userType = document.getElementById('user_type').value;
+            
+            if (!userType) {
+                e.preventDefault();
+                alert('Por favor selecciona un tipo de usuario');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>
