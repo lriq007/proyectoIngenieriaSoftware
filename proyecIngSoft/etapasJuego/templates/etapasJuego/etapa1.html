@@ -6,11 +6,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Etapa 1 — Trabajo en Equipo</title>
 
+  <!-- Tus estilos existentes -->
   <link rel="stylesheet" href="{% static 'etapasJuego/css/base.css' %}">
   <link rel="stylesheet" href="{% static 'etapasJuego/css/components.css' %}">
 
+  <!-- Estilos de la sopa de letras -->
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/wordsearch.css' %}">
+
   <style>
+    /* Ajustes para convivir con la barra fija y botones existentes */
     body { padding-top: 56px; }
+
     .nav-actions {
       position: fixed; bottom: 24px; left: 0; right: 0;
       display: flex; justify-content: center; gap: 16px; z-index: 50;
@@ -28,30 +34,90 @@
 
     .logo {
       position: relative;
-      top: px;      /* baja la imagen */
-      left: 200px;    /* la mueve a la derecha */
+      top: 0;      /* ajusta si usas un <img> con clase .logo */
+      left: 200px; /* ajusta si usas un <img> con clase .logo */
     }
 
     .badge { font-size: 12px; padding: 4px 8px; border-radius: 999px; background: #eef1f6; color: #23325a; }
+
+    /* Integramos la maqueta de la sopa dentro del layout existente */
+    .ws-container {
+      max-width: 1000px;
+      margin: 88px auto 120px; /* deja espacio para la barra superior y botones inferiores */
+      padding: 0 16px;
+    }
+
+    /* Ajustes leves para que la grilla no choque con tus estilos */
+    .ws-main { display:grid; grid-template-columns: 1fr 260px; gap:16px; }
+    @media (max-width: 768px) {
+      .ws-main { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- ESTA LOGICA SE DEBE PLASMAR EN VIEWS ?? -->
-
+  <!-- Tu barra de progreso fija existente -->
   <div id="progress-bar" style="position:fixed;top:0;left:0;width:100%;background:rgba(255,255,255,0.98);padding:0.5rem 0;box-shadow:0 2px 8px rgba(0,0,0,0.08);z-index:40;">
     <div style="max-width:640px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:0 12px;">
       <span style="font-weight:700;letter-spacing:0.5px;">Etapa 1 de 5</span>
       <div style="flex:1;height:10px;background:#23325a;border-radius:6px;overflow:hidden;">
+        <!-- Este “20%” es decorativo. El progreso real lo muestra #ws-progress abajo. -->
         <div style="width:20%;height:100%;background:linear-gradient(90deg,#FFD24A,#FF5FA2);transition:width 0.4s;"></div>
       </div>
+      <!-- Progreso dinámico de la sopa (sin romper tu barra) -->
+      <span id="ws-progress" class="badge">Progreso: 0%</span>
     </div>
   </div>
 
+  <!-- Contenido de la sopa de letras integrado -->
+  <div class="ws-container">
+    <!-- Título y meta compactos (sin duplicar headers grandes) -->
+    <div class="ws-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+      <h1 style="margin:0;font-size:20px;color:#23325a;">Etapa 1 — Sopa de Letras</h1>
+      <button id="ws-reset" class="btn btn-outline">Reiniciar</button>
+    </div>
+
+    <main class="ws-main">
+      <div id="ws-board" class="ws-board" aria-label="Sopa de letras"></div>
+
+      <aside class="ws-sidebar">
+        <h2 style="margin:6px 0 8px;">Palabras</h2>
+        <ul id="ws-words"></ul>
+        <div class="ws-legend" style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+          <div><span class="dot dot1"></span>Jugador A</div>
+          <div><span class="dot dot2"></span>Jugador B</div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <!-- Modal de etapa completada -->
+  <div id="ws-complete" class="ws-complete" hidden>
+    <div>
+      <h2>¡Etapa completada! 🎉</h2>
+      <p>Excelente trabajo en equipo. Pueden avanzar a la siguiente etapa.</p>
+      <!-- Mantengo tu navegación existente -->
+      <a href="{% url 'etapa2' %}" class="ws-button">Ir a la Etapa 2 →</a>
+    </div>
+  </div>
+
+  <!-- Tus acciones de navegación existentes (permanezco fiel a tu estructura) -->
   <div class="nav-actions">
     <a class="btn btn-primary" href="{% url 'etapa2' %}">Avanzar →</a>
   </div>
 
+  <!-- CSRF para fetch -->
+  <script>
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    window.CSRF_TOKEN = getCookie('csrftoken');
+  </script>
+
+  <!-- JS de la sopa de letras -->
+  <script src="{% static 'etapasJuego/js/wordsearch.js' %}"></script>
 </body>
 </html>

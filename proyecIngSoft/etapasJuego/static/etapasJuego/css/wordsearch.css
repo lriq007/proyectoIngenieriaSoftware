@@ -1,0 +1,27 @@
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, sans-serif; margin: 0; color: #1f2937; }
+.ws-header { display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#0ea5e9; color:white; }
+.ws-meta button { background:white; color:#0ea5e9; border:none; padding:6px 10px; border-radius:8px; cursor:pointer; }
+
+.ws-main { display:grid; grid-template-columns: 1fr 260px; gap:16px; padding:16px; }
+.ws-board { display:grid; gap:6px; touch-action:none; user-select:none; }
+.ws-cell {
+  width:42px; height:42px; display:flex; align-items:center; justify-content:center;
+  border-radius:8px; background:#f3f4f6; font-weight:700; font-size:18px;
+}
+.ws-cell.locked { outline:2px solid #9ca3af; opacity:0.8; }
+.ws-cell.found { background:#bbf7d0; outline:2px solid #10b981; color:#064e3b; }
+
+.ws-sidebar h2 { margin:6px 0 8px; }
+#ws-words { list-style:none; padding:0; margin:0; display:grid; gap:6px; }
+#ws-words li { padding:6px 8px; border-radius:8px; background:#eef2ff; color:#3730a3; }
+#ws-words li.found { text-decoration: line-through; opacity:0.6; }
+
+.ws-legend { margin-top:10px; display:flex; gap:10px; align-items:center; }
+.dot { display:inline-block; width:14px; height:14px; border-radius:50%; margin-right:6px; vertical-align:middle; }
+.dot1 { background:#fb7185; } /* rojo suave */
+.dot2 { background:#60a5fa; } /* azul suave */
+
+.ws-complete { position:fixed; inset:0; display:grid; place-items:center; background:rgba(0,0,0,.4); }
+.ws-complete > * { background:white; padding:24px; border-radius:16px; text-align:center; }
+.ws-button { display:inline-block; margin-top:10px; background:#0ea5e9; color:white; padding:8px 14px; border-radius:10px; text-decoration:none; }
+.ws-complete[hidden] { display: none !important; }
