@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel del Estudiante - Misión Emprende</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'login/css/home.css' %}">
+</head>
+<body class="home-estudiante-body">
+    <div class="home-estudiante-container">
+        <div class="home-estudiante-header">
+            <div class="home-estudiante-welcome">
+                <h1>¡Bienvenidos a Misión Emprende!</h1>
+                <p>El juego está por comenzar</p>
+            </div>
+        </div>
+
+        <div class="home-estudiante-video-container">
+            <div class="home-estudiante-video-wrapper">
+                <video controls width="100%">
+                    <source src="{% static 'videos/bienvenida.mp4' %}" type="video/mp4">
+                </video>
+            </div>
+        </div>
+
+        <div class="home-estudiante-buttons">
+            <a href="http://127.0.0.1:8000/etapasJuego/etapa/1/" class="btn-home btn-continue">
+                ▶ Continuar
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.btn-home');
+            
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            const logoutBtn = document.querySelector('.btn-logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    if (!confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

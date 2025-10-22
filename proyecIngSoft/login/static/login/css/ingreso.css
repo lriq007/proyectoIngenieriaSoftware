@@ -1,0 +1,116 @@
+.felicitaciones-container {
+    text-align: center;
+    padding: 40px 20px;
+}
+        
+.felicitaciones-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+}
+        
+.grupo-asignado {
+    background: linear-gradient(135deg, #e8c116 0%, #c68c3b 100%);
+    color: #000000;
+    padding: 5px;
+    border-radius: 15px;
+    margin: 30px auto;
+    max-width: 300px;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+        
+.info-estudiante {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px auto;
+    max-width: 400px;
+    backdrop-filter: blur(10px);
+}
+
+.home-estudiante-body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #06165f 0%, #1d4b99 100%);
+    min-height: 100vh;
+    padding: 20px;
+    margin: 0;
+}
+
+.home-estudiante-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-estudiante-welcome {
+    width: 100%;
+    text-align: center;
+}
+
+.home-estudiante-welcome h1 {
+    background: linear-gradient(135deg, #e8c116 0%, #c68c3b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.home-estudiante-welcome h2 {
+    color: white;
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+.mensaje-ingreso p {
+    color: white;
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+.lista-compañeros {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 25px;
+    border-radius: 15px;
+    margin: 25px auto;
+    max-width: 500px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.lista-compañeros h3 {
+    color: white;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.3em;
+}
+
+.integrantes-lista {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.integrantes-lista li {
+    background: rgba(255, 255, 255, 0.9);
+    margin: 8px 0;
+    padding: 12px 15px;
+    border-radius: 8px;
+    color: #333;
+    font-size: 0.95em;
+    border-left: 4px solid #e8c116;
+}
+
+.integrantes-lista li:first-child {
+    border-left-color: #00b894;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.integrantes-lista li em {
+    color: #666;
+    font-size: 0.85em;
+    font-style: italic;
+}
