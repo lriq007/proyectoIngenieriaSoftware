@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Felicidades! - Misión Emprende</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'login/css/ingreso.css' %}">
+</head>
+
+<body class="home-estudiante-body">
+    <div class="home-estudiante-container">
+        <div class="felicitaciones-container">
+            <div class="felicitaciones-icon">🎉</div>
+            <div class="home-estudiante-welcome">
+            <h1>¡Felicidades {{ estudiante.nombre_apellido }}!</h1>
+            <h2>Has ingresado exitosamente.</h2>
+            </div>
+            
+            <div class="grupo-asignado">
+                <h3>Grupo {{ estudiante.grupo }}</h3>
+            </div>
+
+            <div class="lista-compañeros">
+                <h3>Integrantes del grupo {{ estudiante.grupo }}:</h3>
+                <ul class="integrantes-lista">
+                    <li><strong>{{ estudiante.nombre_apellido }}</strong> - {{ estudiante.carrera }} <em>(Tú)</em></li>
+                    {% for compañero in compañeros %}
+                    <li><strong>{{ compañero.nombre_apellido }}</strong> - {{ compañero.carrera }}</li>
+                    {% empty %}
+                    <li>Esperando más integrantes...</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="mensaje-ingreso">
+                <p>Reúnase con su grupo en la tableta {{ estudiante.grupo }}</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

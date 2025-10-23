@@ -1,0 +1,175 @@
+.home-estudiante-body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #06165f 0%, #1d4b99 100%);
+    min-height: 100vh;
+    padding: 20px;
+    margin: 0;
+}
+
+.home-estudiante-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.home-estudiante-header {
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 30px;
+    gap: 15px;
+    text-align: center;
+    width: 100%;
+}
+
+.home-estudiante-welcome {
+    width: 100%;
+    text-align: center;
+}
+
+.home-estudiante-welcome h1 {
+    background: linear-gradient(135deg, #e8c116 0%, #c68c3b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.home-estudiante-welcome p {
+    color: white;
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+.home-estudiante-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.btn-home {
+    margin: 10px auto;
+    display: inline-block;
+    padding: 15px 30px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    text-align: center;
+    min-width: 140px;
+    max-width: 300px;
+    border: 2px solid #c68c3b transparent;
+    border-radius: 30px;
+    text-decoration: none;
+}
+
+.btn-continue {
+    background: linear-gradient(135deg, #e8c116 0%, #c68c3b 100%);
+    color: #000000;
+}
+
+.btn-home:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.btn-home:active {
+    transform: translateY(-1px);
+}
+
+.home-estudiante-video-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+.home-estudiante-video-wrapper {
+    width: 100%;
+    max-width: 800px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.home-estudiante-footer {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+    color: white;
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .home-estudiante-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .home-estudiante-welcome h1 {
+        font-size: 2em;
+    }
+
+    .home-estudiante-video-placeholder {
+        height: 300px;
+        font-size: 1.2em;
+    }
+
+    .home-estudiante-video-icon {
+        font-size: 2.5em;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-estudiante-body {
+        padding: 15px;
+    }
+
+    .home-estudiante-welcome h1 {
+        font-size: 1.8em;
+    }
+
+    .home-estudiante-video-placeholder {
+        height: 250px;
+        font-size: 1.1em;
+    }
+
+    .home-estudiante-video-icon {
+        font-size: 2em;
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.home-estudiante-welcome,
+.home-estudiante-video-wrapper,
+.home-estudiante-buttons {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.home-estudiante-video-wrapper {
+    animation-delay: 0.2s;
+}
+
+.home-estudiante-buttons {
+    animation-delay: 0.4s;
+}
