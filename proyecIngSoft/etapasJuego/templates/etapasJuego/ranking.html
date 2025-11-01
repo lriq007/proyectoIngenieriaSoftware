@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados Finales - Misión Emprende</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'etapasJuego/css/final.css' %}">
+</head>
+
+<body class="home-estudiante-body">
+    <div class="home-estudiante-container">
+        <div class="ranking-container">
+            <div class="ranking-title">
+                <h1>Resultados Finales</h1>
+                <p>Clasificación de los equipos</p>
+            </div>
+            
+            <table class="tabla-ranking">
+                <thead>
+                    <tr>
+                        <th>Posición</th>
+                        <th>Grupo</th>
+                        <th>Tokens</th>
+                        <th>Puntos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="posicion-1">1°</td>
+                        <td class="grupo-destacado">Grupo C</td>
+                        <td>2</td>
+                        <td>850</td>
+                    </tr>
+                    <tr>
+                        <td class="posicion-2">2°</td>
+                        <td>Grupo A</td>
+                        <td>1</td>
+                        <td>780</td>
+                    </tr>
+                    <tr>
+                        <td class="posicion-3">3°</td>
+                        <td>Grupo B</td>
+                        <td>1</td>
+                        <td>650</td>
+                    </tr>
+                    <tr>
+                        <td class="posicion-restante">4°</td>
+                        <td>Grupo D</td>
+                        <td>0</td>
+                        <td>520</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="home-estudiante-buttons" style="margin-top: 40px;">
+                <a href="{% url 'qr' %}" class="btn-home btn-continue">
+                    Avanzar
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

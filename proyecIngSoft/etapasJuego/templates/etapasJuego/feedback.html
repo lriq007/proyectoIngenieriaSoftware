@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - Misión Emprende</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'etapasJuego/css/final.css' %}">
+</head>
+
+<body class="home-estudiante-body">
+    <div class="home-estudiante-container">
+        <div class="feedback-container">
+            <div class="feedback-title">
+                <h1>¡Danos tu opinión!</h1>
+                <p style="color: white; opacity: 0.8;">Tu feedback nos ayuda a mejorar</p>
+            </div>
+            
+            <div class="stars-container">
+                <div class="stars-rating" id="starsRating">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+                
+                <div class="rating-text" id="ratingText">
+                    Haz clic en las estrellas para calificar
+                </div>
+            </div>
+            
+            <form id="feedbackForm">
+                <div class="comment-section">
+                    <label class="comment-label" for="comment">
+                        Escribe tu opinión:
+                    </label>
+                    <textarea 
+                        id="comment" 
+                        class="comment-textarea" 
+                        placeholder="Recuerda ser respetuoso..."
+                    ></textarea>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                    Enviar Opinión
+                </button>
+            </form>
+            
+            <div class="thank-you-message" id="thankYouMessage">
+                ¡Gracias por tu feedback! 🎉
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const stars = document.querySelectorAll('.star');
+            const ratingText = document.getElementById('ratingText');
+            const submitBtn = document.getElementById('submitBtn');
+            const feedbackForm = document.getElementById('feedbackForm');
+            const thankYouMessage = document.getElementById('thankYouMessage');
+            
+            let currentRating = 0;
+            
+            const ratingMessages = {
+                1: "¿Por qué no te gustó?",
+                2: "¿Por qué no te gustó?",
+                3: "¿Cuál es tu opinión?",
+                4: "¿Por qué te gustó?",
+                5: "¿Por qué te gustó?"
+            };
+            
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    currentRating = rating;
+
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                    
+                    ratingText.textContent = ratingMessages[rating];
+                    
+                    submitBtn.disabled = false;
+                });
+                
+                star.addEventListener('mouseenter', function() {
+                    const rating = parseInt(this.getAttribute('data-rating'));
+                    
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.style.color = '#FFD700';
+                        } else {
+                            s.style.color = '#ddd';
+                        }
+                    });
+                });
+                
+                star.addEventListener('mouseleave', function() {
+                    stars.forEach((s, index) => {
+                        if (currentRating === 0) {
+                            s.style.color = '#ddd';
+                        } else {
+                            s.style.color = index < currentRating ? '#FFD700' : '#ddd';
+                        }
+                    });
+                });
+            });
+            
+            feedbackForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const comment = document.getElementById('comment').value;
+                
+                console.log('Calificación:', currentRating);
+                console.log('Comentario:', comment);
+
+                feedbackForm.style.display = 'none';
+                thankYouMessage.style.display = 'block';
+            });
+        });
+    </script>
+</body>
+</html>

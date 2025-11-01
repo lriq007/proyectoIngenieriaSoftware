@@ -199,3 +199,19 @@ def etapa3(request):
 
 def etapa4(request):
     return render(request, "etapasJuego/etapa4.html")
+
+def ganador(request):
+    return render(request, "etapasJuego/ganador.html")
+
+def ranking(request):
+    return render(request, "etapasJuego/ranking.html")
+
+def qr(request):
+    return render(request, 'etapasJuego/qr.html')
+
+def feedback(request):
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+        return redirect('feedback_thank_you')
+    return render(request, 'etapasJuego/feedback.html')

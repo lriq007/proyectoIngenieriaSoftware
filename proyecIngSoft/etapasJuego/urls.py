@@ -13,4 +13,8 @@ urlpatterns = [
     path("etapa/2/", views.etapa2, name="etapa2"),
     path("etapa/3/", views.etapa3, name="etapa3"),
     path("etapa/4/", views.etapa4, name="etapa4"),
+    path("ganador/", views.ganador, name="ganador"),
+    path("ranking/", views.ranking, name="ranking"),
+    path("qr/", views.qr, name="qr"),
+    path("feedback/", views.feedback, name="feedback"),
 ]
