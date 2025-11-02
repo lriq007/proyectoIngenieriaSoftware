@@ -49,3 +49,42 @@ class TeamGameSession(models.Model):
             if set(self.found_words) == set(self.words) and not self.ended_at:
                 self.ended_at = timezone.now()
             self.save()
+
+
+class Desafio(models.Model):
+    numero = models.PositiveSmallIntegerField(default=1)
+    titulo = models.CharField(max_length=150)
+
+    # Descripciones
+    historia = models.TextField(help_text="Texto narrativo breve del desafío o problemática.")
+    descripcion_larga = models.TextField(
+        blank=True, null=True,
+        help_text="Descripción más extensa que se mostrará en el modal."
+    )
+
+    # Personaje e imagen
+    personaje = models.CharField(max_length=100)
+    imagen_personaje = models.ImageField(
+        upload_to="desafios/", blank=True, null=True,
+        help_text="Imagen del personaje asociado."
+    )
+
+    # Video (archivo o URL)
+    video_file = models.FileField(
+        upload_to="desafios/videos/", blank=True, null=True,
+        help_text="Archivo de video del desafío (loop)."
+    )
+    video_url = models.URLField(
+        blank=True, null=True,
+        help_text="Enlace directo a un video externo (YouTube, CDN o MP4)."
+    )
+
+    duracion_min = models.PositiveSmallIntegerField(default=3)
+    etapa = models.CharField(max_length=50, blank=True, null=True)
+    activo = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["numero"]
+
+    def __str__(self):
+        return f"{self.numero}. {self.titulo}"

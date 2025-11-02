@@ -1,0 +1,365 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Etapa 2.1 — Mapa de empatía</title>
+
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/theme_login_port.css' %}">
+
+  <style>
+    /* Espacio para no tapar con la barra superior */
+    body.theme-login { padding-top: 72px; }
+
+    .ws-container {
+      max-width: 1200px;
+      margin: 88px auto 120px;
+      padding: 0 24px;
+      display: grid;
+      gap: 36px;
+      justify-items: center;
+    }
+
+    .stage-title {
+      margin: 0;
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #FFD24A;
+      -webkit-text-stroke: 1px #000;
+      text-shadow: 0 1px 0 #000, 0 -1px 0 #000, 1px 0 0 #000, -1px 0 0 #000;
+      text-align: center;
+    }
+
+    .stage-wrapper {
+      width: 100%;
+      display: grid;
+      gap: 48px;
+      justify-items: center;
+    }
+
+    .challenge-summary {
+      background: linear-gradient(180deg,#333333 0%,#3C3C3C 55%,#474747 100%);
+      border: 2px solid rgba(255,255,255,0.12);
+      border-radius: 22px;
+      padding: 26px 42px;
+      color: #fefefe;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      max-width: 980px;
+      min-height: 220px;
+      box-shadow: 0 22px 40px rgba(0,0,0,0.32), 0 0 0 1px rgba(255,255,255,0.05) inset;
+    }
+
+    .challenge-summary .summary-copy {
+      flex: 1;
+      display: grid;
+      gap: 14px;
+      text-align: left;
+    }
+
+    .challenge-summary .summary-copy .badge {
+      justify-self: flex-start;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: #FFD24A;
+      color: #071022;
+      font-weight: 700;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .challenge-summary .summary-figure {
+      width: min(320px, 32vw);
+      flex-shrink: 0;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 20px 38px rgba(255,210,74,0.28);
+      background: rgba(255, 255, 255, 0.08);
+      border: 3px solid #FFD24A;
+    }
+
+    .challenge-summary .summary-figure img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .bubble-section {
+      display: grid;
+      gap: 32px;
+      justify-items: center;
+      width: 100%;
+    }
+
+    /* ===========================
+       Mapa centrado en pantalla
+       =========================== */
+    .bubble-map {
+      position: relative;
+      width: min(900px, 100%);
+      height: 820px;
+      margin: 0 auto;
+      isolation: isolate; /* evita superposición con otros bloques */
+    }
+
+    .bubble {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px)));
+      width: 210px;
+      height: 210px;
+      border-radius: 50%;
+      border: 3px solid rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      font-weight: 600;
+      transition: transform .28s cubic-bezier(0.4,0,0.2,1),
+                  box-shadow .28s cubic-bezier(0.4,0,0.2,1),
+                  border-color .28s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    .bubble.central {
+      width: 280px;
+      height: 280px;
+      background: #FFD24A;
+      color: #000;
+      border: none;
+      box-shadow: 0 26px 40px rgba(0, 0, 0, 0.18);
+      font-size: 1.1rem;
+      letter-spacing: .04em;
+      transform: translate(-50%, -50%);
+    }
+
+    .bubble-question {
+      color: #fff;
+      box-shadow: 0 20px 28px rgba(0, 0, 0, 0.18);
+      cursor: pointer;
+    }
+
+    .bubble-question.pos-1 { background: #23325A; }
+    .bubble-question.pos-2 { background: #FF5FA2; color: #071022; }
+    .bubble-question.pos-3 { background: #00FFFF; color: #071022; }
+    .bubble-question.pos-4 { background: #23325A; }
+    .bubble-question.pos-5 { background: #FF5FA2; color: #071022; }
+
+    .bubble-question:hover {
+      transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) scale(1.06);
+    }
+
+    .bubble-question.is-active {
+      transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) scale(1.12);
+      border-color: #FFD24A;
+      z-index: 5;
+    }
+
+    .bubble-question.has-content {
+      border-color: #FF5FA2;
+    }
+
+    .bubble-editor {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      height: 100%;
+    }
+
+    .bubble-question.is-active .bubble-label { display: none; }
+    .bubble-question.is-active .bubble-editor { display: flex; }
+
+    .bubble-editor h3 {
+      margin: 0;
+      font-size: 1rem;
+      color: #000;
+    }
+
+    .bubble-editor textarea {
+      flex: 1;
+      border: 2px solid rgba(0, 0, 0, 0.18);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-family: inherit;
+      resize: none;
+    }
+
+    .bubble-editor textarea:focus {
+      border-color: #23325A;
+      outline: none;
+    }
+
+    .bubble-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .bubble-feedback {
+      min-height: 22px;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+
+    .bubble-feedback.success { color: #2E7D32; }
+    .bubble-feedback.error { color: #C62828; }
+
+    @media (max-width: 720px) {
+      .challenge-summary {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+        padding: 28px;
+      }
+      .challenge-summary .summary-copy {
+        text-align: center;
+      }
+      .challenge-summary .summary-copy .badge {
+        justify-self: center;
+      }
+      .challenge-summary .summary-figure {
+        width: min(320px, 70vw);
+      }
+    }
+
+    #btnSaveBubble {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-width: 220px;
+      padding: 18px 48px;
+      border-radius: 999px;
+      border: 3px solid rgba(0,0,0,0.22);
+      background: linear-gradient(135deg, #FFD24A 10%, #FFF7D4 90%);
+      color: #071022;
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 18px 36px rgba(0,0,0,0.22);
+      transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+    }
+    #btnSaveBubble:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 26px 42px rgba(0,0,0,0.24);
+      filter: brightness(1.02);
+    }
+    #btnSaveBubble:active {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 28px rgba(0,0,0,0.24);
+    }
+
+    /* Posiciones relativas desde el centro */
+    .pos-1 { --tx: 0px;    --ty: -300px; }
+    .pos-2 { --tx: 300px;  --ty: -56px; }
+    .pos-3 { --tx: 179px;  --ty: 246px; }
+    .pos-4 { --tx: -179px; --ty: 246px; }
+    .pos-5 { --tx: -300px; --ty: -45px; }
+
+    @media (max-width: 860px) {
+      .bubble-map {
+        width: 100%;
+        height: auto;
+        display: grid;
+        gap: 24px;
+      }
+      .bubble,
+      .bubble.central {
+        position: relative;
+        transform: none !important;
+        width: 100%;
+        height: auto;
+        border-radius: 20px;
+      }
+      .bubble-editor { display: block; }
+      .bubble-editor textarea { min-height: 140px; }
+    }
+  </style>
+</head>
+
+<body class="theme-login">
+  <div class="app-noise"></div>
+
+  <!-- Barra de progreso -->
+  <div id="progress-bar">
+    <div style="max-width:640px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:0 12px;">
+      <span style="font-weight:700;letter-spacing:0.5px;">Etapa 2 — Mapa de empatía</span>
+      <div style="flex:1;height:10px;background:rgb(35,50,90);border-radius:6px;overflow:hidden;">
+        <div style="width:60%;height:100%;background:linear-gradient(90deg,#FFD24A,#FF5FA2);transition:width .4s;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenido -->
+  <div class="ws-container">
+    <div class="stage-wrapper">
+      <h1 class="stage-title">Mapa de Empatía</h1>
+
+      <div class="challenge-summary">
+        <div class="summary-copy">
+          <span class="badge">Desafío activo</span>
+          <h2>{{ desafio.titulo }}</h2>
+        </div>
+        {% if desafio_persona_image %}
+          <figure class="summary-figure">
+            {% if desafio_persona_image|slice:'0:8' == '/static' %}
+              <img src="{{ desafio_persona_image }}" alt="Ilustración del desafío seleccionado">
+            {% else %}
+              <img src="{% static desafio_persona_image %}" alt="Ilustración del desafío seleccionado">
+            {% endif %}
+          </figure>
+        {% endif %}
+      </div>
+
+      <section class="bubble-section">
+        <div id="bubbleMap" class="bubble-map" data-desafio="{{ desafio.numero }}" role="group" aria-label="Mapa de empatía">
+          <div class="bubble central" aria-hidden="true">
+            <span>{{ desafio.titulo }}</span>
+          </div>
+          {% for item in bubble_questions %}
+            <div class="bubble bubble-question pos-{{ forloop.counter }}{% if item.answer %} has-content{% endif %}"
+                 data-key="{{ item.key }}" data-label="{{ item.label }}" role="button" tabindex="0">
+              <span class="bubble-label">{{ item.label }}</span>
+              <div class="bubble-editor">
+                <h3>{{ item.label }}</h3>
+                <textarea name="{{ item.key }}" placeholder="Escribe aquí...">{% if item.answer %}{{ item.answer }}{% endif %}</textarea>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="bubble-actions">
+          <button type="button" id="btnSaveBubble" class="btn btn-primary">Guardar respuestas</button>
+          <p id="bubbleFeedback" class="bubble-feedback" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Flechas de navegación -->
+  <a href="{% url 'etapa2' %}" class="btn-arrow btn-arrow-left" title="Regresar a la etapa 2"><span class="arrow-icon">➜</span></a>
+  <a href="{% url 'etapa3' %}" class="btn-arrow btn-arrow-right" title="Avanzar a la etapa 3"><span class="arrow-icon">➜</span></a>
+
+  <script>
+    window.bubblePayload = {
+      numero: {{ desafio.numero|default:'null' }},
+      saveUrl: "{% url 'etapa2_guardar_mapa' %}"
+    };
+  </script>
+  <script src="{% static 'etapasJuego/js/bubble-map.js' %}"></script>
+  {% include 'etapasJuego/mascota.html' %}
+</body>
+</html>

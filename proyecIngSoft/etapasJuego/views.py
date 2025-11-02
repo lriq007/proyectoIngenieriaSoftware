@@ -6,6 +6,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from .models import TeamGameSession
 from .wordsearch.engine import create_soup, validate_selection
+from django.urls import reverse
+from .models import Desafio
+from django.db import connection
+from django.templatetags.static import static
+
 
 
 def etapas_index(request):
@@ -191,11 +196,270 @@ def api_select_commit(request):
 
 ################################################################
 
+### ETAPA 2: Desafíos ###
+
+# ---------- Helpers de presentación ----------
+def _desc_para_modal(d):
+    """Usa descripcion_larga si existe; si no, historia; si no, resumen."""
+    return (
+        getattr(d, "descripcion_larga", "") 
+        or getattr(d, "historia", "") 
+        or getattr(d, "resumen", "") 
+        or (d.get("historia", "") if isinstance(d, dict) else "")
+    )
+
+def _video_src(d):
+    """
+    Orden de prioridad:
+      1) archivo subido (d.video_file.url)
+      2) URL directa (d.video_url)
+      3) fallback estático: /static/etapasJuego/videos/desafio<N>.mp4
+    """
+    vf = getattr(d, "video_file", None)
+    if vf:
+        try:
+            return vf.url
+        except Exception:
+            pass
+    vu = getattr(d, "video_url", "") or (d.get("video_url", "") if isinstance(d, dict) else "")
+    if vu:
+        return vu
+    num = getattr(d, "numero", None) or (d.get("numero") if isinstance(d, dict) else None)
+    if num:
+        return static(f"etapasJuego/videos/desafio{num}.mp4")
+    return ""
+
+def _imagen_url(d):
+    """Resuelve imagen_personaje.url o la clave 'imagen' del fallback."""
+    ip = getattr(d, "imagen_personaje", None)
+    if ip:
+        try:
+            return ip.url
+        except Exception:
+            pass
+    return (d.get("imagen", "") if isinstance(d, dict) else getattr(d, "imagen", ""))
+
+
+FALLBACK_DESAFIOS = [
+    {
+        "numero": 1,
+        "titulo": "Tecnología adultos mayores",
+        "historia": "Mejorar autonomía y conexión social.",
+        "personaje": "Don Miguel",
+        "imagen": "/static/etapasJuego/img/hombre-con-los-brazos-cruzados.png",
+        "duracion_min": 3,
+        "video_url": "/static/etapasJuego/videos/desafio1.mp4",
+    },
+    {
+        "numero": 2,
+        "titulo": "Fastfashion y zonas de desechos",
+        "historia": "Impacto ambiental y social del consumo de ropa.",
+        "personaje": "Ana",
+        "imagen": "/static/etapasJuego/img/apuesto-hombre-apuntando-hacia-atras.png",
+        "duracion_min": 3,
+        "video_url": "/static/etapasJuego/videos/desafio2.mp4",
+    },
+    {
+        "numero": 3,
+        "titulo": "Sustentabilidad del agua en la agricultura",
+        "historia": "Optimizar uso de agua y productividad.",
+        "personaje": "Pedro",
+        "imagen": "/static/etapasJuego/img/primer-plano-de-hombre-feliz-con-camiseta-blanca.png",
+        "duracion_min": 3,
+        "video_url": "/static/etapasJuego/videos/desafio3.mp4",
+    },
+]
+
+
+BUBBLE_QUESTIONS = [
+    {"key": "likes_dislikes", "label": "¿Qué le gusta y qué no le gusta?"},
+    {"key": "feelings", "label": "¿Qué siente respecto a lo que le está pasando?"},
+    {"key": "obstacles", "label": "¿Qué obstáculos está enfrentando?"},
+    {"key": "others_say", "label": "¿Qué le dicen los demás?"},
+    {"key": "hobbies", "label": "¿Cuáles son sus hobbies?"},
+]
+
+
+def _build_desafios_vm():
+    """Genera la lista visual de desafíos desde BD o fallback."""
+    desafios_vm = []
+
+    try:
+        if "etapasJuego_desafio" in connection.introspection.table_names():
+            qs = Desafio.objects.filter(activo=True).order_by("numero")[:3]
+            for d in qs:
+                desafios_vm.append({
+                    "numero":       d.numero,
+                    "titulo":       d.titulo,
+                    "descripcion":  _desc_para_modal(d),
+                    "imagen":       _imagen_url(d),
+                    "video_src":    _video_src(d),
+                    "personaje":    getattr(d, "personaje", ""),
+                    "duracion_min": getattr(d, "duracion_min", None),
+                })
+    except Exception:
+        desafios_vm = []
+
+    if not desafios_vm:
+        for d in FALLBACK_DESAFIOS:
+            desafios_vm.append({
+                "numero":       d["numero"],
+                "titulo":       d["titulo"],
+                "descripcion":  _desc_para_modal(d),
+                "imagen":       _imagen_url(d),
+                "video_src":    _video_src(d),
+                "personaje":    d.get("personaje", ""),
+                "duracion_min": d.get("duracion_min"),
+            })
+
+    return desafios_vm
+
+# ---------- Vista Etapa 2 (reemplazo) ----------
 def etapa2(request):
-    return render(request, "etapasJuego/etapa2.html")
+    """
+    Entrega al template una lista homogénea 'desafios' con:
+    numero, titulo, descripcion, imagen, video_src, personaje, duracion_min.
+    Funciona con BD real o con fallback (mock) editable.
+    """
+    desafios_vm = _build_desafios_vm()
+    return render(request, "etapasJuego/etapa2.html", {"desafios": desafios_vm})
+
+
+####################################################
 
 def etapa3(request):
     return render(request, "etapasJuego/etapa3.html")
 
 def etapa4(request):
-    return render(request, "etapasJuego/etapa4.html")
+    mapas = request.session.get("etapa2_mapas", {})
+    desafio_numero = request.session.get("etapa2_desafio_numero")
+
+    pitch_payload = {
+        "desafio_numero": desafio_numero,
+        "bubble_map": mapas.get(str(desafio_numero), {}),
+    }
+
+    pitch_tips = [
+        {
+            "title": "Idea clave pendiente",
+            "content": "Aquí mostraremos una recomendación generada por OpenAI con base en el mapa de empatía del equipo.",
+        },
+        {
+            "title": "Estructura sugerida",
+            "content": "Una vez integrada la API, este espacio detallará cómo ordenar el pitch según los hallazgos del usuario.",
+        },
+        {
+            "title": "Llamado a la acción",
+            "content": "Este bloque resaltará la acción final que el pitch debe provocar, ajustada automáticamente con IA.",
+        },
+    ]
+
+    return render(
+        request,
+        "etapasJuego/etapa4.html",
+        {
+            "pitch_tips": pitch_tips,
+            "pitch_payload": pitch_payload,
+        },
+    )
+
+
+@require_POST
+def etapa2_seleccionar(request):
+    """Guarda el desafío seleccionado y redirige a la vista de detalle."""
+    numero = request.POST.get("desafio_numero")
+
+    try:
+        numero_int = int(numero)
+    except (TypeError, ValueError):
+        return redirect("etapa2")
+
+    desafios = _build_desafios_vm()
+    seleccionado = next((d for d in desafios if d["numero"] == numero_int), None)
+    if not seleccionado:
+        return redirect("etapa2")
+
+    request.session["etapa2_desafio_numero"] = numero_int
+    request.session.modified = True
+
+    return redirect("etapa2_1")
+
+
+def etapa2_1(request):
+    """Pantalla placeholder para el bubble map, muestra el desafío elegido."""
+    numero = request.session.get("etapa2_desafio_numero")
+    if numero is None:
+        return redirect("etapa2")
+
+    desafios = _build_desafios_vm()
+    desafio = next((d for d in desafios if d["numero"] == numero), None)
+
+    if desafio is None:
+        request.session.pop("etapa2_desafio_numero", None)
+        request.session.modified = True
+        return redirect("etapa2")
+
+    mapas = request.session.get("etapa2_mapas", {})
+    respuestas = mapas.get(str(numero), {})
+    bubble_items = [
+        {
+            "key": q["key"],
+            "label": q["label"],
+            "answer": respuestas.get(q["key"], ""),
+        }
+        for q in BUBBLE_QUESTIONS
+    ]
+
+    persona_map = {
+        1: "etapasJuego/img/persona1.png",
+        2: "etapasJuego/img/persona2.png",
+        3: "etapasJuego/img/persona3.png",
+    }
+    desafio_image = persona_map.get(desafio.get("numero"))
+    if not desafio_image:
+        desafio_image = desafio.get("imagen") or desafio.get("imagen_personaje")
+
+    return render(
+        request,
+        "etapasJuego/etapa2_1.html",
+        {
+            "desafio": desafio,
+            "bubble_questions": bubble_items,
+            "bubble_responses": respuestas,
+            "desafio_persona_image": desafio_image,
+        },
+    )
+
+
+@require_POST
+def etapa2_guardar_mapa(request):
+    """Guarda temporalmente en sesión las respuestas del bubble map."""
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except (ValueError, TypeError):
+        return JsonResponse({"ok": False, "error": "invalid_json"}, status=400)
+
+    numero = payload.get("desafio_numero")
+    respuestas = payload.get("respuestas", {})
+
+    try:
+        numero_int = int(numero)
+    except (TypeError, ValueError):
+        return JsonResponse({"ok": False, "error": "invalid_challenge"}, status=400)
+
+    if not isinstance(respuestas, dict):
+        return JsonResponse({"ok": False, "error": "invalid_payload"}, status=400)
+
+    # Normaliza claves válidas.
+    valid_keys = {q["key"] for q in BUBBLE_QUESTIONS}
+    respuestas_filtradas = {}
+    for key, value in respuestas.items():
+        if key in valid_keys and isinstance(value, str):
+            respuestas_filtradas[key] = value.strip()
+
+    mapas = request.session.get("etapa2_mapas", {})
+    mapas[str(numero_int)] = respuestas_filtradas
+    request.session["etapa2_mapas"] = mapas
+    request.session.modified = True
+
+    return JsonResponse({"ok": True})

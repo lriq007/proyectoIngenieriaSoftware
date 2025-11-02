@@ -1,67 +1,172 @@
-*{box-sizing:border-box;margin:0;padding:0}
-img{max-width:100%;display:block}
+/* ===========================
+   Variables (paleta del juego)
+   =========================== */
 :root{
-  --bg:#0B1B3A;
-  --accent-yellow:#FFD24A;
-  --accent-pink:#FF5FA2;
-  --accent-cyan:#7ED3F7;
-  --text:#FFFFFF;
-  --muted:#C9D1E3;
-  --focus:#FFF8E1;
-  --font:"Inter",system-ui,Arial,sans-serif;
-  --radius:14px;
-  --space-1:8px;
-  --space-2:12px;
-  --space-3:16px;
-  --space-4:24px;
-  --space-5:32px;
-  --w-content:1200px;
+  --blue:   #23325A;
+  --yellow: #FFD24A;
+  --pink:   #FF5FA2;
+  --shadow: rgba(0,0,0,0.25);
 }
-body{
-  font-family:var(--font);
-  background:var(--bg);
-  color:var(--text);
-  line-height:1.5;
-  min-height:100vh;
+
+/* ===========================
+   Layout base + tipografía
+   =========================== */
+html, body {
+  margin: 0;
+  padding: 0;
 }
-.wrapper{
-  max-width:var(--w-content);
-  margin:0 auto;
-  padding: var(--space-5);
+
+body {
+  position: relative;
+  /* deja espacio para la barra fija superior usada en todas las etapas */
+  padding-top: 56px;
 }
-.header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:var(--space-3);
-  margin-bottom:var(--space-5);
+
+/* Fondo global con textura animada */
+.app-noise{
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background: linear-gradient(135deg,#06165f 0%,#1d4b99 100%);
 }
-.badge{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);color:var(--muted);font-size:12px}
-.badge-winner{background:var(--accent-yellow);color:#071022;border-radius:999px;padding:6px 10px;font-weight:700;font-size:13px}
-.grid{display:grid;gap:var(--space-4)}
-.grid-2{grid-template-columns: repeat(2,1fr)}
-.grid-3{grid-template-columns: repeat(3,1fr)}
-@media (max-width:900px){.grid-2,.grid-3{grid-template-columns:1fr}}
-.stack{display:flex;flex-direction:column;gap:var(--space-2)}
-/* Typography */
-h1{font-size:clamp(28px,2vw + 12px,44px);font-weight:800}
-h2{font-size:clamp(22px,1.3vw + 10px,28px);font-weight:700}
-p{color:var(--muted)}
-.hint{color:var(--muted);font-size:13px}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
-.section{margin-block:var(--space-5)}
-.center{display:grid;place-items:center}
-.hero{display:grid;gap:var(--space-3);max-width:720px;text-align:center}
-.card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:var(--space-4);backdrop-filter: blur(6px)}
-.card-muted{background:rgba(255,255,255,.03);border:1px dashed rgba(255,255,255,.15);opacity:.7;filter:saturate(.7)}
-.table{width:100%;border-collapse:collapse;font-size:14px}
-.table th,.table td{padding:12px 10px;border-bottom:1px solid rgba(255,255,255,.08)}
-.table-rubric th,.table-rubric td{padding:10px 8px;text-align:center}
-.header a{color:var(--text);text-decoration:none;opacity:.85}
-.header a:focus-visible{outline:2px solid var(--accent-yellow);outline-offset:2px}
-.header a:hover{opacity:1}
-.timer{padding:8px 12px;border-radius:10px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);font-variant-numeric:tabular-nums}
-.pill{display:inline-block;padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.08);font-weight:600}
-/* Gate banner and lock state */
-.gate-banner{background:rgba(255,210,74,.15);border:1px solid rgba(255,210,74,.35);color:var(--accent-yellow);padding:10px 14px;border-radius:10px;margin-bottom:16px;text-align:center;font-weight:600;letter-spacing:1px;}
-.is-locked{opacity:.55;filter:saturate(.6);pointer-events:none;}
+
+.app-noise::before{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iMTkuNSIgbnVtT2N0YXZlcz0iMTAiIHJlc3VsdD0idHVyYnVsZW5jZSIvPjxmZUNvbXBvc2l0ZSBvcGVyYXRvcj0iaW4iIGluPSJ0dXJidWxlbmNlIiBpbjI9IlNvdXJjZUFscGhhIiByZXN1bHQ9ImNvbXBvc2l0ZSIvPjxmZUNvbG9yTWF0cml4IGluPSJjb21wb3NpdGUiIHR5cGU9Imx1bWluYW5jZVRvQWxwaGEiLz48ZmVCbGVuZCBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJjb21wb3NpdGUiIG1vZGU9ImNvbG9yLWJ1cm4iLz48L2ZpbHRlcj48L2RlZnM+PGcgZmlsdGVyPSJ1cmwoJyNhJykiPjxwYXRoIGZpbGw9IiMyNmIiIGQ9Ik0wIDBoMTAwdjEwMEgweiIvPjxwYXRoIGQ9Ik0wIDB2MTAwaDEwMFYwWiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2U9IiM0OGYiIGZpbGw9IiMwMDAwIi8+PHBhdGggZmlsbD0iIzQ4ZjUiIGQ9Ik01MCAwaDF2MTAwaC0xeiIvPjxwYXRoIGZpbGw9IiM0OGY1IiBkPSJNMCA1MGgxMDB2MUgweiIvPjwvZz48L3N2Zz4=");
+  mask: linear-gradient(#0004,#000);
+  opacity: .55;
+}
+
+/* Contenedor común */
+.ws-container {
+  max-width: 1000px;
+  margin: 88px auto 120px;
+  padding: 0 16px;
+}
+
+/* Encabezado visual sin recuadro */
+.ws-header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0;
+}
+
+/* Título grande con look “cómic” */
+.ws-title{
+  margin: 0;
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: .5px;
+  color: var(--yellow);
+  -webkit-text-stroke: 1px #000; /* navegadores basados en WebKit */
+  text-shadow:
+    0  1px 0 #000,
+    0 -1px 0 #000,
+    1px  0 0 #000,
+   -1px  0 0 #000;               /* fallback para otros motores */
+}
+
+/* ===========================
+   Barra de progreso fija (top)
+   Nota: si hoy la tienes inline, esto
+   te da el estilo global para un ID común.
+   =========================== */
+#progress-bar{
+  position: fixed;
+  top: 0; left: 0; width: 100%;
+  background: rgba(255,255,255,0.98);
+  padding: 0.5rem 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  z-index: 40;
+}
+
+/* Color de texto dentro de la barra */
+#progress-bar, 
+#progress-bar span{
+  color: var(--blue) !important;
+}
+
+/* Estructura sugerida (opcional) si usas clases en vez de inline:
+   <div id="progress-bar">
+     <div class="progress-wrap">
+       <span>Etapa X de N</span>
+       <div class="progress-track"><div class="progress-fill" style="width: 50%"></div></div>
+     </div>
+   </div>
+*/
+.progress-wrap{
+  max-width: 640px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 12px;
+}
+.progress-track{
+  flex: 1;
+  height: 10px;
+  background: var(--blue);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.progress-fill{
+  height: 100%;
+  background: linear-gradient(90deg, var(--yellow), var(--pink));
+  transition: width 0.4s ease;
+}
+
+/* ===========================
+   Botones de navegación (flechas)
+   =========================== */
+.btn-arrow{
+  --base-transform: none;         /* se usa para reflejar la flecha a la izquierda */
+  position: fixed;
+  bottom: 30px;
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background-color: var(--pink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  z-index: 100;
+  transform: var(--base-transform);
+  box-shadow: 0 4px 12px var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn-arrow:hover{
+  transform: var(--base-transform) translateY(-4px) scale(1.05);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+}
+.btn-arrow:active{
+  transform: var(--base-transform) translateY(0) scale(0.97);
+  box-shadow: none;
+}
+
+/* Ícono de flecha (➜) */
+.arrow-icon{
+  font-size: 3rem;
+  color: #fff;
+  -webkit-text-stroke: 2px var(--blue);
+}
+
+/* Posiciones */
+.btn-arrow-right{ right: 40px; }
+.btn-arrow-left { left:  40px; --base-transform: scaleX(-1); }
+
+/* ===========================
+   Utilidades (por si las usas)
+   =========================== */
+.hidden { display: none !important; }
+.center { text-align: center !important; }
+.bold   { font-weight: 700 !important; }

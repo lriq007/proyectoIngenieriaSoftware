@@ -1,0 +1,88 @@
+/* === Tema inspirado en login, scopeado para Etapas === */
+/* 1) Fondo y tipografía */
+.theme-login {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #06165f 0%, #1d4b99 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* 2) Contenedor central opcional (si quieres alguna sección “tipo login”) */
+.theme-login .login-like-container {
+  max-width: 420px;
+  margin: 80px auto 120px;  /* deja espacio a tu header/progreso/nav */
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  color: #f5f7ff;
+}
+
+/* 3) Títulos y textos */
+.theme-login .login-like-container h1,
+.theme-login .login-like-container h2 {
+  color: #ffffff;
+  margin-bottom: 12px;
+}
+.theme-login .login-like-container p { color: #e5e9ff; }
+
+/* 4) Inputs estilo login */
+.theme-login .login-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.08);
+  color: #f5f7ff;
+  outline: none;
+  transition: box-shadow .2s ease, border-color .2s ease;
+}
+.theme-login .login-input::placeholder { color: rgba(255,255,255,0.65); }
+.theme-login .login-input:focus {
+  border-color: #9bb8ff;
+  box-shadow: 0 0 0 3px rgba(155, 184, 255, 0.28);
+}
+
+/* 5) Botón primario inspirado en login */
+.theme-login .login-btn {
+  display: inline-block;
+  width: 100%;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #0b1b55;
+  background: linear-gradient(135deg, #66a6ff 0%, #89f7fe 100%);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  margin-top: 10px;
+}
+.theme-login .login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(102, 126, 234, 0.35);
+  filter: brightness(1.02);
+}
+.theme-login .login-btn:active { transform: translateY(0); }
+
+/* 6) Tarjetas / paneles dentro del tema */
+.theme-login .card-like {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 14px;
+  padding: 16px;
+  color: #eef2ff;
+}
+
+/* 7) Si necesitas una barra superior translucida sobre el gradiente */
+.theme-login .glass-header {
+  position: sticky; top: 0; z-index: 60;
+  background: rgba(255,255,255,0.10);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,0.22);
+}
+
+/* 8) Utilidades */
+.theme-login .muted { color: #c7d2fe; }
+.theme-login .spacer { height: 16px; }

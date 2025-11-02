@@ -6,49 +6,258 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Etapa 4 — Pitch Final</title>
 
+  <!-- Estilos base -->
   <link rel="stylesheet" href="{% static 'etapasJuego/css/base.css' %}">
   <link rel="stylesheet" href="{% static 'etapasJuego/css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/theme_login_port.css' %}">
 
   <style>
     body { padding-top: 56px; }
-    .nav-actions {
-      position: fixed; bottom: 24px; left: 0; right: 0;
-      display: flex; justify-content: center; gap: 16px;
-      z-index: 50;
+
+    .ws-container {
+      max-width: 1100px;
+      margin: 88px auto 120px;
+      padding: 0 16px;
+      display: grid;
+      gap: 48px;
     }
-    .btn {
-      padding: 10px 18px; border-radius: 10px; text-decoration: none;
-      display:inline-flex; align-items:center; gap:8px;
+
+    .ws-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      background: transparent !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      padding: 0;
     }
-    .btn-primary { background: #23325a; color: #fff; }
-    .btn-outline { border: 1px solid #d0d2d6; color: #23325a; background: #fff; }
-    .header.wrapper {
-      position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
-      display:flex; align-items:center; gap:12px; z-index: 60;
-      background: rgba(255,255,255,0.9); padding: 6px 10px; border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+    /* Título grande, amarillo con borde negro */
+    .ws-title {
+      margin: 0;
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: .5px;
+      color: #FFD24A;
+      -webkit-text-stroke: 1px #000;
+      text-shadow:
+        0  1px 0 #000,
+        0 -1px 0 #000,
+        1px  0 0 #000,
+       -1px  0 0 #000;
     }
-    .badge { font-size: 12px; padding: 4px 8px; border-radius: 999px; background: #eef1f6; color: #23325a; }
+
+    .pitch-intro{
+      display:grid;
+      gap:18px;
+      color:#f5f7ff;
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.18);
+      border-radius:18px;
+      padding:28px 32px;
+      box-shadow:0 16px 32px rgba(0,0,0,0.22);
+      backdrop-filter:blur(4px);
+    }
+
+    .pitch-intro strong{color:#FFD24A;}
+
+    .pitch-card-shell{
+      width:100%;
+      display:flex;
+      justify-content:center;
+    }
+
+    .pitch-hover-card{
+      position:relative;
+      width:min(980px,100%);
+      min-height:320px;
+      border-radius:26px;
+      overflow:hidden;
+      box-shadow:0 30px 60px rgba(0,0,0,0.28);
+      background:linear-gradient(135deg,rgba(255,255,255,0.96) 0%,rgba(214,229,255,0.94) 45%,rgba(173,197,255,0.9) 100%);
+      transition:transform .6s cubic-bezier(0.23,1,0.32,1);
+    }
+
+    .pitch-hover-card .front{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100%;
+      padding:40px 32px;
+      transition:all .6s cubic-bezier(0.23,1,0.32,1);
+    }
+
+    .pitch-hover-card .front h2{
+      margin:0;
+      font-size:clamp(2.2rem,3.8vw,3.2rem);
+      font-weight:800;
+      letter-spacing:0.05em;
+      text-transform:uppercase;
+      color:#0b1026;
+      text-shadow:0 8px 18px rgba(255,210,74,0.32);
+    }
+
+    .pitch-hover-card .back{
+      position:absolute;
+      inset:0;
+      display:grid;
+      align-content:center;
+      gap:18px;
+      padding:48px 64px;
+      text-align:left;
+      background:linear-gradient(135deg,#0b1026 0%,#15296b 60%,#1f3fa0 100%);
+      color:#f4f7ff;
+      transform:translateY(92%);
+      transition:all .6s cubic-bezier(0.23,1,0.32,1);
+      border-radius:inherit;
+      border:2px solid rgba(255,210,74,0.65);
+      box-shadow:0 24px 48px rgba(255,210,74,0.28);
+    }
+
+    .pitch-hover-card .back h3{
+      margin:0;
+      font-size:clamp(1.8rem,3vw,2.4rem);
+      font-weight:800;
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+      color:#FFD24A;
+    }
+
+    .pitch-hover-card .back p{
+      margin:0;
+      font-size:1.05rem;
+      line-height:1.6;
+    }
+
+    .pitch-hover-card .back ul{
+      margin:0;
+      padding-left:1.2rem;
+      display:grid;
+      gap:10px;
+      font-size:1rem;
+    }
+
+    .pitch-hover-card:hover .back{
+      transform:translateY(0);
+    }
+
+    .pitch-hover-card:hover .front{
+      transform:translateY(-20%);
+      opacity:0;
+    }
+
+    @media (max-width:720px){
+      .ws-container{gap:32px;padding:0 12px;}
+    }
+
+    /* ======== Botones de navegación (versión corregida) ======== */
+    .btn-arrow {
+      --base-transform: none;
+      position: fixed;
+      bottom: 30px;
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background-color: #FF5FA2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      z-index: 100;
+      transform: var(--base-transform);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-arrow:hover {
+      transform: var(--base-transform) translateY(-4px) scale(1.05);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.3);
+    }
+
+    .arrow-icon {
+      font-size: 3rem;
+      color: #fff;
+      -webkit-text-stroke: 2px #23325A;
+      -webkit-text-stroke: 2px #23325A;
+    }
+
+    .btn-arrow-right { right: 40px; }
+    .btn-arrow-left  { left: 40px;  --base-transform: scaleX(-1); }
+
+        /* Asegura contraste dentro de la barra fija */
+    #progress-bar,
+    #progress-bar span {
+      color: #23325A !important; /* azul del juego; usa #000 si prefieres negro */
+    }
+
   </style>
 </head>
-<body>
 
+<body class="theme-login">
+  <div class="app-noise"></div>
 
-  <!-- Barra de progreso (Etapa 4 = 80%) -->
-  <div id="progress-bar" style="position:fixed;top:0;left:0;width:100%;background:rgba(255,255,255,0.98);padding:0.5rem 0;box-shadow:0 2px 8px rgba(0,0,0,0.08);z-index:40;">
-    <div style="max-width:640px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:0 12px;">
-      <span style="font-weight:700;letter-spacing:0.5px;">Etapa 4 de 5</span>
-      <div style="flex:1;height:10px;background:#23325a;border-radius:6px;overflow:hidden;">
-        <div style="width:80%;height:100%;background:linear-gradient(90deg,#FFD24A,#FF5FA2);transition:width 0.4s;"></div>
+    <!-- Barra de progreso fija estándar -->
+    <div id="progress-bar" style="position:fixed;top:0;left:0;width:100%;
+    background:rgba(255,255,255,0.98);padding:0.5rem 0;
+    box-shadow:0 2px 8px rgba(0,0,0,0.08);z-index:40;">
+
+      <div style="max-width:640px;margin:0 auto;display:flex;align-items:center;
+      gap:16px;padding:0 12px;">
+        
+        <!-- Cambia aquí el número de etapa -->
+        <span style="font-weight:700;letter-spacing:0.5px;">Etapa 4 de 4</span>
+
+        <div style="flex:1;height:10px;background:rgb(35, 50, 90);
+        border-radius:6px;overflow:hidden;">
+          <!-- Cambia aquí el porcentaje decorativo (20, 40, 60, 80) -->
+          <div style="width:100%;height:100%;
+          background:linear-gradient(90deg,#FFD24A,#FF5FA2);
+          transition:width 0.4s;"></div>
+        </div>
+
       </div>
     </div>
+
+  <!-- Encabezado -->
+  <div class="ws-container">
+    <div class="ws-header">
+      <h1 class="ws-title">Etapa 4 — Pitch Final</h1>
+    </div>
+
+    <section class="pitch-card-shell">
+      <article class="pitch-hover-card">
+        <div class="front">
+          <h2>Estructura Pitch</h2>
+        </div>
+        <div class="back">
+          <h3>Plantilla sugerida</h3>
+          <p>Cuando conectemos con OpenAI, este bloque se alimentará con tips generados a partir del mapa de empatía del equipo.</p>
+          <ul>
+            <li><strong>Apertura:</strong> Presenta la oportunidad y conecta con el usuario que definiste.</li>
+            <li><strong>Solución:</strong> Explica cómo resuelves el punto de dolor clave usando tus hallazgos.</li>
+            <li><strong>Llamado a la acción:</strong> Termina con un cierre claro que invite a apoyar tu propuesta.</li>
+          </ul>
+        </div>
+      </article>
+    </section>
+
+    <section class="pitch-intro">
+      <p><strong>Objetivo:</strong> transforma los aprendizajes del mapa de empatía en un pitch convincente. Esta pantalla conectará el trabajo previo con recomendaciones generadas por IA.</p>
+      <p><strong>Próximo paso técnico:</strong> cuando se integre la API de OpenAI, enviaremos a ChatGPT el resumen siguiente como payload:</p>
+      {{ pitch_payload|json_script:"pitch-payload" }}
+      <pre style="margin:0;background:rgba(17,32,67,0.6);color:#FFEDB4;padding:16px;border-radius:12px;overflow:auto;max-height:160px;font-size:0.9rem;">{{ pitch_payload|pprint }}</pre>
+      <p>El backend generará tres ideas fuerzas que alimentarán las tarjetas de abajo.</p>
+    </section>
   </div>
 
-  <!-- Navegación -->
-  <div class="nav-actions">
-    <a class="btn btn-outline" href="{% url 'etapa3' %}">← Volver</a>
-    <!-- No hay botón Avanzar (última etapa) -->
-  </div>
+  <!-- Botón de navegación flotante (solo volver, no avanzar) -->
+  <a href="{% url 'etapa3' %}" class="btn-arrow btn-arrow-left" title="Volver">
+    <span class="arrow-icon">➜</span>
+  </a>
+
+  {% include 'etapasJuego/mascota.html' %}
 
 </body>
 </html>

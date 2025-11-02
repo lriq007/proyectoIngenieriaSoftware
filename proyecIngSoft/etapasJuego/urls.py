@@ -11,6 +11,9 @@ urlpatterns = [
     path("api/reset/", views.api_reset, name="api_reset"),
     
     path("etapa/2/", views.etapa2, name="etapa2"),
+    path("etapa/2/seleccionar/", views.etapa2_seleccionar, name="etapa2_select"),
+    path("etapa/2/seleccion/", views.etapa2_1, name="etapa2_1"),
+    path("etapa/2/mapa/guardar/", views.etapa2_guardar_mapa, name="etapa2_guardar_mapa"),
     path("etapa/3/", views.etapa3, name="etapa3"),
     path("etapa/4/", views.etapa4, name="etapa4"),
 ]
