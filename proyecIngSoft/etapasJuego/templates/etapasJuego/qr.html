@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encuesta de Satisfacción - Misión Emprende</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'etapasJuego/css/final.css' %}">
+</head>
+
+<body class="home-estudiante-body">
+    <div class="home-estudiante-container">
+        <div class="qr-container">
+            <div class="qr-title">
+                <h1>Encuesta de Satisfacción</h1>
+            </div>
+            
+            <p class="qr-subtitle">
+                Escanea el código QR con tu celular para entregar tu opinión sobre el juego
+            </p>
+            
+            <div class="qr-code-container">
+                <div class="qr-code">
+                    <div class="qr-placeholder">
+                        <div style="font-size: 2em;">📱</div>
+                        <div class="qr-text">QR Code<br>feedback.html</div>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="qr-instructions">
+                📱 Usa la cámara de tu celular para escanear el código
+            </p>
+            
+            <p class="qr-note">
+                Tu opinión nos ayuda a mejorar la experiencia de juego
+            </p>
+
+            <div class="home-estudiante-buttons" style="margin-top: 40px;">
+                <a href="{% url 'feedback' %}" class="btn-home btn-continue">
+                    Avanzar
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

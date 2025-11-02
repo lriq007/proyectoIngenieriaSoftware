@@ -65,6 +65,16 @@ def login_view(request):
                 return redirect('login:estudiante_ingresado', estudiante_id=estudiante.id)
             else:
                 messages.error(request, "Por favor completa todos los campos para estudiante")
+            
+        elif user_type == 'tableta':
+            pin = request.POST.get('pin')
+            pins_validos = ['1234']
+            if pin in pins_validos:
+                messages.success(request, f'Acceso concedido a tableta con PIN: {pin}')
+                return redirect('login:home_estudiante')
+            else:
+                messages.error(request, "PIN incorrecto")
+
         else:
             messages.error(request, "Por favor selecciona un tipo de usuario válido")
     

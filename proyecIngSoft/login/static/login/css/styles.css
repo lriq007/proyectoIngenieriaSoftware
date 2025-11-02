@@ -245,6 +245,13 @@ body {
     animation: fadeIn 0.4s ease-out;
 }
 
+#pin {
+    text-align: center;
+    letter-spacing: 8px;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;

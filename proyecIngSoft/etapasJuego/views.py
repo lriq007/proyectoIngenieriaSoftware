@@ -463,3 +463,20 @@ def etapa2_guardar_mapa(request):
     request.session.modified = True
 
     return JsonResponse({"ok": True})
+    return render(request, "etapasJuego/etapa4.html")
+
+def ganador(request):
+    return render(request, "etapasJuego/ganador.html")
+
+def ranking(request):
+    return render(request, "etapasJuego/ranking.html")
+
+def qr(request):
+    return render(request, 'etapasJuego/qr.html')
+
+def feedback(request):
+    if request.method == 'POST':
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+        return redirect('feedback_thank_you')
+    return render(request, 'etapasJuego/feedback.html')

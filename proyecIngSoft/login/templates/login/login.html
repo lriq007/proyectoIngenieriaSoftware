@@ -25,7 +25,7 @@
             </div>
             {% endif %}
             
-            <form method="post" class="login-form" id="login-form">
+            <form method="post" class="login-form" id="loginForm">
                 {% csrf_token %}
 
                 <div class="form-group">
@@ -34,6 +34,7 @@
                         <option value="estudiante">Estudiante</option>
                         <option value="profesor">Profesor</option>
                         <option value="administrador">Administrador</option>
+                        <option value="tableta">Tableta</option>
                     </select>
                 </div>
                 
@@ -60,6 +61,13 @@
                         <input type="text" id="carrera" name="carrera" class="form-field">
                     </div>
                 </div>
+
+                <div id="tabletaFields" class="form-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="pin">PIN</label>
+                        <input type="password" id="pin" name="pin" class="form-field" maxlength="4" pattern="[0-9]{4}" placeholder="0000">
+                    </div>
+                </div>
                 
                 <button type="submit" class="login-btn" id="submitBtn">Iniciar sesión</button>
             </form>
@@ -71,10 +79,12 @@
             const userType = document.getElementById('user_type').value;
             const profesorAdminFields = document.getElementById('profesorAdminFields');
             const estudianteFields = document.getElementById('estudianteFields');
+            const tabletaFields = document.getElementById('tabletaFields');
             const submitBtn = document.getElementById('submitBtn');
             
             profesorAdminFields.style.display = 'none';
             estudianteFields.style.display = 'none';
+            tabletaFields.style.display = 'none';
             submitBtn.style.display = 'none';
             
             if (userType === 'profesor' || userType === 'administrador') {
@@ -85,6 +95,7 @@
                 document.getElementById('password').required = true;
                 document.getElementById('nombre_apellido').required = false;
                 document.getElementById('carrera').required = false;
+                document.getElementById('pin').required = false;
                 
             } else if (userType === 'estudiante') {
                 estudianteFields.style.display = 'block';
@@ -94,6 +105,17 @@
                 document.getElementById('password').required = false;
                 document.getElementById('nombre_apellido').required = true;
                 document.getElementById('carrera').required = true;
+                document.getElementById('pin').required = false;
+
+            } else if (userType === 'tableta') {
+                tabletaFields.style.display = 'block';
+                submitBtn.style.display = 'block';
+                
+                document.getElementById('email').required = false;
+                document.getElementById('password').required = false;
+                document.getElementById('nombre_apellido').required = false;
+                document.getElementById('carrera').required = false;
+                document.getElementById('pin').required = true;
             }
         }
         
@@ -106,6 +128,8 @@
                 return false;
             }
         });
+
+        document.addEventListener('DOMContentLoaded', toggleFormFields);
     </script>
 </body>
 </html>
