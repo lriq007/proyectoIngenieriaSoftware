@@ -77,7 +77,7 @@ def api_init(request):
         "soup": tgs.soup,
         "words": tgs.words,
         "found_words": tgs.found_words,
-        "progress_pct": tgs.progress_pct,
+        "progress": float(tgs.progress_pct or 0.0),
         "active_selections": tgs.active_selections,
         "ended": tgs.ended_at is not None,
     })

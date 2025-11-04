@@ -26,29 +26,49 @@ from django.utils import timezone
 ###############################################
 
 class TeamGameSession(models.Model):
-    team_id = models.CharField(max_length=64, db_index=True)  # un identificador por tablet/equipo
+    id = models.BigAutoField(primary_key=True)
+    team_id = models.CharField(max_length=64, db_index=True)
     board_size = models.PositiveIntegerField(default=10)
-    words = models.JSONField(default=list)  # lista de palabras
-    soup = models.JSONField(default=list)   # matriz de letras
-    dict_word_position = models.JSONField(default=dict)  # {palabra: [(i,j), ...]}
-
-    found_words = models.JSONField(default=list)          # palabras ya encontradas
-    locked_cells = models.JSONField(default=list)         # celdas bloqueadas temporalmente [(i,j), ...]
-    progress_pct = models.FloatField(default=0.0)
-
-    started_at = models.DateTimeField(default=timezone.now)
-    ended_at = models.DateTimeField(null=True, blank=True)
-
-    # hasta 2 selecciones activas: { "s1": {"color":"#..","path":[(i,j),...]}, "s2": {...} }
+    words = models.JSONField(default=list)
+    soup = models.JSONField(default=list)
+    dict_word_position = models.JSONField(default=dict)
+    found_words = models.JSONField(default=list)
+    locked_cells = models.JSONField(default=list)
     active_selections = models.JSONField(default=dict)
+    progress_pct = models.FloatField(default=0.0)
+    started_at = models.DateTimeField(default=timezone.now)   # default
+    ended_at = models.DateTimeField(null=True, blank=True)
+    creado_en = models.DateTimeField(default=timezone.now)    # default
+    actualizado_en = models.DateTimeField(auto_now=True)      # auto_now
 
+    class Meta:
+        managed = False
+        db_table = 'team_game_session'
+
+    # ✅ Agrega este método que tu vista usa:
     def mark_found(self, word: str):
-        if word not in self.found_words:
-            self.found_words.append(word)
-            self.progress_pct = 100.0 * len(self.found_words) / max(1, len(self.words))
-            if set(self.found_words) == set(self.words) and not self.ended_at:
+        # normaliza
+        words = list(self.words or [])
+        found = list(self.found_words or [])
+
+        if word and word not in found:
+            found.append(word)
+            self.found_words = found
+
+        total = len(words)
+        if total > 0:
+            pct = 100.0 * (len(found) / total)
+            self.progress_pct = min(100.0, round(pct, 2))
+            if len(found) >= total and not self.ended_at:
                 self.ended_at = timezone.now()
-            self.save()
+        else:
+            self.progress_pct = 0.0
+
+        # timestamps defensivos (aunque auto_now cubre actualizado_en)
+        if not self.started_at:
+            self.started_at = timezone.now()
+        if not self.creado_en:
+            self.creado_en = timezone.now()
 
 
 class Desafio(models.Model):
