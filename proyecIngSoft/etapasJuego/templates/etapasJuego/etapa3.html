@@ -6,128 +6,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Etapa 3 — Creatividad</title>
 
-  <!-- Estilos base -->
   <link rel="stylesheet" href="{% static 'etapasJuego/css/base.css' %}">
   <link rel="stylesheet" href="{% static 'etapasJuego/css/components.css' %}">
   <link rel="stylesheet" href="{% static 'etapasJuego/css/theme_login_port.css' %}">
-
-  <style>
-    body { padding-top: 56px; }
-
-    .ws-container {
-      max-width: 1000px;
-      margin: 88px auto 120px;
-      padding: 0 16px;
-    }
-
-    .ws-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      background: transparent !important;
-      border: 0 !important;
-      box-shadow: none !important;
-      padding: 0;
-    }
-
-    /* Título grande, amarillo con borde negro */
-    .ws-title {
-      margin: 0;
-      font-size: clamp(40px, 6vw, 72px);
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: .5px;
-      color: #FFD24A;
-      -webkit-text-stroke: 1px #000;
-      text-shadow:
-        0  1px 0 #000,
-        0 -1px 0 #000,
-        1px  0 0 #000,
-       -1px  0 0 #000;
-    }
-
-    /* ======== Botones de navegación (versión corregida) ======== */
-    .btn-arrow {
-      --base-transform: none;
-      position: fixed;
-      bottom: 30px;
-      width: 80px;
-      height: 80px;
-      border-radius: 20px;
-      background-color: #FF5FA2;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      z-index: 100;
-      transform: var(--base-transform);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .btn-arrow:hover {
-      transform: var(--base-transform) translateY(-4px) scale(1.05);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.3);
-    }
-
-    .btn-arrow:active {
-      transform: var(--base-transform) translateY(0) scale(0.97);
-      box-shadow: none;
-    }
-
-    .arrow-icon {
-      font-size: 3rem;
-      color: #fff;
-      -webkit-text-stroke: 2px #23325A;
-      -webkit-text-stroke: 2px #23325A;
-    }
-
-    .btn-arrow-right { right: 40px; }
-    .btn-arrow-left  { left: 40px;  --base-transform: scaleX(-1); }
-
-    /* Asegura contraste dentro de la barra fija */
-    #progress-bar,
-    #progress-bar span {
-      color: #23325A !important; /* azul del juego; usa #000 si prefieres negro */
-    }
-
-  </style>
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/etapa3.css' %}">
 </head>
 
 <body class="theme-login">
   <div class="app-noise"></div>
 
-    <!-- Barra de progreso fija estándar -->
-    <div id="progress-bar" style="position:fixed;top:0;left:0;width:100%;
-    background:rgba(255,255,255,0.98);padding:0.5rem 0;
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);z-index:40;">
-
-      <div style="max-width:640px;margin:0 auto;display:flex;align-items:center;
-      gap:16px;padding:0 12px;">
-        
-        <!-- Cambia aquí el número de etapa -->
-        <span style="font-weight:700;letter-spacing:0.5px;">Etapa 3 de 4</span>
-
-        <div style="flex:1;height:10px;background:rgb(35, 50, 90);
-        border-radius:6px;overflow:hidden;">
-          <!-- Cambia aquí el porcentaje decorativo (20, 40, 60, 80) -->
-          <div style="width:75%;height:100%;
-          background:linear-gradient(90deg,#FFD24A,#FF5FA2);
-          transition:width 0.4s;"></div>
-        </div>
-
+  <div id="progress-bar">
+    <div>
+      <span>Etapa 3 de 4</span>
+      <div>
+        <div style="width:75%;"></div>
       </div>
     </div>
+  </div>
 
-  <!-- Encabezado -->
   <div class="ws-container">
     <div class="ws-header">
       <h1 class="ws-title">Etapa 3 — Creatividad</h1>
     </div>
   </div>
 
-  <!-- Botones de navegación flotantes -->
   <a href="{% url 'etapa2' %}" class="btn-arrow btn-arrow-left" title="Volver">
     <span class="arrow-icon">➜</span>
   </a>
@@ -136,6 +38,5 @@
   </a>
 
   {% include 'etapasJuego/mascota.html' %}
-
 </body>
 </html>

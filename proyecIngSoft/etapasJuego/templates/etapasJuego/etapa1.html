@@ -6,345 +6,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Etapa 1 — Trabajo en Equipo</title>
 
-  <!-- Tus estilos existentes -->
+  <!-- Estilos organizados -->
   <link rel="stylesheet" href="{% static 'etapasJuego/css/base.css' %}">
   <link rel="stylesheet" href="{% static 'etapasJuego/css/components.css' %}">
   <link rel="stylesheet" href="{% static 'etapasJuego/css/theme_login_port.css' %}">
-
-  <!-- Estilos de la sopa de letras -->
   <link rel="stylesheet" href="{% static 'etapasJuego/css/wordsearch.css' %}">
-
-  <style>
-    /* Ajustes para convivir con la barra fija y botones existentes */
-    body { padding-top: 56px; }
-
-    .nav-actions {
-      position: fixed; bottom: 24px; left: 0; right: 0;
-      display: flex; justify-content: center; gap: 16px; z-index: 50;
-    }
-    .btn { padding: 10px 18px; border-radius: 10px; text-decoration: none; display:inline-flex; align-items:center; gap:8px; }
-    .btn-primary { background: #23325a; color: #fff; }
-    .btn-outline { border: 1px solid #d0d2d6; color: #23325a; background: #fff; }
-
-    .header.wrapper {
-      position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
-      display:flex; align-items:center; gap:12px; z-index: 60;
-      background: rgba(255,255,255,0.9); padding: 6px 10px; border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-
-    .logo {
-      position: relative;
-      top: 0;      /* ajusta si usas un <img> con clase .logo */
-      left: 200px; /* ajusta si usas un <img> con clase .logo */
-    }
-
-    .badge { font-size: 12px; padding: 4px 8px; border-radius: 999px; background: #eef1f6; color: #23325a; }
-
-    /* Integramos la maqueta de la sopa dentro del layout existente */
-    .ws-container {
-      max-width: 1000px;
-      margin: 88px auto 120px; /* deja espacio para la barra superior y botones inferiores */
-      padding: 0 16px;
-    }
-
-    /* Ajustes leves para que la grilla no choque con tus estilos */
-    .ws-main { display:grid; grid-template-columns: 1fr 260px; gap:16px; }
-    @media (max-width: 768px) {
-      .ws-main { grid-template-columns: 1fr; }
-    }
-
-        /* Quitar “recuadro” y dejar solo letras */
-    .ws-header{
-      display:flex; align-items:center; justify-content:space-between;
-      margin-bottom:8px;
-      background: transparent !important;
-      border: 0 !important;
-      box-shadow: none !important;
-      padding: 0;
-    }
-
-    /* Título grande, amarillo con borde negro */
-    .ws-title{
-      margin:0;
-      /* Tamaño fluido: crece en pantallas grandes, legible en móviles */
-      font-size: clamp(40px, 6vw, 72px);
-      line-height: 1;
-      font-weight: 800;
-      letter-spacing: .5px;
-      color: #FFD24A;                /* amarillo */
-      -webkit-text-stroke: 1px #000; /* borde negro (WebKit/Chromium) */
-      /* Fallback para navegadores sin text-stroke */
-      text-shadow:
-        0  1px 0 #000,
-        0 -1px 0 #000,
-        1px  0 0 #000,
-      -1px  0 0 #000;
-    }
-
-    /* Botón Reiniciar con tipografía un poco más grande */
-    .ws-reset{
-      font-size: 1.05rem;   /* ~16.8px si base=16px */
-      padding: 12px 20px;   /* mantener proporción */
-    }
-    @media (max-width: 768px){
-      .ws-reset{ font-size: 1rem; padding: 10px 16px; }
-    }
-
-    /* Botón Reiniciar: amarillo con letras negras, más grande y más abajo */
-    .ws-reset {
-      display: block;
-      margin-top: 24px;      /* lo separa del bloque anterior */
-      font-size: 1.2rem;     /* letras más grandes */
-      font-weight: 700;
-      background-color: #FFD24A; /* amarillo brillante */
-      color: #000;           /* letras negras */
-      border: 2px solid #000; /* pequeño marco negro */
-      border-radius: 10px;
-      padding: 14px 22px;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .ws-reset:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    }
-
-    .ws-reset:active {
-      transform: translateY(0);
-      box-shadow: none;
-    }
-
-    /* ====== Ajustes visuales de la sección lateral ====== */
-
-    /* Encabezado "Palabras" */
-    .ws-sidebar h2 {
-      color: #fff ;        /* texto blanco */
-      font-weight: 700;
-      
-      letter-spacing: 1px;
-    }
-
-    /* Textos "Jugador A" y "Jugador B" */
-    .ws-legend div {
-      color: #fff !important;        /* texto blanco */
-      font-weight: 600;
-      font-size: 1rem;
-    }
-
-    /* Si quieres que los puntitos mantengan contraste sobre fondo oscuro */
-    .dot {
-      border: 1px solid #fff;
-    }
-
-    /* ====== Palabras dentro de la sopa de letras ====== */
-
-    /* El tablero de letras */
-    .ws-board {
-      color: #23325A !important;    /* azul igual que el fondo principal */
-      font-weight: bold;
-    }
-
-    /* Si el script genera letras con <span> o <td>, forzamos color azul */
-    .ws-board span,
-    .ws-board td {
-      color: #23325A !important;
-    }
-
-    /* Para asegurarnos que no se sobreescriba por selección */
-    .ws-board .found {
-      color: #FFD24A !important;    /* opcional: amarillo si ya fue encontrada */
-    }
-
-    /* ===== Igualar color de palabras con el de la sopa de letras ===== */
-
-    /* Color base de las letras del tablero */
-    .ws-board {
-      color: #23325A !important; /* azul característico de la sopa */
-    }
-
-    /* Aplicar ese mismo color a la lista de palabras */
-    #ws-words li {
-      color: #23325A !important; /* mismo tono azul */
-      font-weight: 700;
-      font-size: 1.1rem;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-      list-style: none;
-    }
-
-    /* Cuando una palabra es encontrada (si el script la marca) */
-    #ws-words li.found {
-      color: #FFD24A !important;   /* amarillo igual que el título */
-      text-decoration: line-through;
-      transition: color 0.3s ease;
-    }
-
-    /* ======== BOTONES DE NAVEGACIÓN ESTÉTICOS ======== */
-
-    /* Contenedor general (si en el futuro agregas ambos) */
-    .btn-arrow {
-      position: fixed;
-      bottom: 30px;
-      width: 80px;
-      height: 80px;
-      border-radius: 20px;
-      background-color: #FF5FA2; /* rosa principal (de tu imagen) */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-decoration: none;
-      z-index: 100;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    /* Efecto hover */
-    .btn-arrow:hover {
-      transform: translateY(-4px) scale(1.05);
-      box-shadow: 0 8px 18px rgba(0,0,0,0.3);
-    }
-
-    /* Efecto al hacer clic */
-    .btn-arrow:active {
-      transform: translateY(0) scale(0.97);
-      box-shadow: none;
-    }
-
-    /* Flecha interna */
-    .arrow-icon {
-      font-size: 3rem;
-      color: #fff;                 /* blanco */
-      -webkit-text-stroke: 2px #23325A; /* borde azul del juego */
-      -webkit-text-stroke: 2px #23325A;   /* soporte futuro */
-    }
-
-    /* Posición derecha (Avanzar) */
-    .btn-arrow-right {
-      right: 40px;
-    }
-
-    /* Posición izquierda (Retroceder, si la agregas más adelante) */
-    .btn-arrow-left {
-      left: 40px;
-      transform: scaleX(-1); /* refleja la flecha ➜ hacia la izquierda */
-    }
-
-    /* Contenedor conjunto del botón y el texto de progreso */
-    .ws-actions {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 24px;
-    }
-
-    /* Botón (mantiene tu estilo actual) */
-    .ws-reset {
-      font-size: 1.2rem;
-      font-weight: 700;
-      background-color: #FFD24A;
-      color: #000;
-      border: 2px solid #000;
-      border-radius: 10px;
-      padding: 14px 22px;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .ws-reset:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    }
-
-    /* Estilo “explosión” tipo cómic */
-    .comic-progress {
-      position: relative;
-      display: inline-block;
-      padding: 12px 20px;
-      font-size: 2rem;               /* letras grandes */
-      font-weight: 900;
-      color: #ffffff;                /* rojo fuerte */
-      -webkit-text-stroke: 2px #ffffff; /* borde negro */
-      text-shadow:
-        2px 2px 0 #000,
-      -2px -2px 0 #000,
-        2px -2px 0 #000,
-      -2px  2px 0 #000;
-      background: #FFD700;           /* amarillo brillante */
-      border: 3px solid #000;
-      border-radius: 12px;
-      transform: rotate(-2deg);
-      box-shadow: 0 6px 0 #000, 0 6px 15px rgba(0,0,0,0.3);
-    }
-
-    /* Efecto de “explosión irregular” con pseudo-elemento */
-    .comic-progress::before {
-      content: "";
-      position: absolute;
-      inset: -6px;
-      background: radial-gradient(circle at 40% 40%, #FFD700 80%, transparent 50%);
-      clip-path: polygon(50% 0%, 80% 10%, 100% 30%, 90% 50%, 100% 70%, 80% 90%, 50% 100%, 20% 90%, 0% 70%, 10% 50%, 0% 30%, 20% 10%);
-      z-index: -1;
-    }
-
-
-  </style>
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/etapa1.css' %}">  <!-- ← NUEVO -->
 </head>
-  {% include 'etapasJuego/mascota.html' %}
 
 <body>
+  {% include 'etapasJuego/mascota.html' %}
+  
   <div class="app-noise"></div>
 
-    <!-- Barra de progreso fija estándar -->
-    <div id="progress-bar" style="position:fixed;top:0;left:0;width:100%;
-    background:rgba(255,255,255,0.98);padding:0.5rem 0;
-    box-shadow:0 2px 8px rgba(0,0,0,0.08);z-index:40;">
-
-      <div style="max-width:640px;margin:0 auto;display:flex;align-items:center;
-      gap:16px;padding:0 12px;">
-        
-        <!-- Cambia aquí el número de etapa -->
-        <span style="font-weight:700;letter-spacing:0.5px;">Etapa 1 de 4</span>
-
-        <div style="flex:1;height:10px;background:rgb(35, 50, 90);
-        border-radius:6px;overflow:hidden;">
-          <!-- Cambia aquí el porcentaje decorativo (20, 40, 60, 80) -->
-          <div style="width:25%;height:100%;
-          background:linear-gradient(90deg,#FFD24A,#FF5FA2);
-          transition:width 0.4s;"></div>
-        </div>
-
+  <!-- Barra de progreso -->
+  <div id="progress-bar">
+    <div>
+      <span>Etapa 1 de 4</span>
+      <div>
+        <div style="width:25%;"></div>
       </div>
     </div>
-
-  <!-- Contenido de la sopa de letras integrado -->
-  <div class="ws-container">
-    <!-- Título y meta compactos (sin duplicar headers grandes) -->
-    <!-- Título y meta -->
-  <div class="ws-header">
-    <h1 class="ws-title">Etapa 1 — Sopa de Letras</h1>
   </div>
+
+  <!-- Contenido principal -->
+  <div class="ws-container">
+    <div class="ws-header">
+      <h1 class="ws-title">Etapa 1 — Sopa de Letras</h1>  <!-- ← AHORA CENTRADO -->
+    </div>
 
     <main class="ws-main">
       <div id="ws-board" class="ws-board" aria-label="Sopa de letras"></div>
 
       <aside class="ws-sidebar">
-        <h2 style="margin:6px 0 8px;">Palabras</h2>
+        <h2>Palabras</h2>
         <ul id="ws-words"></ul>
-        <div class="ws-legend" style="margin-top:10px;display:flex;gap:10px;align-items:center;">
+        <div class="ws-legend">
           <div><span class="dot dot1"></span>Jugador A</div>
           <div><span class="dot dot2"></span>Jugador B</div>
         </div>
         
-      <div class="ws-actions">
-      <button id="ws-reset" class="btn ws-reset">Reiniciar</button>
-      <div id="ws-progress" class="comic-progress">100%</div>
-      </div>
-
-
+        <div class="ws-actions">
+          <button id="ws-reset" class="btn ws-reset">Reiniciar</button>
+          <div id="ws-progress" class="comic-progress">100%</div>
+        </div>
       </aside>
     </main>
   </div>
@@ -354,20 +59,18 @@
     <div>
       <h2>¡Etapa completada! 🎉</h2>
       <p>Excelente trabajo en equipo. Pueden avanzar a la siguiente etapa.</p>
-      <!-- Mantengo tu navegación existente -->
       <a href="{% url 'etapa2' %}" class="ws-button">Ir a la Etapa 2 →</a>
     </div>
   </div>
 
-  <!-- Tus acciones de navegación existentes (permanezco fiel a tu estructura) -->
+  <!-- Navegación -->
   <div class="nav-actions">
-        <!-- Botón de avanzar -->
     <a href="{% url 'etapa2' %}" class="btn-arrow btn-arrow-right" title="Avanzar">
       <span class="arrow-icon">➜</span>
     </a>
   </div>
 
-  <!-- CSRF para fetch -->
+  <!-- Scripts -->
   <script>
     function getCookie(name) {
       const value = `; ${document.cookie}`;
@@ -377,11 +80,6 @@
     window.CSRF_TOKEN = getCookie('csrftoken');
   </script>
 
-  <!-- JS de la sopa de letras -->
   <script src="{% static 'etapasJuego/js/wordsearch.js' %}"></script>
-
-  
-  {% include 'etapasJuego/mascota.html' %}
-
 </body>
 </html>
