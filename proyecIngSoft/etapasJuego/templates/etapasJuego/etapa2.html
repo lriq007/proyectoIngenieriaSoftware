@@ -6,11 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Etapa 2 — Desafío y Empatía</title>
 
-  <!-- Estilos organizados -->
   <link rel="stylesheet" href="{% static 'etapasJuego/css/base.css' %}">
   <link rel="stylesheet" href="{% static 'etapasJuego/css/components.css' %}">
   <link rel="stylesheet" href="{% static 'etapasJuego/css/theme_login_port.css' %}">
-  <link rel="stylesheet" href="{% static 'etapasJuego/css/etapa2.css' %}">  <!-- ← NUEVO -->
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/etapa2.css' %}">
+  <link rel="icon" href="{% static 'favicon.ico' %}">
 </head>
 
 <body class="theme-login">
@@ -20,16 +20,17 @@
   <div id="progress-bar">
     <div>
       <span>Etapa 2 de 4</span>
-      <div>
-        <div style="width:50%;"></div>
-      </div>
+      <div><div style="width:50%;"></div></div>
     </div>
   </div>
 
   <!-- Contenido -->
   <div class="ws-container" id="mainContent">
+    <!-- Cronómetro Etapa 2 -->
+    <div id="e2-timer" class="ws-timer" aria-live="polite" aria-label="Tiempo restante">10:00</div>
+
     <div class="ws-header">
-      <h1 class="ws-title">Etapa 2 — Desafío y Empatía</h1>  <!-- ← AHORA CENTRADO -->
+      <h1 class="ws-title">Etapa 2 — Desafío y Empatía</h1>
     </div>
 
     <!-- Frase -->
@@ -78,7 +79,6 @@
         <div class="modal-copy">
           <p id="modalDesc" class="modal-desc"></p>
         </div>
-
         <div class="video-frame">
           <video id="modalVideo" playsinline muted loop autoplay></video>
         </div>
@@ -102,7 +102,7 @@
     <span class="arrow-icon">➜</span>
   </a>
 
-  <!-- Script (se mantiene igual) -->
+  <!-- Script (modal) -->
   <script>
     (function(){
       const main = document.getElementById('mainContent');
@@ -114,20 +114,16 @@
       const form = document.getElementById('selectForm');
       const hiddenField = document.getElementById('desafioNumeroField');
       const submitBtn = form?.querySelector('button[type="submit"]');
-      
       if(submitBtn){ submitBtn.disabled = true; }
 
       function setSelected(num){
         if(hiddenField){ hiddenField.value = num || ''; }
         if(submitBtn){ submitBtn.disabled = !num; }
       }
-
       function openModal(data){
         title.textContent = data.title || 'Desafío';
         desc.textContent  = data.desc  || '';
         setSelected(data.num || '');
-
-        // Cargar video (si existe)
         try { video.pause(); } catch(e){}
         video.removeAttribute('src');
         while (video.firstChild) video.removeChild(video.firstChild);
@@ -136,13 +132,11 @@
           video.load();
           video.play().catch(()=>{});
         }
-
         backdrop.classList.add('is-open');
         main.classList.add('blurred');
         document.body.classList.add('modal-open');
         backdrop.setAttribute('aria-hidden','false');
       }
-
       function closeModal(){
         backdrop.classList.remove('is-open');
         main.classList.remove('blurred');
@@ -151,11 +145,8 @@
         try { video.pause(); } catch(e){}
         setSelected('');
       }
-
-      // Abrir con clic
       document.getElementById('listaDesafios')?.addEventListener('click', (e)=>{
-        const card = e.target.closest('.challenge-card');
-        if(!card) return;
+        const card = e.target.closest('.challenge-card'); if(!card) return;
         openModal({
           num:   card.dataset.num,
           title: card.dataset.title,
@@ -163,8 +154,6 @@
           video: card.dataset.video
         });
       });
-
-      // Abrir con teclado (Enter/Espacio)
       document.getElementById('listaDesafios')?.addEventListener('keydown', (e)=>{
         if((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('challenge-card')){
           e.preventDefault();
@@ -177,14 +166,16 @@
           });
         }
       });
-
-      // Cerrar
       btnClose.addEventListener('click', closeModal);
       backdrop.addEventListener('click', (e)=>{ if(e.target === backdrop) closeModal(); });
       document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
     })();
   </script>
-  
+
+  <!-- Cronómetro persistente Etapa 2 (con reset en la raíz) -->
+  <script>window.E2_FORCE_RESET = true;</script>
+  <script src="{% static 'etapasJuego/js/timer_etapa2.js' %}"></script>
+
   {% include 'etapasJuego/mascota.html' %}
 </body>
 </html>

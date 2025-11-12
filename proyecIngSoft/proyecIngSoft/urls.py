@@ -23,4 +23,5 @@ urlpatterns = [
     path('login/', include('login.urls')),
     path('etapasJuego/', include('etapasJuego.urls')),
     path('logout/', auth_views.LogoutView.as_view(next_page='/login/'), name='logout'),
+    path('etapa-final/', include('etapaFinal.urls', namespace='etapaFinal')),  # ← nuevo
 ]

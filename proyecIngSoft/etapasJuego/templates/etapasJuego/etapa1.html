@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="{% static 'etapasJuego/css/components.css' %}">
   <link rel="stylesheet" href="{% static 'etapasJuego/css/theme_login_port.css' %}">
   <link rel="stylesheet" href="{% static 'etapasJuego/css/wordsearch.css' %}">
-  <link rel="stylesheet" href="{% static 'etapasJuego/css/etapa1.css' %}">  <!-- ← NUEVO -->
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/etapa1.css' %}">
 </head>
 
 <body>
@@ -31,8 +31,11 @@
 
   <!-- Contenido principal -->
   <div class="ws-container">
+    <!-- Cronómetro -->
+    <div id="ws-timer" class="ws-timer" aria-live="polite" aria-label="Tiempo restante">05:00</div>
+
     <div class="ws-header">
-      <h1 class="ws-title">Etapa 1 — Sopa de Letras</h1>  <!-- ← AHORA CENTRADO -->
+      <h1 class="ws-title">Etapa 1 — Sopa de Letras</h1>
     </div>
 
     <main class="ws-main">
@@ -47,8 +50,8 @@
         </div>
         
         <div class="ws-actions">
-          <button id="ws-reset" class="btn ws-reset">Reiniciar</button>
-          <div id="ws-progress" class="comic-progress">100%</div>
+          <!-- Botón Reiniciar eliminado -->
+          <div id="ws-progress" class="comic-progress">Progreso: 0%</div>
         </div>
       </aside>
     </main>

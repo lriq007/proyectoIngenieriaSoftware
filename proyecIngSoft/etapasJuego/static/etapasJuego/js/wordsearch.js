@@ -20,7 +20,6 @@
   const elBoard = qs("#ws-board");
   const elWords = qs("#ws-words");
   const elProgress = qs("#ws-progress");
-  const elReset = qs("#ws-reset");
   const elComplete = qs("#ws-complete");
 
   const key = (i,j) => `${i},${j}`;
@@ -33,7 +32,7 @@
         const d = document.createElement("div");
         d.className = "ws-cell";
         d.dataset.i = i; d.dataset.j = j;
-        d.textContent = BOARD[i][j].toUpperCase();
+        d.textContent = (BOARD[i][j] || "").toString().toUpperCase();
         elBoard.appendChild(d);
       }
     }
@@ -51,7 +50,6 @@
   }
 
   function lockCellsFromActive() {
-    // marca visualmente celdas bloqueadas
     qsa(".ws-cell").forEach(c => {
       const k = key(+c.dataset.i, +c.dataset.j);
       c.classList.toggle("locked", LOCKED.has(k));
@@ -59,7 +57,6 @@
   }
 
   function colorActivePaths() {
-    // colorea las rutas activas
     qsa(".ws-cell").forEach(c => c.style.outline = "");
     Object.values(ACTIVE).forEach(sel => {
       sel.path.forEach(([i,j]) => {
@@ -70,19 +67,14 @@
   }
 
   function markFound(word) {
-    // colorea “found” en el tablero
     FOUND.add(word);
-    // (opcional) podríamos pintar permanentemente esas celdas como found:
-    // backend no envía coordenadas aquí; lo simple: recalcular posiciones en FE no es trivial
-    // Mantendremos el estilo found marcando las celdas de rutas recientes si coincide el commit.
   }
 
   function showComplete() {
     elComplete.hidden = false;
   }
 
-  // --- EVENTOS POINTER (multitouch) ---
-  // Usamos 2 punteros máximo. Cada pointerId mapea a un selection_id en backend.
+  // --- EVENTOS POINTER ---
   const pointerMap = new Map(); // pointerId -> {selection_id,color}
 
   async function pointerDown(e) {
@@ -91,14 +83,12 @@
     const i = +e.target.dataset.i;
     const j = +e.target.dataset.j;
     const k = key(i,j);
-    if (LOCKED.has(k)) return; // Bloqueo suave
+    if (LOCKED.has(k)) return;
 
-    // asigna color por orden
     const color = (pointerMap.size === 0) ? COLORS[0] : COLORS[1];
 
-    // inicia selección en backend
     const resp = await POST("/etapasJuego/api/select/start/", { color, start:[i,j] });
-    if (!resp.ok) return; // posiblemente "max_selections"
+    if (!resp.ok) return;
     const sid = resp.selection_id;
 
     pointerMap.set(e.pointerId, { selection_id: sid, color });
@@ -107,7 +97,6 @@
     lockCellsFromActive();
     colorActivePaths();
 
-    // capturar movimientos de este pointer
     e.target.setPointerCapture(e.pointerId);
   }
 
@@ -145,16 +134,13 @@
     if (resp.result === "found" && resp.word) {
       markFound(resp.word);
       paintWords();
-      // “congelamos” el último trazo como found: colorea en verde las celdas que tenían el color activo
-      // (simple, visual)
       qsa(".ws-cell").forEach(c => {
         if (c.style.outline && c.style.outline.includes(info.color)) {
           c.classList.add("found");
-          c.style.outline = ""; // limpia borde del trazo
+          c.style.outline = "";
         }
       });
     } else if (resp.result === "already_found") {
-      // feedback visual rápido (parpadeo)
       qsa(".ws-cell").forEach(c => {
         if (c.style.outline && c.style.outline.includes(info.color)) {
           c.animate([{ background:"#fde68a" }, { background:"#f3f4f6" }], { duration: 600 });
@@ -162,21 +148,22 @@
         }
       });
     } else {
-      // not_found: sacudir un poco las celdas
       qsa(".ws-cell").forEach(c => {
         if (c.style.outline && c.style.outline.includes(info.color)) {
-          c.animate([{ transform:"translateX(0px)" }, { transform:"translateX(6px)" }, { transform:"translateX(0px)"}], { duration: 150 });
+          c.animate(
+            [{ transform:"translateX(0px)" }, { transform:"translateX(6px)" }, { transform:"translateX(0px)"}],
+            { duration: 150 }
+          );
           c.style.outline = "";
         }
       });
     }
 
-    ACTIVE = {}; // backend ya limpió la selección; aquí limpiamos outlines
-    LOCKED = new Set(); // backend liberó esas celdas
+    ACTIVE = {};
+    LOCKED = new Set();
     lockCellsFromActive();
     colorActivePaths();
 
-    // progreso / fin
     if (resp.found_words) {
       FOUND = new Set(resp.found_words);
     }
@@ -194,41 +181,64 @@
     elBoard.addEventListener("pointermove", pointerMove);
     elBoard.addEventListener("pointerup", pointerUp);
     elBoard.addEventListener("pointercancel", pointerUp);
-    elBoard.addEventListener("pointerleave", () => {}); // noop
-    elReset.addEventListener("click", async () => {
-      await POST("/etapasJuego/api/reset/", {});
-      await init(); // recarga tablero
-    });
   }
 
-    async function init() {
-        // 1) Pedimos una partida
-        let resp = await POST("/etapasJuego/api/init/", {});
+  // === INIT con reset forzado para limpiar estado persistente ===
+  async function init() {
+    try {
+      // Resetea la sesión actual en backend (ignora errores si no existe)
+      await POST("/etapasJuego/api/reset/", {});
+    } catch (e) {
+      /* noop */
+    }
 
-        // 2) Si por cualquier razón viene terminada, la reiniciamos y pedimos otra
-        if (resp && resp.ended === true) {
-            await POST("/etapasJuego/api/reset/", {});
-            resp = await POST("/etapasJuego/api/init/", {});
-        }
+    // Pide una sesión nueva limpia
+    let resp = await POST("/etapasJuego/api/init/", {});
 
-        BOARD = resp.soup || [];
-        WORDS = resp.words || [];
-        FOUND = new Set(resp.found_words || []);
-        PROGRESS = resp.progress_pct || 0;
-        BOARD_SIZE = resp.board_size || 10;
+    // Por si acaso el backend devolviera algo ya 'found', normalizamos
+    if (resp && resp.ended === true) {
+      await POST("/etapasJuego/api/reset/", {});
+      resp = await POST("/etapasJuego/api/init/", {});
+    }
 
-        // Aseguramos que el modal esté oculto al iniciar
-        const elComplete = document.getElementById("ws-complete");
-        if (elComplete) elComplete.hidden = true;
+    BOARD = resp.soup || [];
+    WORDS = resp.words || [];
+    FOUND = new Set(resp.found_words || []); // debería venir vacío tras reset
+    PROGRESS = resp.progress_pct || 0;
+    BOARD_SIZE = resp.board_size || 10;
 
-        paintBoard();
-        paintWords();
-        lockCellsFromActive();
-        colorActivePaths();
-}
+    if (elComplete) elComplete.hidden = true;
+
+    paintBoard();
+    paintWords();
+    lockCellsFromActive();
+    colorActivePaths();
+  }
+
+  // ===== Cronómetro simple 5:00 → 0:00 (solo display) =====
+  function startSimpleTimer(durationSeconds = 300) {
+    const elTimer = document.getElementById("ws-timer");
+    if (!elTimer) return;
+
+    let remaining = durationSeconds;
+    const format = (t) => {
+      const m = Math.floor(t / 60);
+      const s = t % 60;
+      return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    };
+
+    elTimer.textContent = format(remaining);
+
+    const interval = setInterval(() => {
+      remaining = Math.max(remaining - 1, 0);
+      elTimer.textContent = format(remaining);
+      if (remaining === 0) clearInterval(interval);
+    }, 1000);
+  }
 
   document.addEventListener("DOMContentLoaded", async () => {
     bindEvents();
     await init();
+    startSimpleTimer(300); // 5 minutos
   });
 })();

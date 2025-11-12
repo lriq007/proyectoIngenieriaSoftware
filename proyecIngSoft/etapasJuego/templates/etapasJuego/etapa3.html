@@ -18,16 +18,35 @@
   <div id="progress-bar">
     <div>
       <span>Etapa 3 de 4</span>
-      <div>
-        <div style="width:75%;"></div>
-      </div>
+      <div><div style="width:75%;"></div></div>
     </div>
   </div>
 
   <div class="ws-container">
+    <!-- Cronómetro Etapa 3 -->
+    <div id="e3-timer" class="ws-timer" aria-live="polite" aria-label="Tiempo restante">15:00</div>
+
     <div class="ws-header">
       <h1 class="ws-title">Etapa 3 — Creatividad</h1>
     </div>
+
+    <!-- Uploader LEGO (cuadro grande gris con preview dentro) -->
+    <section class="lego-uploader" id="legoUploader">
+      <input id="legoInput" type="file" accept="image/*" capture="environment" hidden>
+
+      <label for="legoInput" id="legoBtn" class="lego-btn" role="button" tabindex="0">
+        <div class="lego-btn-inner">
+          <span class="lego-icon">📸</span>
+          <span class="lego-text">Haz clic o arrastra una foto de tu LEGO</span>
+          <small>Formatos: JPG o PNG · Máx 8 MB</small>
+        </div>
+        <img id="legoImg" alt="Vista previa del LEGO" hidden>
+      </label>
+
+      <div class="lego-actions">
+        <button type="button" id="legoClear" class="lego-clear" hidden>Quitar foto</button>
+      </div>
+    </section>
   </div>
 
   <a href="{% url 'etapa2' %}" class="btn-arrow btn-arrow-left" title="Volver">
@@ -36,6 +55,12 @@
   <a href="{% url 'etapa4' %}" class="btn-arrow btn-arrow-right" title="Avanzar">
     <span class="arrow-icon">➜</span>
   </a>
+
+  <!-- JS de carga/preview (no guarda en backend) -->
+  <script defer src="{% static 'etapasJuego/js/lego_upload.js' %}"></script>
+
+  <!-- Cronómetro simple de Etapa 3 (15:00) — v6 corrige el error de ruta -->
+  <script defer src="{% static 'etapasJuego/js/timer_etapa3.js' %}?v=6"></script>
 
   {% include 'etapasJuego/mascota.html' %}
 </body>

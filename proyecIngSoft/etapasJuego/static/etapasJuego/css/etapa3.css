@@ -30,6 +30,7 @@ body {
     max-width: 1000px;
     margin: 88px auto 120px;
     padding: 0 16px;
+    position: relative;
 }
 
 #progress-bar {
@@ -107,11 +108,139 @@ body {
     -webkit-text-stroke: 2px #23325A;
 }
 
-.btn-arrow-right { 
-    right: 40px; 
+.btn-arrow-right { right: 40px; }
+.btn-arrow-left  { left: 40px;  --base-transform: scaleX(-1); }
+
+/* ================= LEGO Uploader (cuadro grande que se rellena con la foto) ================= */
+
+.lego-uploader {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
-.btn-arrow-left { 
-    left: 40px;  
-    --base-transform: scaleX(-1); 
+/* Recuadro principal (botón) */
+.lego-btn {
+  position: relative;
+  width: 100%;
+  max-width: 700px;
+  aspect-ratio: 1 / 1;            /* cuadrado */
+  background: #e5e7eb;            /* gris claro */
+  border: 4px solid #FFD24A;      /* borde amarillo */
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: #000;
+  font-weight: 800;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  box-shadow: 0 6px 16px rgba(0,0,0,.2);
+}
+
+.lego-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 26px rgba(0,0,0,.25);
+  border-color: #FFD700;
+}
+
+.lego-btn:focus {
+  outline: 4px solid #FF5FA2;
+  outline-offset: 2px;
+}
+
+/* Texto inicial dentro del recuadro */
+.lego-btn-inner {
+  z-index: 2;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+}
+
+.lego-icon { font-size: 3rem; }
+.lego-text { font-size: 1.4rem; font-weight: 900; }
+.lego-btn small { font-size: 0.9rem; font-weight: 600; opacity: 0.8; }
+
+/* Imagen cargada ocupa todo el recuadro */
+.lego-btn img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;     /* rellena */
+  display: block;
+  border-radius: 16px;
+  z-index: 1;
+}
+
+/* Al tener imagen, ocultamos el texto */
+.lego-btn.has-image .lego-btn-inner {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+/* Botón "Quitar foto" */
+.lego-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.lego-clear {
+  padding: 12px 20px;
+  border-radius: 14px;
+  font-weight: 800;
+  background: #fff;
+  color: #23325A;
+  border: 2px solid #23325A;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.lego-clear:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0,0,0,.15);
+}
+
+/* ===== Cronómetro Etapa 3 (estilo cuadrado, borde amarillo, dígitos negros) ===== */
+.ws-timer{
+  position: absolute;
+  /* punto de anclaje base (cerca del título) */
+  top: 32px;
+  right: 120px;
+
+  /* desplazamiento solicitado: +5cm derecha, -3cm arriba */
+  transform: translate(190px, -114px);
+
+  width: 120px;
+  height: 120px;
+  background: #ffffff;
+  border: 4px solid #FFD24A;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 34px;
+  color: #000;
+  box-shadow: 0 6px 16px rgba(0,0,0,.2);
+  z-index: 55;
+  user-select: none;
+}
+
+@media (max-width: 640px){
+  .ws-timer{
+    width: 96px;
+    height: 96px;
+    font-size: 28px;
+    /* en móvil lo acercamos al borde superior derecho */
+    top: 48px;
+    right: 12px;
+    transform: none;
+  }
 }
