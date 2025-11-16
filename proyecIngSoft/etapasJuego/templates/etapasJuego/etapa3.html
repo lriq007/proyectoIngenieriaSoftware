@@ -23,30 +23,53 @@
   </div>
 
   <div class="ws-container">
-    <!-- Cronómetro Etapa 3 -->
     <div id="e3-timer" class="ws-timer" aria-live="polite" aria-label="Tiempo restante">15:00</div>
 
     <div class="ws-header">
       <h1 class="ws-title">Etapa 3 — Creatividad</h1>
     </div>
 
-    <!-- Uploader LEGO (cuadro grande gris con preview dentro) -->
-    <section class="lego-uploader" id="legoUploader">
-      <input id="legoInput" type="file" accept="image/*" capture="environment" hidden>
+    <div class="lego-content-wrapper">
+      <section class="lego-uploader" id="legoUploader">
+        <input id="legoInput" type="file" accept="image/*" capture="environment" hidden>
 
-      <label for="legoInput" id="legoBtn" class="lego-btn" role="button" tabindex="0">
-        <div class="lego-btn-inner">
-          <span class="lego-icon">📸</span>
-          <span class="lego-text">Haz clic o arrastra una foto de tu LEGO</span>
-          <small>Formatos: JPG o PNG · Máx 8 MB</small>
+        <label for="legoInput" id="legoBtn" class="lego-btn" role="button" tabindex="0">
+          <div class="lego-btn-inner">
+            <span class="lego-icon">📸</span>
+            <span class="lego-text">Haz clic o arrastra una foto de tu LEGO</span>
+            <small>Formatos: JPG o PNG · Máx 8 MB</small>
+          </div>
+          <img id="legoImg" alt="Vista previa del LEGO" hidden>
+        </label>
+
+        <div class="lego-actions">
+          <button type="button" id="legoClear" class="lego-clear" hidden>Quitar foto</button>
         </div>
-        <img id="legoImg" alt="Vista previa del LEGO" hidden>
-      </label>
+      </section>
 
-      <div class="lego-actions">
-        <button type="button" id="legoClear" class="lego-clear" hidden>Quitar foto</button>
-      </div>
-    </section>
+      <section class="instructions-panel">
+        <div class="instructions-content">
+
+          <h3>🎯 Instrucciones de la Actividad</h3>
+
+          <ol class="instructions-list">
+            <li>Construye una figura LEGO que represente tu solución creativa al desafío seleccionado anteriormente</li>
+            <li>Toma una foto clara del LEGO con la tableta</li>
+            <li>Asegúrate de que la imagen muestre todos los detalles importantes</li>
+            <li>¡Sé creativo! Esta es tu oportunidad de pensar fuera de la caja</li>
+          </ol>
+
+          <div class="instructions-tips">
+            <h4>💡 Consejos:</h4>
+            <ul>
+              <li>Relación clara con el desafío</li>
+              <li>Creatividad en la construcción</li>
+              <li>Calidad de la fotografía</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
   </div>
 
   <a href="{% url 'etapa2' %}" class="btn-arrow btn-arrow-left" title="Volver">
@@ -56,12 +79,146 @@
     <span class="arrow-icon">➜</span>
   </a>
 
-  <!-- JS de carga/preview (no guarda en backend) -->
-  <script defer src="{% static 'etapasJuego/js/lego_upload.js' %}"></script>
-
-  <!-- Cronómetro simple de Etapa 3 (15:00) — v6 corrige el error de ruta -->
-  <script defer src="{% static 'etapasJuego/js/timer_etapa3.js' %}?v=6"></script>
+  <script defer src="{% static 'etapasJuego/js/etapa3.js' %}"></script>
 
   {% include 'etapasJuego/mascota.html' %}
 </body>
+  <style>
+    .lego-content-wrapper {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+      justify-content: center;
+      margin: 30px auto 0;
+      max-width: 1200px;
+    }
+
+    .lego-uploader {
+      flex: 0 1 500px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .instructions-panel {
+      flex: 0 1 500px;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      border: 3px solid #FFD24A;
+      min-height: 400px;
+    }
+
+    .instructions-content h3 {
+      color: #23325A;
+      font-size: 1.8rem;
+      margin-bottom: 25px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .instructions-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 30px;
+      padding-left: 0;
+      list-style: none;
+    }
+
+    .instructions-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border-left: 4px solid #103c8e;
+      color: #23325A;
+      font-size: 1rem;
+      line-height: 1.4;
+      font-weight: 500;
+      position: relative;
+    }
+
+    .instructions-list li::before {
+      content: counter(list-item);
+      counter-increment: list-item;
+      background: #103c8e;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      flex-shrink: 0;
+      font-size: 0.9rem;
+    }
+
+    .instructions-tips {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 20px;
+    }
+
+    .instructions-tips h4 {
+      margin: 0 0 15px 0;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .instructions-tips ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .instructions-tips li {
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .instructions-tips li:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 1024px) {
+      .lego-content-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+      }
+      
+      .lego-uploader,
+      .instructions-panel {
+        flex: 1 1 100%;
+        max-width: 600px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .instructions-panel {
+        padding: 20px;
+      }
+      
+      .instructions-content h3 {
+        font-size: 1.5rem;
+      }
+      
+      .instructions-list li {
+        padding: 12px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
 </html>

@@ -480,3 +480,6 @@ def feedback(request):
         comment = request.POST.get('comment')
         return redirect('feedback_thank_you')
     return render(request, 'etapasJuego/feedback.html')
+
+def inicio_juego(request):
+    return render(request, 'etapasJuego/inicio_juego.html')

@@ -16,4 +16,5 @@ urlpatterns = [
     path("etapa/2/mapa/guardar/", views.etapa2_guardar_mapa, name="etapa2_guardar_mapa"),
     path("etapa/3/", views.etapa3, name="etapa3"),
     path("etapa/4/", views.etapa4, name="etapa4"),
+    path("inicio_juego/", views.inicio_juego, name="inicio_juego"),
 ]

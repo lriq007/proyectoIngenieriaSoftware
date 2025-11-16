@@ -4,8 +4,11 @@
   const img   = document.getElementById("legoImg");
   const clear = document.getElementById("legoClear");
 
-  // Ya no dependemos de #legoPreview
-  if (!input || !btn || !img || !clear) return;
+  // Verificación más flexible para el clear button
+  if (!input || !btn || !img) {
+    console.error('Elementos esenciales del lego uploader no encontrados');
+    return;
+  }
 
   const MAX_SIZE = 8 * 1024 * 1024; // 8 MB
   let objectUrl = null;
@@ -21,7 +24,7 @@
     }
     img.src = "";
     img.hidden = true;
-    clear.hidden = true;
+    if (clear) clear.hidden = true;
     btn.classList.remove("has-image");
   }
 
@@ -41,8 +44,10 @@
     objectUrl = URL.createObjectURL(file);
     img.src = objectUrl;
     img.hidden = false;
-    clear.hidden = false;
+    if (clear) clear.hidden = false;
     btn.classList.add("has-image");
+    
+    console.log('Imagen cargada correctamente:', file.name);
   }
 
   // Input clásico
@@ -56,7 +61,15 @@
   btn.addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      btn.click();
+      input.click();
+    }
+  });
+
+  // Click directo en el botón (para mejor UX)
+  btn.addEventListener("click", (e) => {
+    // Solo activar el input si no hay imagen
+    if (!btn.classList.contains("has-image")) {
+      input.click();
     }
   });
 
@@ -66,32 +79,40 @@
       e.preventDefault();
       e.stopPropagation();
       btn.classList.add("is-dragover");
+      btn.style.borderColor = '#FF5FA2';
+      btn.style.transform = 'translateY(-2px)';
     });
   });
+  
   ["dragleave","dragend","drop"].forEach(ev => {
     btn.addEventListener(ev, (e) => {
       e.preventDefault();
       e.stopPropagation();
       btn.classList.remove("is-dragover");
+      btn.style.borderColor = '#FFD24A';
+      btn.style.transform = 'translateY(0)';
     });
   });
+  
   btn.addEventListener("drop", (e) => {
     const file = e.dataTransfer?.files?.[0];
     if (!file) return;
     showPreview(file);
   });
 
-  // Botón limpiar
-  clear.addEventListener("click", () => {
-    input.value = "";
-    resetPreview();
-  });
+  // Botón limpiar (si existe)
+  if (clear) {
+    clear.addEventListener("click", () => {
+      input.value = "";
+      resetPreview();
+    });
+  }
 
   // Estado inicial
   resetPreview();
 })();
 
-
+// Timer function - mantenla igual
 document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("e3-timer");
   if (!el) return;

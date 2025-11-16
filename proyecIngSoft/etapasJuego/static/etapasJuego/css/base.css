@@ -6,6 +6,20 @@
   --yellow: #FFD24A;
   --pink:   #FF5FA2;
   --shadow: rgba(0,0,0,0.25);
+
+  --accent-yellow: #FFD24A;
+  --accent-pink: #FF5FA2;
+  --accent-cyan: #66F7FE;
+  --text: #ffffff;
+  --muted: #cdd4ff;
+
+  --radius: 14px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
 }
 
 /* ===========================
