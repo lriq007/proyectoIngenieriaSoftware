@@ -1,0 +1,51 @@
+/* Contenedor y título */
+.ef-container { max-width: 1000px; margin: 96px auto 120px; padding: 0 16px; }
+.ef-title { 
+  font-size: clamp(32px, 5vw, 56px); font-weight: 800; color: #FFD24A; 
+  -webkit-text-stroke: 1px #000; 
+  text-shadow: 0 1px 0 #000, 0 -1px 0 #000, 1px 0 0 #000, -1px 0 0 #000; 
+  margin: 0 0 16px; 
+}
+
+/* Tabs de grupos */
+.ef-groups { 
+  display:flex; gap:12px; background: rgba(255,255,255,0.85); 
+  padding:12px; border-radius:16px; box-shadow: 0 2px 10px rgba(0,0,0,.08); 
+  width: fit-content; 
+}
+.ef-tab { 
+  border:2px solid #23325A; background:#fff; color:#23325A; 
+  padding:8px 14px; border-radius:12px; font-weight:700; 
+  cursor:pointer; transition: transform .15s ease, box-shadow .15s ease;
+}
+.ef-tab:hover { transform: translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,.15); }
+.ef-tab-active { background:#23325A; color:#fff; }
+.ef-tab[disabled] { opacity:.5; cursor:not-allowed; }
+
+/* Preguntas y escala */
+.ef-questions { display: grid; gap:18px; margin-top:16px; }
+.ef-card { 
+  background:#fff; padding:24px; border-radius:16px; 
+  box-shadow: 0 6px 20px rgba(0,0,0,.12);
+}
+.ef-card h2 { margin: 0 0 12px; font-size: clamp(18px, 2.3vw, 24px); color:#111; }
+
+.ef-scale { display:flex; gap:12px; flex-wrap: wrap; }
+.ef-pill { 
+  width:44px; height:44px; display:grid; place-items:center; 
+  border:2px solid #23325A; border-radius:12px; background:#fff; 
+  font-weight:800; cursor:pointer; 
+  transition: transform .1s ease, box-shadow .1s ease, background .15s ease;
+}
+.ef-pill:hover { transform: translateY(-1px); box-shadow:0 4px 10px rgba(0,0,0,.12); }
+.ef-pill-active { background:#23325A; color:#fff; }
+
+/* Acciones */
+.ef-actions { margin-top: 16px; display:flex; align-items:center; gap:12px; }
+.ef-btn { padding:10px 16px; border-radius:12px; font-weight:700; cursor:pointer; }
+.ef-btn-primary { background:#23325A; color:#fff; border:2px solid #23325A; }
+.ef-btn-outline  { background:#fff; color:#23325A; border:2px solid #23325A; }
+.ef-status { color:#f9fafb; background:#111827; border-radius:999px; padding:6px 10px; font-size:.9rem; }
+
+/* Accesibilidad de foco */
+.ef-tab:focus, .ef-pill:focus, .ef-btn:focus { outline: 3px solid #FF5FA2; outline-offset: 2px; }

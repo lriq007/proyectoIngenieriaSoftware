@@ -1,0 +1,51 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Etapa Final — Coevaluación</title>
+
+  <!-- Reutilizamos estilos del proyecto -->
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/theme_login_port.css' %}">
+  <link rel="stylesheet" href="{% static 'etapaFinal/css/etapaFinal.css' %}">
+</head>
+<body>
+  {% include 'etapasJuego/mascota.html' %}
+
+  <div class="app-noise"></div>
+
+  <div class="ef-container">
+    <h1 class="ef-title">Etapa Final — Coevaluación</h1>
+
+    <!-- Barra de grupos -->
+    <div class="ef-groups" role="tablist" aria-label="Seleccionar grupo a evaluar">
+      <!-- NOTA: si conoces el grupo del usuario, podrás desactivar su propia pestaña desde JS -->
+      <button class="ef-tab ef-tab-active" data-group="Grupo A" role="tab" aria-selected="true">Grupo A</button>
+      <button class="ef-tab" data-group="Grupo B" role="tab" aria-selected="false">Grupo B</button>
+      <button class="ef-tab" data-group="Grupo C" role="tab" aria-selected="false">Grupo C</button>
+      <button class="ef-tab" data-group="Grupo D" role="tab" aria-selected="false">Grupo D</button>
+    </div>
+
+    <!-- Plantilla de preguntas (renderizada por JS, igual para todos los grupos) -->
+    <div id="ef-questions" class="ef-questions" aria-live="polite"></div>
+
+    <!-- (Opcional) Zona de acciones -->
+    <div class="ef-actions">
+      <button id="ef-clear-group" class="ef-btn ef-btn-outline">Limpiar respuestas del grupo</button>
+      <!-- más adelante: <button id="ef-submit" class="ef-btn ef-btn-primary">Enviar evaluación</button> -->
+      <span id="ef-status" class="ef-status" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <script>
+    // Si más adelante renderizas el grupo del evaluador desde Django:
+    // window.CURRENT_TEAM = "{{ request.user.perfil.grupo|default:'Grupo X' }}";
+    window.CURRENT_TEAM = null; // ← por ahora sin restricción; setéalo p.ej. "Grupo B" para bloquear evaluar el propio grupo
+  </script>
+
+  <script src="{% static 'etapaFinal/js/etapaFinal.js' %}"></script>
+</body>
+</html>
