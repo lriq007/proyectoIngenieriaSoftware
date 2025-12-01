@@ -1,15 +1,15 @@
 import json
 from django.http import JsonResponse, HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from .models import TeamGameSession
+from .models import TeamGameSession, Desafio, Topic, Challenge, Project, EmpathyMap
 from .wordsearch.engine import create_soup, validate_selection
 from django.urls import reverse
-from .models import Desafio
 from django.db import connection
 from django.templatetags.static import static
+from .context import get_or_create_team_for_request
 
 
 
@@ -61,6 +61,39 @@ def _ensure_active_session(team_id, words=None, board_size=10):
 def etapa1(request):
     return render(request, "etapasJuego/etapa1.html")
 
+
+def etapa2_tema(request):
+    """
+    Pantalla de Etapa 2.0: selección de tema.
+
+    - En GET: muestra todas las opciones de Topic activos.
+    - En POST: recibe un topic_id, lo guarda en la sesión y redirige a Etapa 2.
+    """
+    sesion, team = get_or_create_team_for_request(request)
+
+    if request.method == "POST":
+        topic_id = request.POST.get("topic_id")
+        if topic_id:
+            topic = get_object_or_404(Topic, id=topic_id, activo=True)
+            # Guardamos solo el ID en la sesión para usarlo después en Etapa 2
+            request.session["topic_id"] = topic.id
+            request.session.modified = True
+            # Redirigimos a la vista de Etapa 2 (listado de desafíos)
+            return redirect("etapa2")
+
+        # Si no viene topic_id, simplemente recargamos la misma pantalla
+        return redirect("etapa2_tema")
+
+    # GET: mostrar todos los temas activos
+    topics = Topic.objects.filter(activo=True).order_by("nombre")
+
+    context = {
+        "sesion": sesion,
+        "team": team,
+        "topics": topics,
+    }
+    return render(request, "etapasJuego/etapa2_0.html", context)
+
 # --- API ---
 @require_POST
 def api_init(request):
@@ -70,6 +103,11 @@ def api_init(request):
 
     _, team_id = _get_or_create_session(request)
     tgs = _ensure_active_session(team_id, words=words, board_size=board_size)
+    # Asociar Team actual con esta sesión de sopa (opcional, no rompe nada)
+    _, team = get_or_create_team_for_request(request)
+    if tgs.equipo is None:
+        tgs.equipo = team
+        tgs.save(update_fields=["equipo"])
 
     return JsonResponse({
         "team_id": tgs.team_id,
@@ -317,18 +355,102 @@ def _build_desafios_vm():
 # ---------- Vista Etapa 2 (reemplazo) ----------
 def etapa2(request):
     """
-    Entrega al template una lista homogénea 'desafios' con:
-    numero, titulo, descripcion, imagen, video_src, personaje, duracion_min.
-    Funciona con BD real o con fallback (mock) editable.
+    Etapa 2: listado de desafíos para el tema seleccionado.
     """
-    desafios_vm = _build_desafios_vm()
-    return render(request, "etapasJuego/etapa2.html", {"desafios": desafios_vm})
+    sesion, team = get_or_create_team_for_request(request)
+
+    topic_id = request.session.get("topic_id")
+    if not topic_id:
+        # Si no hay tema seleccionado, volvemos a Etapa 2.0
+        return redirect("etapa2_tema")
+
+    topic = get_object_or_404(Topic, id=topic_id, activo=True)
+
+    desafios = (
+        Desafio.objects.filter(
+            challenge__topic=topic,
+            activo=True,
+            challenge__activo=True,
+        )
+        .select_related("challenge")
+        .order_by("challenge__orden", "numero", "id")
+    )
+
+    project = getattr(team, "proyecto", None)
+
+    context = {
+        "sesion": sesion,
+        "team": team,
+        "topic": topic,
+        "desafios": desafios,
+        "project": project,
+    }
+    return render(request, "etapasJuego/etapa2.html", context)
 
 
 ####################################################
 
 def etapa3(request):
-    return render(request, "etapasJuego/etapa3.html")
+    sesion, team = get_or_create_team_for_request(request)
+    project = None
+
+    project_id = request.session.get("project_id")
+    if project_id:
+        project = Project.objects.filter(id=project_id, equipo=team).first()
+
+    return render(
+        request,
+        "etapasJuego/etapa3.html",
+        {
+            "project": project,
+        },
+    )
+
+
+@require_POST
+def etapa3_guardar_foto(request):
+    """
+    Recibe la imagen subida en Etapa 3 y la guarda en Project.foto_prototipo
+    para el equipo actual, manteniendo la relación con tema, challenge y desafío
+    seleccionados en Etapa 2.
+    """
+    # 1) Identificar la sesión de juego y el equipo actual
+    sesion, team = get_or_create_team_for_request(request)
+
+    # 2) Recuperar el project_id guardado en la sesión durante Etapa 2
+    project_id = request.session.get("project_id")
+    if not project_id:
+        # Si por alguna razón no hay proyecto, simplemente volvemos a Etapa 3
+        # (no romper la UX ni lanzar error 500)
+        return redirect("etapa3")
+
+    # 3) Obtener el Project asociado a este equipo
+    project = get_object_or_404(Project, id=project_id, equipo=team)
+
+    # 4) Obtener el archivo de imagen desde request.FILES
+    #    El nombre del campo debe coincidir con el atributo "name" del input file en la template
+    image_file = request.FILES.get("lego_image")
+    resumen_idea = (request.POST.get("resumen_idea", "") or "").strip()
+    if resumen_idea and len(resumen_idea) < 70:
+        resumen_idea = ""
+    if resumen_idea and len(resumen_idea) > 280:
+        resumen_idea = resumen_idea[:280]
+
+    campos = []
+    if image_file:
+        # 5) Guardar la imagen en foto_prototipo sin alterar otros campos
+        project.foto_prototipo = image_file
+        campos.append("foto_prototipo")
+    if resumen_idea:
+        project.resumen_idea = resumen_idea
+        campos.append("resumen_idea")
+
+    if campos:
+        project.save(update_fields=campos)
+    # Si no hay archivo, no hacer nada destructivo; simplemente continuar
+
+    # 6) Redirigir a Etapa 4 (Pitch) manteniendo el flujo del juego
+    return redirect("etapa4")
 
 def etapa4(request):
     mapas = request.session.get("etapa2_mapas", {})
@@ -366,20 +488,47 @@ def etapa4(request):
 
 @require_POST
 def etapa2_seleccionar(request):
-    """Guarda el desafío seleccionado y redirige a la vista de detalle."""
-    numero = request.POST.get("desafio_numero")
+    """
+    Guarda el desafío seleccionado para el equipo actual como parte de su Project.
+    """
+    sesion, team = get_or_create_team_for_request(request)
 
-    try:
-        numero_int = int(numero)
-    except (TypeError, ValueError):
+    topic_id = request.session.get("topic_id")
+    if not topic_id:
+        return redirect("etapa2_tema")
+
+    topic = get_object_or_404(Topic, id=topic_id, activo=True)
+
+    challenge_id = request.POST.get("challenge_id")
+    if not challenge_id:
+        # Si no viene challenge_id, volvemos al listado de desafíos
         return redirect("etapa2")
 
-    desafios = _build_desafios_vm()
-    seleccionado = next((d for d in desafios if d["numero"] == numero_int), None)
-    if not seleccionado:
-        return redirect("etapa2")
+    challenge = get_object_or_404(
+        Challenge,
+        id=challenge_id,
+        topic=topic,
+        activo=True
+    )
+    desafio_id = request.POST.get("desafio_id")
+    selected_desafio = None
+    if desafio_id:
+        selected_desafio = get_object_or_404(Desafio, pk=desafio_id)
 
-    request.session["etapa2_desafio_numero"] = numero_int
+    project, created = Project.objects.get_or_create(
+        equipo=team,
+        defaults={"desafio": challenge},
+    )
+    if not created:
+        project.desafio = challenge
+        project.save(update_fields=["desafio"])
+
+    if selected_desafio:
+        project.selected_desafio = selected_desafio
+        project.save(update_fields=["selected_desafio"])
+
+    request.session["project_id"] = project.id
+    request.session["etapa2_desafio_numero"] = selected_desafio.id if selected_desafio else challenge.id
     request.session.modified = True
 
     return redirect("etapa2_1")
@@ -387,6 +536,66 @@ def etapa2_seleccionar(request):
 
 def etapa2_1(request):
     """Pantalla placeholder para el bubble map, muestra el desafío elegido."""
+    project_id = request.session.get("project_id")
+    if project_id:
+        project = get_object_or_404(Project, id=project_id)
+        challenge = project.desafio
+        selected_desafio = project.selected_desafio
+        numero = request.session.get("etapa2_desafio_numero") or (selected_desafio.id if selected_desafio else challenge.id)
+        mapas = request.session.get("etapa2_mapas", {})
+        respuestas = mapas.get(str(numero), {})
+        bubble_items = [
+            {
+                "key": q["key"],
+                "label": q["label"],
+                "answer": respuestas.get(q["key"], ""),
+            }
+            for q in BUBBLE_QUESTIONS
+        ]
+
+        desafio = None
+        if selected_desafio:
+            desafio = {
+                "titulo": selected_desafio.titulo,
+                "numero": numero,
+                "historia": selected_desafio.historia,
+                "personaje": selected_desafio.personaje,
+                "imagen_personaje": selected_desafio.imagen_personaje,
+            }
+        else:
+            desafio = {
+                "titulo": challenge.titulo,
+                "numero": numero,
+            }
+
+        persona_map = {
+            1: "etapasJuego/img/persona1.png",
+            2: "etapasJuego/img/persona2.png",
+            3: "etapasJuego/img/persona3.png",
+        }
+        try:
+            numero_int = int(numero) if numero is not None else None
+        except (TypeError, ValueError):
+            numero_int = None
+
+        desafio_image = persona_map.get(numero_int) if numero_int else None
+        if not desafio_image and selected_desafio:
+            if selected_desafio.imagen_personaje:
+                desafio_image = selected_desafio.imagen_personaje.url
+        if not desafio_image and desafio:
+            desafio_image = desafio.get("imagen_personaje")
+
+        return render(
+            request,
+            "etapasJuego/etapa2_1.html",
+            {
+                "desafio": desafio,
+                "bubble_questions": bubble_items,
+                "bubble_responses": respuestas,
+                "desafio_persona_image": desafio_image,
+            },
+        )
+
     numero = request.session.get("etapa2_desafio_numero")
     if numero is None:
         return redirect("etapa2")
@@ -433,37 +642,71 @@ def etapa2_1(request):
 
 @require_POST
 def etapa2_guardar_mapa(request):
-    """Guarda temporalmente en sesión las respuestas del bubble map."""
+    """
+    Vista AJAX/POST que guarda el Bubble Map.
+    - Mantiene el guardado en sesión como backup.
+    - Agrega guardado persistente en EmpathyMap asociado al Project.
+    """
+    if request.method != "POST":
+        return JsonResponse({"ok": False, "error": "Método no permitido"}, status=405)
+
+    sesion, team = get_or_create_team_for_request(request)
+
+    # 1. Obtener JSON del Bubble Map
     try:
-        payload = json.loads(request.body.decode("utf-8"))
-    except (ValueError, TypeError):
-        return JsonResponse({"ok": False, "error": "invalid_json"}, status=400)
+        data = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        return JsonResponse({"ok": False, "error": "JSON inválido"}, status=400)
 
-    numero = payload.get("desafio_numero")
-    respuestas = payload.get("respuestas", {})
-
-    try:
-        numero_int = int(numero)
-    except (TypeError, ValueError):
-        return JsonResponse({"ok": False, "error": "invalid_challenge"}, status=400)
-
-    if not isinstance(respuestas, dict):
-        return JsonResponse({"ok": False, "error": "invalid_payload"}, status=400)
-
-    # Normaliza claves válidas.
-    valid_keys = {q["key"] for q in BUBBLE_QUESTIONS}
-    respuestas_filtradas = {}
-    for key, value in respuestas.items():
-        if key in valid_keys and isinstance(value, str):
-            respuestas_filtradas[key] = value.strip()
-
-    mapas = request.session.get("etapa2_mapas", {})
-    mapas[str(numero_int)] = respuestas_filtradas
-    request.session["etapa2_mapas"] = mapas
+    # 2. Guardar copia en la sesión (backup NO se elimina)
+    request.session["etapa2_mapas"] = data
     request.session.modified = True
 
+    # 3. Obtener project_id desde la sesión
+    project_id = request.session.get("project_id")
+    if not project_id:
+        # No hay proyecto aún: no se rompe la UX, se guarda solo en sesión
+        return JsonResponse({
+            "ok": True,
+            "warning": "no_project_yet",
+            "msg": "Mapa guardado en sesión pero no en base de datos."
+        })
+
+    # 4. Obtener el Project vinculado al equipo
+    project = get_object_or_404(Project, id=project_id, equipo=team)
+
+    # 5. Obtener o crear EmpathyMap persistente
+    emp_map, _ = EmpathyMap.objects.get_or_create(proyecto=project)
+
+    # 6. Extraer clusters relevantes del JSON
+    # Nuevo formato: viene un objeto "respuestas" con las claves del bubble map
+    respuestas = data.get("respuestas") or {}
+
+    if respuestas:
+        # Mapeo desde las claves de bubble-map.js a los campos del modelo EmpathyMap
+        gustos = respuestas.get("likes_dislikes", "")
+        problemas = respuestas.get("obstacles", "")
+        miedos = respuestas.get("feelings", "")
+        contexto = respuestas.get("others_say", "")
+        hobbies = respuestas.get("hobbies", "")
+    else:
+        # Compatibilidad con formato antiguo (si el JSON viniera con las claves planas)
+        gustos = data.get("gustos", "")
+        problemas = data.get("problemas", "")
+        miedos = data.get("miedos", "")
+        contexto = data.get("contexto", "")
+        hobbies = data.get("hobbies", "")
+
+    # 7. Guardar el JSON completo y los campos principales
+    emp_map.gustos = gustos
+    emp_map.problemas = problemas
+    emp_map.miedos = miedos
+    emp_map.contexto = contexto
+    emp_map.hobbies = hobbies
+    emp_map.datos_extra = data  # full JSON
+    emp_map.save()
+
     return JsonResponse({"ok": True})
-    return render(request, "etapasJuego/etapa4.html")
 
 def ganador(request):
     return render(request, "etapasJuego/ganador.html")

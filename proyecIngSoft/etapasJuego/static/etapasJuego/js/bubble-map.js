@@ -47,6 +47,14 @@
     }
   };
 
+  const updateCharCount = (textarea) => {
+    const charCount = textarea.nextElementSibling;
+    if (!charCount) return;
+    const current = textarea.value.length;
+    const max = textarea.maxLength || 300;
+    charCount.textContent = `${current} / ${max}`;
+  };
+
   bubbles.forEach((bubble) => {
     bubble.addEventListener('click', () => handleBubbleClick(bubble));
     bubble.addEventListener('keydown', (evt) => {
@@ -57,8 +65,15 @@
     });
     const textarea = bubble.querySelector('textarea');
     if (textarea) {
-      textarea.addEventListener('input', () => toggleHasContent(bubble));
+      textarea.addEventListener('input', () => {
+        toggleHasContent(bubble);
+        updateCharCount(textarea);
+      });
+      textarea.addEventListener('keydown', (e) => e.stopPropagation());
+      textarea.addEventListener('click', (e) => e.stopPropagation());
+      textarea.addEventListener('keyup', (e) => e.stopPropagation());
       toggleHasContent(bubble);
+      updateCharCount(textarea);
     }
   });
 
