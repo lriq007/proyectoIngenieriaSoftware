@@ -136,6 +136,7 @@ body {
     justify-content: center;
 }
 
+/* Recuadros originales para los desafíos (Etapa 2) */
 .challenge-card {
     width: 247px;
     height: 330px;
@@ -144,9 +145,9 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-end;      /* el contenido texto va abajo */
+    justify-content: flex-end;
     text-align: center;
-    overflow: visible;              /* 🔴 deja que la imagen pueda salir por arriba */
+    overflow: visible;
     border-radius: 24px;
     border: 2px solid rgba(126, 105, 105, 0.08);
     box-shadow: 0 18px 32px rgba(0,0,0,0.35);
@@ -155,10 +156,7 @@ body {
     color: #f5f5f5;
     padding: 18px 14px 20px;
     gap: 10px;
-}
-
-.challenge-card.topic-card {
-    overflow: visible !important; /* permite que la ilustración flote sobre el marco */
+    z-index: 1;
 }
 
 .challenge-card h3 {
@@ -211,24 +209,137 @@ body {
     z-index: 1;
 }
 
-.topic-card {
+/* Recuadros estilos tipo “box” solo para la selección de tema (Etapa 2.0) */
+.topic-list .topic-card {
+    --c1: #2f7cf6;
+    --c2: #6c2bd9;
+    --accent: #ffbe2e;
     position: relative;
-    overflow: visible;               /* permite que la ilustración salga del marco */
-    padding-top: 220px;              /* deja espacio para texto; imagen flotará arriba */
-    justify-content: flex-start;
+    overflow: visible;
+    width: 240px;
+    height: 320px;
+    margin: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform .22s ease, box-shadow .22s ease;
+    z-index: 1;
 }
 
-/* usa la clase de la imagen, por claridad */
-.topic-card .topic-img {
+.topic-list .topic-card .topic-glow {
     position: absolute;
-    top: -140px;                     /* saca la imagen por encima del recuadro */
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    max-height: 260px;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.topic-list .topic-card::before,
+.topic-list .topic-card::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50px;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(315deg, var(--c1), var(--c2));
+    border-radius: 12px;
+    transform: skewX(15deg);
+    transition: 0.5s;
+    filter: blur(0);
+    z-index: 0;
+}
+
+.topic-list .topic-card::after {
+    left: 50px;
+    filter: blur(26px);
+}
+
+.topic-list .topic-card:hover::before,
+.topic-list .topic-card:hover::after {
+    transform: skewX(0deg) scaleX(1.22);
+}
+
+.topic-list .topic-card .topic-content {
+    position: relative;
+    width: 220px;
+    height: 280px;
+    padding: 20px 18px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+    border-radius: 12px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+}
+
+.topic-list .topic-card .topic-content::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    border: 2px solid rgba(255,255,255,0.14);
+    pointer-events: none;
+}
+
+.topic-list .topic-card .topic-img {
+    position: relative;
+    display: block;
+    width: 120px;
+    height: 120px;
     object-fit: contain;
-    filter: drop-shadow(0 14px 24px rgba(0,0,0,0.35));
-    z-index: 10;                     /* sobre pseudo-elementos */
+    filter: drop-shadow(0 10px 18px rgba(0,0,0,0.25));
+    transition: transform .22s ease;
+}
+
+.topic-list .topic-card h3 {
+    margin: 0;
+    color: #fefefe;
+    font-size: 1.1rem;
+    letter-spacing: 0.4px;
+}
+
+.topic-list .topic-card p {
+    margin: 0;
+    color: #e5e7eb;
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.topic-list .topic-card:hover {
+    transform: translateY(-10px);
+}
+
+.topic-list .topic-card:active {
+    transform: translateY(-4px) scale(0.99);
+}
+
+.topic-list .topic-card:active .topic-img,
+.topic-list .topic-card:hover .topic-img {
+    transform: translateY(-6px);
+}
+
+.topic-list .topic-card[data-tema="SALUD"] {
+    --c1: #22c55e;
+    --c2: #0ea5e9;
+    --accent: #22d3ee;
+}
+
+.topic-list .topic-card[data-tema="SUST"] {
+    --c1: #16a34a;
+    --c2: #65a30d;
+    --accent: #facc15;
+}
+
+.topic-list .topic-card[data-tema="EDU"] {
+    --c1: #2f7cf6;
+    --c2: #6c2bd9;
+    --accent: #ffbe2e;
 }
 
 @media (max-width: 500px) {

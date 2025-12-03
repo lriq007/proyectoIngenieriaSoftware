@@ -1,0 +1,50 @@
+{% extends "login/panel_base.html" %}
+{% block title %}Panel Profesor{% endblock %}
+{% block header_title %}Panel Profesor{% endblock %}
+
+{% block content %}
+<div class="panel-card">
+    <div class="panel-stats">
+        <div class="stat-tile"><strong>{{ seccion_count }}</strong> Secciones</div>
+        <div class="stat-tile"><strong>{{ sesion_count }}</strong> Sesiones</div>
+    </div>
+</div>
+
+<div class="panel-card">
+    <h3>Sesiones</h3>
+    <table class="panel-table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Código</th>
+                <th>Sección</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in sesiones %}
+                <tr>
+                    <td>{{ s.nombre }}</td>
+                    <td>{{ s.codigo }}</td>
+                    <td>{{ s.seccion }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3">Aún no tienes sesiones asociadas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="panel-actions-row" style="margin-top:12px;">
+        <a class="btn-link btn-primary" href="{% url 'profesorpanel:sesiones' %}">Gestionar sesiones</a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <h3>Secciones</h3>
+    <ul class="panel-list">
+        {% for sec in secciones %}
+            <li>{{ sec.nombre }} - {{ sec.carrera }}</li>
+        {% empty %}
+            <li>No hay secciones asociadas.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

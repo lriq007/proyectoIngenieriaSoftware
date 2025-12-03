@@ -15,9 +15,8 @@
 </head>
 
 <body>
-  {% include 'etapasJuego/mascota.html' %}
-  
   <div class="app-noise"></div>
+  <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
 
   <!-- Barra de progreso -->
   <div id="progress-bar">
@@ -32,7 +31,13 @@
   <!-- Contenido principal -->
   <div class="ws-container">
     <!-- Cronómetro -->
-    <div id="ws-timer" class="ws-timer" aria-live="polite" aria-label="Tiempo restante">05:00</div>
+    <div
+      id="ws-timer"
+      class="ws-timer"
+      aria-live="polite"
+      aria-label="Tiempo restante"
+      data-duration-seconds="{{ sesion.duracion_etapa1_segundos|default:300 }}"
+    >05:00</div>
 
     <div class="ws-header">
       <h1 class="ws-title">Etapa 1 — Sopa de Letras</h1>
@@ -66,13 +71,13 @@
     <div>
       <h2>¡Etapa completada! 🎉</h2>
       <p>Excelente trabajo en equipo. Pueden avanzar a la siguiente etapa.</p>
-      <a href="{% url 'etapa2' %}" class="ws-button">Ir a la Etapa 2 →</a>
+      <a href="{% url 'etapa2_tema' %}" class="ws-button">Ir a la Etapa 2 →</a>
     </div>
   </div>
 
   <!-- Navegación -->
   <div class="nav-actions">
-    <a href="{% url 'etapa2' %}" class="btn-arrow btn-arrow-right" title="Avanzar">
+    <a href="{% url 'etapa2_tema' %}" class="btn-arrow btn-arrow-right" title="Avanzar">
       <span class="arrow-icon">➜</span>
     </a>
   </div>
@@ -87,6 +92,7 @@
     window.CSRF_TOKEN = getCookie('csrftoken');
   </script>
 
+  <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
   <script src="{% static 'etapasJuego/js/wordsearch.js' %}"></script>
 </body>
 </html>

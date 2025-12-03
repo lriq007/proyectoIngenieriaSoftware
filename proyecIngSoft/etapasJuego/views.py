@@ -4,18 +4,36 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from .models import TeamGameSession, Desafio, Topic, Challenge, Project, EmpathyMap
+from .models import TeamGameSession, Desafio, Topic, Challenge, Project, EmpathyMap, Pitch
 from .wordsearch.engine import create_soup, validate_selection
 from django.urls import reverse
 from django.db import connection
 from django.templatetags.static import static
 from .context import get_or_create_team_for_request
+from .services.pitch_ai import generar_sugerencias_pitch, actualizar_score_ai
 
 
 
 def etapas_index(request):
     # /etapasJuego/ → redirige a la primera etapa
     return redirect("etapa1")
+
+
+def seleccion_modalidad(request):
+    """
+    Pantalla previa para tablets: elige modalidad antes de la sopa de letras.
+    Asume que la tablet ya tiene sesión iniciada.
+    """
+    return render(request, "etapasJuego/seleccion_modalidad.html")
+
+
+def rompehielo(request):
+    """
+    Placeholder de la opción 'No nos conocemos': presentación + rompehielo.
+    La lógica de temporizador/dinámica se agregará en un prompt posterior.
+    """
+    return render(request, "etapasJuego/rompehielo.html")
+
 
 # --- Helpers ---
 def _get_or_create_session(request):
@@ -59,7 +77,8 @@ def _ensure_active_session(team_id, words=None, board_size=10):
     return tgs
 
 def etapa1(request):
-    return render(request, "etapasJuego/etapa1.html")
+    sesion, _team = get_or_create_team_for_request(request)
+    return render(request, "etapasJuego/etapa1.html", {"sesion": sesion})
 
 
 def etapa2_tema(request):
@@ -402,6 +421,7 @@ def etapa3(request):
         request,
         "etapasJuego/etapa3.html",
         {
+            "sesion": sesion,
             "project": project,
         },
     )
@@ -447,43 +467,114 @@ def etapa3_guardar_foto(request):
 
     if campos:
         project.save(update_fields=campos)
+        team.update_tokens()
     # Si no hay archivo, no hacer nada destructivo; simplemente continuar
 
     # 6) Redirigir a Etapa 4 (Pitch) manteniendo el flujo del juego
     return redirect("etapa4")
 
 def etapa4(request):
-    mapas = request.session.get("etapa2_mapas", {})
-    desafio_numero = request.session.get("etapa2_desafio_numero")
+    project_id = request.session.get("project_id")
+    if not project_id:
+        return HttpResponse(
+            "Error: no hay project_id en la sesión. Vuelve a Etapa 2 y selecciona el desafío de nuevo.",
+            status=400,
+        )
+
+    project = get_object_or_404(
+        Project.objects.select_related(
+            "desafio",
+            "desafio__topic",
+            "selected_desafio",
+        ),
+        id=project_id,
+    )
+
+    emp_map = getattr(project, "mapa_empatia", None)
+    if emp_map is None:
+        emp_map = EmpathyMap.objects.filter(proyecto=project).first()
+
+    pitch, _ = Pitch.objects.get_or_create(proyecto=project)
+
+    if not pitch.sugerencias_ia:
+        topic = getattr(project.desafio, "topic", None)
+        challenge = project.desafio
+        desafio = project.selected_desafio
+        sugerencias = generar_sugerencias_pitch(topic, challenge, desafio, emp_map)
+        if sugerencias:
+            pitch.sugerencias_ia = sugerencias
+            pitch.save(update_fields=["sugerencias_ia"])
+        else:
+            sugerencias = ""
+    else:
+        sugerencias = pitch.sugerencias_ia
+
+    desafio_numero = getattr(project.selected_desafio, "id", None) or getattr(project.desafio, "id", None)
+
+    bubble_map = {}
+    if emp_map:
+        bubble_map = emp_map.datos_extra or {
+            "respuestas": {
+                "likes_dislikes": getattr(emp_map, "gustos", ""),
+                "obstacles": getattr(emp_map, "problemas", ""),
+                "feelings": getattr(emp_map, "miedos", ""),
+                "others_say": getattr(emp_map, "contexto", ""),
+                "hobbies": getattr(emp_map, "hobbies", ""),
+            }
+        }
+    else:
+        mapas = request.session.get("etapa2_mapas", {})
+        bubble_map = mapas.get(str(desafio_numero), {})
 
     pitch_payload = {
         "desafio_numero": desafio_numero,
-        "bubble_map": mapas.get(str(desafio_numero), {}),
+        "bubble_map": bubble_map,
     }
 
-    pitch_tips = [
-        {
-            "title": "Idea clave pendiente",
-            "content": "Aquí mostraremos una recomendación generada por OpenAI con base en el mapa de empatía del equipo.",
-        },
-        {
-            "title": "Estructura sugerida",
-            "content": "Una vez integrada la API, este espacio detallará cómo ordenar el pitch según los hallazgos del usuario.",
-        },
-        {
-            "title": "Llamado a la acción",
-            "content": "Este bloque resaltará la acción final que el pitch debe provocar, ajustada automáticamente con IA.",
-        },
-    ]
-
+    sesion = getattr(project.equipo, "sesion", None)
     return render(
         request,
         "etapasJuego/etapa4.html",
         {
-            "pitch_tips": pitch_tips,
+            "sesion": sesion,
+            "pitch_tips": sugerencias,
             "pitch_payload": pitch_payload,
+            "pitch_text": pitch.guion,
         },
     )
+
+
+@require_POST
+def etapa4_guardar_pitch(request):
+    """
+    Guarda el texto del pitch, evalúa score_ai y actualiza tokens del equipo.
+    """
+    project_id = request.session.get("project_id")
+    if not project_id:
+        return JsonResponse({"ok": False, "error": "no_project"}, status=400)
+
+    project = get_object_or_404(Project, id=project_id)
+    pitch, _ = Pitch.objects.get_or_create(proyecto=project)
+
+    pitch_text = request.POST.get("pitch_text") or request.POST.get("pitch")
+    if pitch_text is None:
+        try:
+            body = json.loads(request.body.decode("utf-8") or "{}")
+            pitch_text = body.get("pitch_text") or body.get("pitch")
+        except Exception:
+            pitch_text = None
+
+    pitch_text = (pitch_text or "").strip()
+    pitch.guion = pitch_text
+    pitch.save(update_fields=["guion"])
+
+    actualizar_score_ai(pitch)
+
+    team = getattr(project, "equipo", None)
+    if team:
+        team.update_tokens()
+
+    return JsonResponse({"ok": True, "score_ai": pitch.score_ai})
 
 
 @require_POST
@@ -536,6 +627,7 @@ def etapa2_seleccionar(request):
 
 def etapa2_1(request):
     """Pantalla placeholder para el bubble map, muestra el desafío elegido."""
+    sesion, team = get_or_create_team_for_request(request)
     project_id = request.session.get("project_id")
     if project_id:
         project = get_object_or_404(Project, id=project_id)
@@ -585,10 +677,12 @@ def etapa2_1(request):
         if not desafio_image and desafio:
             desafio_image = desafio.get("imagen_personaje")
 
+        sesion_ctx = getattr(project.equipo, "sesion", None) or getattr(team, "sesion", None)
         return render(
             request,
             "etapasJuego/etapa2_1.html",
             {
+                "sesion": sesion_ctx,
                 "desafio": desafio,
                 "bubble_questions": bubble_items,
                 "bubble_responses": respuestas,
@@ -628,10 +722,12 @@ def etapa2_1(request):
     if not desafio_image:
         desafio_image = desafio.get("imagen") or desafio.get("imagen_personaje")
 
+    sesion_ctx = getattr(team, "sesion", None)
     return render(
         request,
         "etapasJuego/etapa2_1.html",
         {
+            "sesion": sesion_ctx,
             "desafio": desafio,
             "bubble_questions": bubble_items,
             "bubble_responses": respuestas,
@@ -705,6 +801,7 @@ def etapa2_guardar_mapa(request):
     emp_map.hobbies = hobbies
     emp_map.datos_extra = data  # full JSON
     emp_map.save()
+    team.update_tokens()
 
     return JsonResponse({"ok": True})
 

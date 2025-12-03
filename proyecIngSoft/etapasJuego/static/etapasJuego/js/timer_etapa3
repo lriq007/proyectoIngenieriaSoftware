@@ -62,6 +62,6 @@
   <!-- Cronómetro simple de Etapa 3 (10:00) — bump de versión para romper caché -->
   <script defer src="{% static 'etapasJuego/js/timer_etapa3.js?v=6' %}"></script>
 
-  {% include 'etapasJuego/mascota.html' %}
+  {# {% include 'etapasJuego/mascota.html' %} #}
 </body>
 </html>

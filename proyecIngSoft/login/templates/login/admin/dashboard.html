@@ -1,0 +1,73 @@
+{% extends "login/panel_base.html" %}
+{% block title %}Panel Admin{% endblock %}
+{% block header_title %}Panel Admin{% endblock %}
+
+{% block content %}
+<div class="panel-card">
+    <h2>Accesos rápidos</h2>
+    <div class="panel-grid">
+        <a class="panel-card" href="{% url 'adminpanel:secciones' %}">
+            <h3>Secciones</h3>
+            <p>Gestiona todas las secciones.</p>
+        </a>
+        <a class="panel-card" href="{% url 'adminpanel:sesiones' %}">
+            <h3>Sesiones</h3>
+            <p>Configura las GameSession y asigna profesores.</p>
+        </a>
+        <a class="panel-card" href="{% url 'adminpanel:tablets' %}">
+            <h3>Tablets</h3>
+            <p>Administra tablets por sesión.</p>
+        </a>
+        <a class="panel-card" href="{% url 'adminpanel:topics' %}">
+            <h3>Catálogo de temas</h3>
+            <p>Temas y desafíos base del juego.</p>
+        </a>
+        <a class="panel-card" href="{% url 'adminpanel:challenges' %}">
+            <h3>Desafíos</h3>
+            <p>Desafíos vinculados a cada tema.</p>
+        </a>
+        <a class="panel-card" href="{% url 'adminpanel:evaluaciones' %}">
+            <h3>Evaluaciones</h3>
+            <p>Puntajes y parámetros de evaluación.</p>
+        </a>
+    </div>
+</div>
+
+<div class="panel-card">
+    <h2>Resumen</h2>
+    <div class="panel-stats">
+        <div class="stat-tile"><strong>{{ seccion_count }}</strong> Secciones</div>
+        <div class="stat-tile"><strong>{{ sesion_count }}</strong> Sesiones</div>
+        <div class="stat-tile"><strong>{{ tablet_count }}</strong> Tablets</div>
+        <div class="stat-tile"><strong>{{ topic_count }}</strong> Temas</div>
+        <div class="stat-tile"><strong>{{ challenge_count }}</strong> Desafíos</div>
+        <div class="stat-tile"><strong>{{ evaluation_count }}</strong> Evaluaciones</div>
+    </div>
+</div>
+
+<div class="panel-card">
+    <h3>Sesiones recientes</h3>
+    <table class="panel-table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Código</th>
+                <th>Profesor</th>
+                <th>Sección</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in sesiones_recientes %}
+                <tr>
+                    <td>{{ s.nombre }}</td>
+                    <td>{{ s.codigo }}</td>
+                    <td>{{ s.profesor }}</td>
+                    <td>{{ s.seccion }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="4">Sin sesiones registradas.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -18,15 +18,63 @@
 
         <div class="home-estudiante-video-container">
             <div class="home-estudiante-video-wrapper">
-                <video controls width="100%">
+                <video controls width="100%" id="video-bienvenida">
                     <source src="{% static 'videos/bienvenida.mp4' %}" type="video/mp4">
                 </video>
             </div>
         </div>
 
+        <section class="home-estudiante-programas">
+            <div class="programas-copy">
+                <h2>¿Qué es Emprendimiento UDD?</h2>
+                <p class="programas-description">
+                    Desarrollamos programas, cursos y concursos para formar, apoyar y fomentar el emprendimiento,
+                    impulsando a emprendedores del ecosistema nacional. Hay rutas para alumnos, alumni y emprendedores
+                    externos en distintas etapas.
+                </p>
+            </div>
+            <div class="timeline-steps">
+                <div class="timeline-step">
+                    <span class="step-time">5 min</span>
+                    <div class="step-circle azul-1">
+                        <div class="step-num">01</div>
+                        <div class="step-label">Trabajo en equipo</div>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <span class="step-time">8 min</span>
+                    <div class="step-circle azul-2">
+                        <div class="step-num">02</div>
+                        <div class="step-label">Desafío y empatía</div>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <span class="step-time">10 min</span>
+                    <div class="step-circle azul-1">
+                        <div class="step-num">03</div>
+                        <div class="step-label">Creatividad</div>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <span class="step-time">6 min</span>
+                    <div class="step-circle azul-2">
+                        <div class="step-num">04</div>
+                        <div class="step-label">Comunicación</div>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <span class="step-time">8 min</span>
+                    <div class="step-circle azul-1">
+                        <div class="step-num">05</div>
+                        <div class="step-label">Apoyo</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <div class="home-estudiante-buttons">
-            <a href="http://127.0.0.1:8000/etapasJuego/etapa/1/" class="btn-home btn-continue">
-                ▶ Continuar
+            <a href="{% url 'seleccion_modalidad' %}" class="btn-home btn-continue">
+                Avanzar a la selección de modalidad ➜
             </a>
         </div>
     </div>

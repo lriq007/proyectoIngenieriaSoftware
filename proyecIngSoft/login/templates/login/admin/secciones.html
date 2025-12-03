@@ -1,0 +1,44 @@
+{% extends "login/panel_base.html" %}
+{% block title %}Secciones{% endblock %}
+{% block header_title %}Secciones{% endblock %}
+
+{% block content %}
+<div class="panel-grid">
+    <div class="panel-card">
+        <h3>Nueva sección</h3>
+        <form method="post" class="panel-form">
+            {% csrf_token %}
+            {% include "login/admin/_form_fields.html" with form=form %}
+            <button class="btn-link btn-primary" type="submit">Guardar sección</button>
+        </form>
+    </div>
+    <div class="panel-card">
+        <h3>Listado</h3>
+        <table class="panel-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Carrera</th>
+                    <th>Año</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in secciones %}
+                    <tr>
+                        <td>{{ s.nombre }}</td>
+                        <td>{{ s.carrera }}</td>
+                        <td>{{ s.anio_ingreso }}</td>
+                        <td class="panel-actions-row">
+                            <a class="btn-link btn-outline" href="{% url 'adminpanel:seccion_editar' s.id %}">Editar</a>
+                            <a class="btn-link btn-danger" href="{% url 'adminpanel:seccion_eliminar' s.id %}">Eliminar</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4">No hay secciones registradas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

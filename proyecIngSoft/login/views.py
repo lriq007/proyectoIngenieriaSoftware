@@ -2,39 +2,75 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.forms import AuthenticationForm
-from .models import Estudiante
+from .permissions import (
+    ensure_default_groups,
+    is_admin,
+    is_profesor,
+)
+from .models import Estudiante, SeccionEstudiantes
+from etapasJuego.models import GameSession, Team, Tablet
 import random
 
 def estudiante_ingresado(request, estudiante_id):
     estudiante = get_object_or_404(Estudiante, id=estudiante_id)
-    compañeros = Estudiante.objects.filter(grupo=estudiante.grupo).exclude(id=estudiante.id)
-    return render(request, 'login/estudiante_ingresado.html', {
-        'estudiante': estudiante,
-        'compañeros': compañeros
-    })
+    team = estudiante.team
+    if team is not None:
+        compañeros = Estudiante.objects.filter(team=team).exclude(id=estudiante.id)
+        num_integrantes = team.count_estudiantes()
+        min_integrantes_para_empezar = 2
+        en_espera = num_integrantes < min_integrantes_para_empezar
+        tablet = getattr(team, "tablet", None)
+    else:
+        compañeros = Estudiante.objects.none()
+        num_integrantes = 0
+        min_integrantes_para_empezar = 2
+        en_espera = True
+        tablet = None
+
+    context = {
+        "estudiante": estudiante,
+        "team": team,
+        "companeros": compañeros,
+        "tablet": tablet,
+        "num_integrantes": num_integrantes,
+        "min_integrantes_para_empezar": min_integrantes_para_empezar,
+        "en_espera": en_espera,
+    }
+    return render(request, 'login/estudiante_ingresado.html', context)
 
 def home_estudiante(request):
     return render(request, 'login/home_estudiante.html')
 
 def login_view(request):
+    ensure_default_groups()
     if request.method == 'POST':
         user_type = request.POST.get('user_type')
 
         if user_type in ['profesor', 'administrador']:
-            form = AuthenticationForm(request, data=request.POST)
-            
+            form_data = {
+                "username": request.POST.get("email"),
+                "password": request.POST.get("password"),
+            }
+            form = AuthenticationForm(request, data=form_data)
+
             if form.is_valid():
-                email = form.cleaned_data.get('email')
+                username = form.cleaned_data.get('username')
                 password = form.cleaned_data.get('password')
-                user = authenticate(email=email, password=password)
+                user = authenticate(request, username=username, password=password)
 
                 if user is not None:
+                    if user_type == 'profesor' and not is_profesor(user):
+                        messages.error(request, "Tu usuario no tiene rol de profesor.")
+                        return redirect('login:login')
+                    if user_type == 'administrador' and not is_admin(user):
+                        messages.error(request, "Tu usuario no tiene permisos de administrador.")
+                        return redirect('login:login')
                     login(request, user)
                     messages.success(request, 'Bienvenido')
                     if user_type == 'profesor':
-                        return redirect('profesor_dashboard')
+                        return redirect('profesorpanel:dashboard')
                     elif user_type == 'administrador':
-                        return redirect('admin_dashboard')
+                        return redirect('adminpanel:dashboard')
                 else:
                     messages.error(request, "Correo o contraseña inválidos")
             else:
@@ -43,40 +79,101 @@ def login_view(request):
         elif user_type == 'estudiante':
             nombre_apellido = request.POST.get('nombre_apellido')
             carrera = request.POST.get('carrera')
+            seccion_id = request.POST.get('seccion_id')
             
-            if nombre_apellido and carrera:
-                grupos = ['A', 'B', 'C', 'D']
-                grupos_disponibles = []
+            if nombre_apellido and carrera and seccion_id:
+                seccion = SeccionEstudiantes.objects.filter(id=seccion_id).first()
+                if not seccion:
+                    messages.error(request, "Selecciona una sección válida.")
+                    return redirect('login:login')
 
-                for grupo in grupos:
-                    cantidad_en_grupo = Estudiante.objects.filter(grupo=grupo).count()
-                    if cantidad_en_grupo < 8:
-                        grupos_disponibles.append(grupo)
+                game_session = GameSession.objects.filter(
+                    seccion=seccion
+                ).order_by("-fecha", "-id").first()
+                if not game_session:
+                    messages.error(request, "Todavía no hay una sesión de juego activa para tu sección. Por favor, contacta a tu profesor.")
+                    return redirect('login:login')
 
-                if grupos_disponibles:
-                    grupo_asignado = random.choice(grupos_disponibles)
+                if game_session.modo_asignacion == "LOGIN_RANDOM":
+                    teams = list(Team.objects.filter(sesion=game_session).order_by("id"))
+                    assigned_team = None
+                    for team in teams:
+                        if team.has_cupo():
+                            assigned_team = team
+                            break
+
+                    if assigned_team is None:
+                        existing_codes = set(Team.objects.filter(sesion=game_session).values_list("codigo_grupo", flat=True))
+                        new_code = None
+                        for i in range(26):
+                            code = chr(ord('A') + i)
+                            if code not in existing_codes:
+                                new_code = code
+                                break
+                        if new_code is None:
+                            new_code = str(len(existing_codes) + 1)
+                        assigned_team = Team.objects.create(
+                            nombre=f"Equipo {new_code}",
+                            sesion=game_session,
+                            codigo_grupo=new_code,
+                        )
+                        tablet = Tablet.objects.filter(
+                            sesion=game_session,
+                            team__isnull=True
+                        ).first()
+                        if tablet is not None:
+                            assigned_team.tablet = tablet
+                            assigned_team.save(update_fields=["tablet"])
+
+                    estudiante = Estudiante.objects.create(
+                        nombre_apellido=nombre_apellido,
+                        carrera=carrera,
+                        seccion=seccion,
+                        team=assigned_team)
+                    return redirect('login:estudiante_ingresado', estudiante_id=estudiante.id)
                 else:
-                    grupo_asignado = random.choice(grupos)
-                
-                estudiante = Estudiante.objects.create(
-                    nombre_apellido=nombre_apellido,
-                    carrera=carrera,
-                    grupo=grupo_asignado)
-                return redirect('login:estudiante_ingresado', estudiante_id=estudiante.id)
+                    if not game_session.seccion:
+                        messages.error(request, "La sesión no tiene sección asignada. Consulta a tu profesor.")
+                        return redirect('login:login')
+
+                    estudiante = Estudiante.objects.filter(
+                        nombre_apellido=nombre_apellido,
+                        carrera=carrera,
+                        seccion=seccion,
+                    ).first()
+
+                    if not estudiante:
+                        messages.error(request, "No estás registrado en la sección de esta sesión. Consulta a tu profesor.")
+                        return redirect('login:login')
+
+                    if estudiante.team is None:
+                        messages.error(request, "Tu profesor aún no te ha asignado a un grupo.")
+                        return redirect('login:login')
+
+                    return redirect('login:estudiante_ingresado', estudiante_id=estudiante.id)
             else:
-                messages.error(request, "Por favor completa todos los campos para estudiante")
+                messages.error(request, "Por favor completa todos los campos para estudiante, incluida la sección")
             
         elif user_type == 'tableta':
             pin = request.POST.get('pin')
-            pins_validos = ['1234']
-            if pin in pins_validos:
-                messages.success(request, f'Acceso concedido a tableta con PIN: {pin}')
-                return redirect('login:home_estudiante')
+            tablet = Tablet.objects.filter(codigo_acceso=pin).first()
+            if tablet is None:
+                messages.error(request, "Código de acceso inválido")
+                return redirect('login:login')
             else:
-                messages.error(request, "PIN incorrecto")
+                request.session["tablet_id"] = tablet.id
+                # Si la tablet ya tiene team asociado, guardamos la referencia
+                from etapasJuego.models import Team  # import local para evitar ciclos
+                existing_team = Team.objects.filter(tablet=tablet).first()
+                if existing_team:
+                    request.session["team_id"] = existing_team.id
+                request.session.modified = True
+                messages.success(request, f'Acceso concedido a tableta con código: {pin}')
+                return redirect('login:home_estudiante')
 
         else:
             messages.error(request, "Por favor selecciona un tipo de usuario válido")
-    
+
     form = AuthenticationForm()
-    return render(request, 'login/login.html', {'form': form})
+    secciones = SeccionEstudiantes.objects.all()
+    return render(request, 'login/login.html', {'form': form, 'secciones': secciones})

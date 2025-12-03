@@ -1,0 +1,86 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Etapa 2.0 — Selección de tema</title>
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/base.css' %}">
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/components.css' %}">
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/theme_login_port.css' %}">
+  <link rel="stylesheet" href="{% static 'etapasJuego/css/etapa2.css' %}">
+</head>
+<body class="theme-login">
+  <div class="app-noise"></div>
+  <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
+
+  <div id="progress-bar">
+    <div>
+      <span>Etapa 2 de 4</span>
+      <div><div style="width:50%;"></div></div>
+    </div>
+  </div>
+
+  <div class="ws-container" id="mainContent">
+    <div class="ws-header">
+      <h1 class="ws-title">Etapa 2 — Selección de tema</h1>
+      <p class="ws-message">
+        Elijan el tema general en el que trabajará su equipo: Salud, Sustentabilidad o Educación.
+      </p>
+    </div>
+
+    <section class="challenge-list topic-list" aria-label="Selecciona un tema">
+      <div class="topic-grid">
+        {% for topic in topics %}
+          <article class="topic-card" data-topic-id="{{ topic.id }}" tabindex="0">
+            <span class="topic-glow"></span>
+            <div class="topic-content">
+              {% if topic.imagen %}
+                <img src="{{ topic.imagen.url }}" alt="Tema {{ topic.nombre }}" class="topic-img">
+              {% else %}
+                <img src="{% static 'etapasJuego/img_topics/salud.png' %}" alt="{{ topic.nombre }}" class="topic-img">
+              {% endif %}
+              <h3>{{ topic.nombre }}</h3>
+              {% if topic.descripcion %}
+                <p>{{ topic.descripcion }}</p>
+              {% endif %}
+            </div>
+          </article>
+        {% empty %}
+          <p>No hay temas configurados. Por favor, pídale al administrador que cree temas en el panel de administración.</p>
+        {% endfor %}
+      </div>
+    </section>
+
+    <form id="topic-form" method="post" action="{% url 'etapa2_tema' %}" style="display:none;">
+      {% csrf_token %}
+      <input type="hidden" name="topic_id" id="topic-id-input">
+    </form>
+  </div>
+
+  <a href="{% url 'etapa1' %}" class="btn-arrow btn-arrow-left" title="Volver a la etapa 1">
+    <span class="arrow-icon">➜</span>
+  </a>
+  <a href="{% url 'etapa2' %}" class="btn-arrow btn-arrow-right" title="Avanzar a selección de desafío">
+    <span class="arrow-icon">➜</span>
+  </a>
+
+  <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const cards = document.querySelectorAll(".topic-card");
+      const form = document.getElementById("topic-form");
+      const input = document.getElementById("topic-id-input");
+
+      cards.forEach(card => {
+        card.addEventListener("click", function () {
+          const topicId = this.dataset.topicId;
+          if (!topicId) return;
+          input.value = topicId;
+          form.submit();
+        });
+      });
+    });
+  </script>
+</body>
+</html>

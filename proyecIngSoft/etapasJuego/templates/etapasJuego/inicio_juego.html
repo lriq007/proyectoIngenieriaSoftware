@@ -16,6 +16,7 @@
 
 <body>
   <div class="app-noise"></div>
+  <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
   
   <div class="ws-header">
     <h1 class="ws-title">¡Antes de empezar!</h1>
@@ -89,6 +90,7 @@
       <span class="arrow-icon">➜</span>
     </a>
   </div>
+  <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
 </body>
   <style>
     .welcome-container {

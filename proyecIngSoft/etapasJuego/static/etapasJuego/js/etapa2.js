@@ -1,11 +1,12 @@
 document.addEventListener("DOMContentLoaded", () => {
   const TIMER_KEY = "E2_TIMER_END_AT_v1"; // persistencia
-  const DURATION_SEC = 600;               // 10 minutos
-
-  // Puede haber timer en etapa2.html o en etapa2_1.html (o en ambas)
   const timers = Array.from(document.querySelectorAll("#e2-timer"));
   if (!timers.length) return;
 
+  const durationFromDom = parseInt(timers[0].dataset.durationSeconds, 10);
+  const DURATION_SEC = Number.isFinite(durationFromDom) ? durationFromDom : 600; // 10 minutos por defecto
+
+  // Puede haber timer en etapa2.html o en etapa2_1.html (o en ambas)
   // Evita crear múltiples intervals si se reinyecta el script
   if (window.__E2_TIMER_ACTIVE__) return;
   window.__E2_TIMER_ACTIVE__ = true;

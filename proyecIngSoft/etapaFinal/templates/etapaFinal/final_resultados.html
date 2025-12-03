@@ -1,0 +1,158 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cierre — Resultados finales</title>
+  <link rel="stylesheet" href="{% static 'etapaFinal/css/etapaFinal.css' %}">
+</head>
+<body class="theme-login">
+  <div class="app-noise"></div>
+  <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
+
+  <div class="ws-container">
+    <div class="ws-header" style="margin-top:24px;">
+      <h1 class="ws-title">Cierre — Resultados finales</h1>
+      <p class="ws-subtitle">Gracias por participar. Aquí están los resultados de tu sesión.</p>
+    </div>
+
+    {% if ranking %}
+      <section class="ws-card ranking-container">
+        <header class="ws-header" style="gap:0.25rem;">
+          <h2 class="ws-title" style="margin-bottom:0;">🏆 Ranking de Equipos</h2>
+          <p class="ws-subtitle">Basado en tokens totales</p>
+        </header>
+
+        {% with top_three=ranking|slice:":3" rest=ranking|slice:"3:" %}
+          <div class="top-three">
+            {% for team in top_three %}
+              {% if forloop.counter == 1 %}
+                <div class="ranking-item first-place">
+                  <span class="position">1º</span>
+                  <span class="team-name">{{ team.nombre }}</span>
+                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
+                  <span class="ef-card-tag" style="margin-left:auto;">Ganador 🏆</span>
+                </div>
+              {% elif forloop.counter == 2 %}
+                <div class="ranking-item second-place">
+                  <span class="position">2º</span>
+                  <span class="team-name">{{ team.nombre }}</span>
+                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
+                </div>
+              {% elif forloop.counter == 3 %}
+                <div class="ranking-item third-place">
+                  <span class="position">3º</span>
+                  <span class="team-name">{{ team.nombre }}</span>
+                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
+                </div>
+              {% endif %}
+            {% empty %}
+              <p class="ws-empty">No hay equipos para rankear aún.</p>
+            {% endfor %}
+          </div>
+
+          {% if rest %}
+            <ul class="remaining-list">
+              {% for team in rest %}
+                <li class="ranking-item">
+                  <span class="position">{{ forloop.counter|add:"3" }}º</span>
+                  <span class="team-name">{{ team.nombre }}</span>
+                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+      </section>
+    {% else %}
+      <p class="ws-empty">No hay resultados para esta sesión.</p>
+    {% endif %}
+
+    <section class="ws-card" style="display:grid;gap:12px;">
+      <h2 class="ws-title" style="margin:0;">Mensaje final</h2>
+      <p class="ws-subtitle" style="color:#0f172a;">Este juego fortaleció habilidades clave: Trabajo en equipo, Empatía, Creatividad, Comunicación y Apoyo. El emprendimiento es un pilar en la UDD porque impulsa innovación y soluciones reales con impacto.</p>
+      <div class="ws-grid" style="gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));">
+        <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
+          <strong>Equipo</strong>
+          <p style="margin:6px 0 0 0;">Coordinar y ejecutar juntos.</p>
+        </div>
+        <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
+          <strong>Empatía</strong>
+          <p style="margin:6px 0 0 0;">Entender al usuario antes de proponer.</p>
+        </div>
+        <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
+          <strong>Creatividad</strong>
+          <p style="margin:6px 0 0 0;">Diseñar soluciones originales.</p>
+        </div>
+        <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
+          <strong>Comunicación</strong>
+          <p style="margin:6px 0 0 0;">Contar la historia con claridad.</p>
+        </div>
+        <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
+          <strong>Apoyo</strong>
+          <p style="margin:6px 0 0 0;">Invertir y dar feedback constructivo.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="ws-card" style="display:grid;gap:16px;">
+      <h2 class="ws-title" style="margin:0;">Encuesta y programas</h2>
+      <div class="ws-grid" style="gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+        {% if sesion.qr_encuesta_url %}
+          <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
+            <h3 class="ws-subtitle" style="margin:0 0 6px 0;color:#0f172a;">Encuesta de satisfacción</h3>
+            {% with url=sesion.qr_encuesta_url|lower %}
+              {% if url|slice:"-4:" == ".png" or url|slice:"-4:" == ".jpg" or url|slice:"-5:" == ".jpeg" or url|slice:"-4:" == ".svg" %}
+                <img src="{{ sesion.qr_encuesta_url }}" alt="QR Encuesta" style="max-width:100%;border-radius:12px;">
+              {% else %}
+                <a class="btn btn-primary" href="{{ sesion.qr_encuesta_url }}" target="_blank" rel="noopener noreferrer">Responder encuesta</a>
+              {% endif %}
+            {% endwith %}
+          </div>
+        {% endif %}
+
+        {% if sesion.qr_instagram_url %}
+          <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
+            <h3 class="ws-subtitle" style="margin:0 0 6px 0;color:#0f172a;">Instagram</h3>
+            {% with url=sesion.qr_instagram_url|lower %}
+              {% if url|slice:"-4:" == ".png" or url|slice:"-4:" == ".jpg" or url|slice:"-5:" == ".jpeg" or url|slice:"-4:" == ".svg" %}
+                <img src="{{ sesion.qr_instagram_url }}" alt="QR Instagram" style="max-width:100%;border-radius:12px;">
+              {% else %}
+                <a class="btn btn-primary" href="{{ sesion.qr_instagram_url }}" target="_blank" rel="noopener noreferrer">Abrir Instagram</a>
+              {% endif %}
+            {% endwith %}
+          </div>
+        {% endif %}
+
+        {% if sesion.qr_linkedin_url %}
+          <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
+            <h3 class="ws-subtitle" style="margin:0 0 6px 0;color:#0f172a;">LinkedIn / Sitio institucional</h3>
+            {% with url=sesion.qr_linkedin_url|lower %}
+              {% if url|slice:"-4:" == ".png" or url|slice:"-4:" == ".jpg" or url|slice:"-5:" == ".jpeg" or url|slice:"-4:" == ".svg" %}
+                <img src="{{ sesion.qr_linkedin_url }}" alt="QR LinkedIn" style="max-width:100%;border-radius:12px;">
+              {% else %}
+                <a class="btn btn-primary" href="{{ sesion.qr_linkedin_url }}" target="_blank" rel="noopener noreferrer">Ver más</a>
+              {% endif %}
+            {% endwith %}
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  </div>
+
+  <a href="{% url 'etapaFinal:home' %}" class="btn-arrow btn-arrow-left" title="Volver a coevaluación">
+    <span class="arrow-icon">➜</span>
+  </a>
+
+  <script>
+    // Pequeño efecto de confeti opcional (placeholder simple)
+    document.addEventListener("DOMContentLoaded", () => {
+      const win = document.querySelector(".first-place");
+      if (!win) return;
+      win.classList.add("confeti");
+    });
+  </script>
+  <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
+</body>
+</html>

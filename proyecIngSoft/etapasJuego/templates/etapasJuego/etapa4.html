@@ -26,6 +26,14 @@
   </div>
 
   <div class="ws-container">
+    <div
+      id="e4-timer"
+      class="ws-timer"
+      aria-live="polite"
+      aria-label="Tiempo restante"
+      data-duration-seconds="{{ sesion.duracion_etapa4_segundos|default:600 }}"
+    >10:00</div>
+
     <div class="ws-header">
       <h1 class="ws-title">Etapa 4 — Pitch Final</h1>
     </div>
@@ -86,40 +94,20 @@
         </div>
 
     </div>
-    <div class="gpt-badge-wrapper">
-        <a href="https://openai.com" target="_blank" rel="noopener noreferrer" class="brutalist-button openai">
-            <div class="openai-logo">
-                <!-- Icono ChatGPT como SVG inline -->
-                <svg class="openai-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="currentColor" d="M22.282 9.821a5.434 5.434 0 0 0-.469-4.217 5.5 5.5 0 0 0-5.917-2.659A5.497 5.497 0 0 0 6.98 3.482a5.5 5.5 0 0 0-3.999 7.709 5.434 5.434 0 0 0 .47 4.217 5.5 5.5 0 0 0 5.916 2.659 5.497 5.497 0 0 0 8.916 0 5.5 5.5 0 0 0 3.999-7.709ZM12.01 21.5a4.46 4.46 0 0 1-2.57-.814l.129-.075 4.281-2.47a.53.53 0 0 0 .265-.458v-5.97l1.811 1.046a.045.045 0 0 1 .024.033v4.994a4.506 4.506 0 0 1-3.94 3.714Zm-8.31-4.277a4.447 4.447 0 0 1-.51-2.605l.129.077 4.281 2.47a.52.52 0 0 0 .528 0l5.169-2.984v2.092a.05.05 0 0 1-.02.043l-4.327 2.499a4.499 4.499 0 0 1-5.25-.494Zm-1.35-9.28a4.464 4.464 0 0 1 1.931-1.947l-.002.149v4.94a.52.52 0 0 0 .265.458l5.169 2.984-1.812 1.046a.05.05 0 0 1-.048.003l-4.327-2.5a4.506 4.506 0 0 1-.976-5.133ZM17.45 10.9l-5.169-2.985 1.811-1.046a.05.05 0 0 1 .049-.003l4.327 2.5a4.501 4.501 0 0 1 .977 5.134l-.003-.15v-4.94a.52.52 0 0 0-.265-.458Zm2.692-3.215a4.455 4.455 0 0 1 .51 2.606l-.128-.078-4.282-2.47a.521.521 0 0 0-.528 0L10.545 10.7V8.608a.05.05 0 0 1 .02-.043l4.327-2.499a4.5 4.5 0 0 1 5.25.494ZM8.165 12.12l-1.812-1.046a.045.045 0 0 1-.024-.033V6.046a4.5 4.5 0 0 1 6.51-1.53l-.13.075L8.43 7.06a.53.53 0 0 0-.265.458Zm1.73-1.993 2.115-1.221 2.116 1.221v2.442l-2.116 1.221-2.115-1.221Z" />
-                </svg>
-                <span class="openai-text">OpenAI</span>
-            </div>
-            <div class="button-text">
-                <span>Powered by</span>
-                <span>GPT</span>
-            </div>
-        </a>
-    </div>
     {% endwith %}
 
     <!-- Editor del pitch (mismo ancho/estética que la tarjeta) -->
     <section class="pitch-editor-shell">
       <article class="pitch-editor-card">
         <label for="pitchText" class="pitch-editor-title">Escribe tu Pitch</label>
-        <textarea id="pitchText" class="pitch-textarea" placeholder="Escribe aquí tu discurso del pitch…" maxlength="2000"></textarea>
-        <button id="btnGuardarPitch" class="btn btn-primary" type="button">
+        <textarea id="pitchText" name="pitch_text" class="pitch-textarea" placeholder="Escribe aquí tu discurso del pitch…" maxlength="2000">{{ pitch_text|default_if_none:"" }}</textarea>
+        <div class="pitch-actions">
+          <button id="btnGuardarPitch" class="btn btn-primary" type="button" data-save-url="{% url 'etapa4_guardar_pitch' %}">
           Guardar Pitch
         </button>
+          <p id="pitchFeedback" class="bubble-feedback" role="status" aria-live="polite"></p>
+        </div>
       </article>
-    </section>
-
-    <section class="pitch-intro">
-      <p><strong>Objetivo:</strong> transforma los aprendizajes del mapa de empatía en un pitch convincente. Esta pantalla conectará el trabajo previo con recomendaciones generadas por IA.</p>
-      <p><strong>Próximo paso técnico:</strong> cuando se integre la API de OpenAI, enviaremos a ChatGPT el resumen siguiente como payload:</p>
-      {{ pitch_payload|json_script:"pitch-payload" }}
-      <pre>{{ pitch_payload|pprint }}</pre>
-      <p>El backend generará tres ideas fuerzas que alimentarán las tarjetas de abajo.</p>
     </section>
   </div>
 
@@ -129,6 +117,5 @@
 
   <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
   <script src="{% static 'etapasJuego/js/etapa4.js' %}"></script>
-  {% include 'etapasJuego/mascota.html' %}
 </body>
 </html>

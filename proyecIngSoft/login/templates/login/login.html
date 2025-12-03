@@ -60,6 +60,16 @@
                         <label for="carrera">Carrera</label>
                         <input type="text" id="carrera" name="carrera" class="form-field">
                     </div>
+
+                    <div class="form-group">
+                        <label for="seccion_id">Sección</label>
+                        <select id="seccion_id" name="seccion_id" class="form-field">
+                            <option value="">Selecciona tu sección</option>
+                            {% for sec in secciones %}
+                                <option value="{{ sec.id }}">{{ sec.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
 
                 <div id="tabletaFields" class="form-fields" style="display: none;">

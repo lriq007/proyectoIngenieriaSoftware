@@ -1,0 +1,18 @@
+{% extends "login/panel_base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block header_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="panel-card">
+    <form method="post" enctype="multipart/form-data" class="panel-form">
+        {% csrf_token %}
+        {% include "login/admin/_form_fields.html" with form=form %}
+        <div class="panel-actions-row">
+            <button class="btn-link btn-primary" type="submit">Guardar</button>
+            {% if back_url %}
+                <a class="btn-link btn-outline" href="{% url back_url %}">Volver</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+{% endblock %}

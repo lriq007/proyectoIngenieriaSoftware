@@ -6,45 +6,130 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Etapa Final — Coevaluación</title>
 
-  <!-- Reutilizamos estilos del proyecto -->
-  <link rel="stylesheet" href="{% static 'etapasJuego/css/base.css' %}">
-  <link rel="stylesheet" href="{% static 'etapasJuego/css/components.css' %}">
-  <link rel="stylesheet" href="{% static 'etapasJuego/css/theme_login_port.css' %}">
   <link rel="stylesheet" href="{% static 'etapaFinal/css/etapaFinal.css' %}">
 </head>
-<body>
-  {% include 'etapasJuego/mascota.html' %}
-
+<body class="theme-login">
   <div class="app-noise"></div>
 
-  <div class="ef-container">
-    <h1 class="ef-title">Etapa Final — Coevaluación</h1>
-
-    <!-- Barra de grupos -->
-    <div class="ef-groups" role="tablist" aria-label="Seleccionar grupo a evaluar">
-      <!-- NOTA: si conoces el grupo del usuario, podrás desactivar su propia pestaña desde JS -->
-      <button class="ef-tab ef-tab-active" data-group="Grupo A" role="tab" aria-selected="true">Grupo A</button>
-      <button class="ef-tab" data-group="Grupo B" role="tab" aria-selected="false">Grupo B</button>
-      <button class="ef-tab" data-group="Grupo C" role="tab" aria-selected="false">Grupo C</button>
-      <button class="ef-tab" data-group="Grupo D" role="tab" aria-selected="false">Grupo D</button>
-    </div>
-
-    <!-- Plantilla de preguntas (renderizada por JS, igual para todos los grupos) -->
-    <div id="ef-questions" class="ef-questions" aria-live="polite"></div>
-
-    <!-- (Opcional) Zona de acciones -->
-    <div class="ef-actions">
-      <button id="ef-clear-group" class="ef-btn ef-btn-outline">Limpiar respuestas del grupo</button>
-      <!-- más adelante: <button id="ef-submit" class="ef-btn ef-btn-primary">Enviar evaluación</button> -->
-      <span id="ef-status" class="ef-status" aria-live="polite"></span>
+  <div id="progress-bar">
+    <div>
+      <span>Etapa 4 de 4</span>
+      <div><div style="width:100%;"></div></div>
     </div>
   </div>
 
-  <script>
-    // Si más adelante renderizas el grupo del evaluador desde Django:
-    // window.CURRENT_TEAM = "{{ request.user.perfil.grupo|default:'Grupo X' }}";
-    window.CURRENT_TEAM = null; // ← por ahora sin restricción; setéalo p.ej. "Grupo B" para bloquear evaluar el propio grupo
-  </script>
+  <div class="ws-container">
+    <div class="ws-header">
+      <h1 class="ws-title">Etapa Final — Coevaluación</h1>
+      <p class="ws-subtitle">Evalúa a los demás equipos de tu sesión. No puedes evaluarte a ti mismo.</p>
+    </div>
+
+    <form id="ef-form" data-save-url="{% url 'etapaFinal:save_coevaluacion' %}">
+      {% csrf_token %}
+      <div class="ws-grid ef-eval-grid">
+        {% for equipo in equipos_a_evaluar %}
+          <article class="ws-card ef-eval-card" data-equipo-id="{{ equipo.id }}">
+            <header class="ef-eval-header">
+              <div class="ef-eval-meta">
+                <p class="ef-card-tag">Equipo</p>
+                <h2 class="ef-card-title">{{ equipo.nombre }}</h2>
+              </div>
+              <div class="ef-eval-code">[{{ equipo.codigo_grupo }}]</div>
+            </header>
+
+            <div class="ef-eval-body">
+              <div class="ef-score-row">
+                <label class="ef-label">Equipo</label>
+                <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_equipo" placeholder="1-5" required>
+              </div>
+              <div class="ef-score-row">
+                <label class="ef-label">Empatía</label>
+                <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_empatia" placeholder="1-5" required>
+              </div>
+              <div class="ef-score-row">
+                <label class="ef-label">Creatividad</label>
+                <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_creatividad" placeholder="1-5" required>
+              </div>
+              <div class="ef-score-row">
+                <label class="ef-label">Comunicación</label>
+                <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_comunicacion" placeholder="1-5" required>
+              </div>
+            </div>
+
+            <div class="ef-eval-footer">
+              <label class="ef-field">
+                <span class="ef-label">Comentario (opcional)</span>
+                <textarea class="ef-comment" data-field="comentario" rows="2" placeholder="Feedback breve"></textarea>
+              </label>
+            </div>
+          </article>
+        {% empty %}
+          <p class="ws-empty">No hay otros equipos para evaluar en esta sesión.</p>
+        {% endfor %}
+      </div>
+
+      <div class="ef-actions">
+        <button type="button" id="ef-submit" class="btn btn-primary">Enviar coevaluaciones</button>
+        <span id="ef-status" class="ef-status" aria-live="polite"></span>
+      </div>
+    </form>
+
+    {% if ranking %}
+      <section class="ws-card ranking-container">
+        <header class="ws-header" style="gap:0.25rem;">
+          <h2 class="ws-title" style="margin-bottom:0;">🏆 Ranking de Equipos</h2>
+          <p class="ws-subtitle">Basado en tokens totales de esta sesión</p>
+        </header>
+
+        {% with top_three=ranking|slice:":3" rest=ranking|slice:"3:" %}
+          <div class="top-three">
+            {% for team in top_three %}
+              {% if forloop.counter == 1 %}
+                <div class="ranking-item first-place">
+                  <span class="position">1º</span>
+                  <span class="team-name">{{ team.nombre }}</span>
+                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
+                </div>
+              {% elif forloop.counter == 2 %}
+                <div class="ranking-item second-place">
+                  <span class="position">2º</span>
+                  <span class="team-name">{{ team.nombre }}</span>
+                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
+                </div>
+              {% elif forloop.counter == 3 %}
+                <div class="ranking-item third-place">
+                  <span class="position">3º</span>
+                  <span class="team-name">{{ team.nombre }}</span>
+                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
+                </div>
+              {% endif %}
+            {% empty %}
+              <p class="ws-empty">No hay equipos para rankear aún.</p>
+            {% endfor %}
+          </div>
+
+          {% if rest %}
+            <ul class="remaining-list">
+              {% for team in rest %}
+                <li class="ranking-item">
+                  <span class="position">{{ forloop.counter|add:"3" }}º</span>
+                  <span class="team-name">{{ team.nombre }}</span>
+                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+      </section>
+    {% endif %}
+  </div>
+
+  <a href="{% url 'etapaFinal:home' %}" class="btn-arrow btn-arrow-left" title="Volver">
+    <span class="arrow-icon">➜</span>
+  </a>
+  <a href="{% url 'etapaFinal:final_resultados' %}" class="btn-arrow btn-arrow-right" title="Ir al ranking final">
+    <span class="arrow-icon">➜</span>
+  </a>
 
   <script src="{% static 'etapaFinal/js/etapaFinal.js' %}"></script>
 </body>

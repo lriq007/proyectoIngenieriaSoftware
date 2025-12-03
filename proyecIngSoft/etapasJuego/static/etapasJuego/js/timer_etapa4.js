@@ -3,15 +3,14 @@
   if (window.__E4_TIMER_ACTIVE__) return;
   window.__E4_TIMER_ACTIVE__ = true;
 
-  const TOTAL_SECONDS = 10 * 60; // 10:00
-
-  const pad2 = (n) => String(n).padStart(2, "0");
-  const fmt = (sec) => `${pad2(Math.floor(sec / 60))}:${pad2(sec % 60)}`;
-
   function startTimer() {
     const el = document.getElementById("e4-timer");
     if (!el) return;
 
+    const durationFromDom = parseInt(el.dataset.durationSeconds, 10);
+    const TOTAL_SECONDS = Number.isFinite(durationFromDom) ? durationFromDom : 10 * 60; // 10:00 por defecto
+    const pad2 = (n) => String(n).padStart(2, "0");
+    const fmt = (sec) => `${pad2(Math.floor(sec / 60))}:${pad2(sec % 60)}`;
     const endAt = Date.now() + TOTAL_SECONDS * 1000;
 
     el.textContent = fmt(TOTAL_SECONDS);

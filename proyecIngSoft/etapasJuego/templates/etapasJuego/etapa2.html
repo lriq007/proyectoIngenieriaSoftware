@@ -16,6 +16,7 @@
 
 <body class="theme-login">
   <div class="app-noise"></div>
+  <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
 
   <!-- Barra de progreso -->
   <div id="progress-bar">
@@ -28,7 +29,13 @@
   <!-- Contenido -->
   <div class="ws-container" id="mainContent">
     <!-- Cronómetro Etapa 2 -->
-    <div id="e2-timer" class="ws-timer" aria-live="polite" aria-label="Tiempo restante">10:00</div>
+    <div
+      id="e2-timer"
+      class="ws-timer"
+      aria-live="polite"
+      aria-label="Tiempo restante"
+      data-duration-seconds="{{ sesion.duracion_etapa2_segundos|default:600 }}"
+    >10:00</div>
 
     <div class="ws-header">
       <h1 class="ws-title">Etapa 2 — Desafío y Empatía</h1>
@@ -50,20 +57,21 @@
 
     <!-- Lista de desafíos -->
     <section class="challenge-list" id="listaDesafios">
-      {% for d in desafios %}
+      {% for desafio in desafios %}
         <article
           class="challenge-card"
           role="button" tabindex="0"
-          aria-label="Abrir información del desafío {{ d.titulo }}"
-          data-num="{{ d.numero }}"
-          data-title="{{ d.titulo|escape }}"
-          data-desc="{{ d.descripcion|default:'Sin descripción'|escape }}"
-          data-video="{{ d.video_src }}"
+          aria-label="Abrir información del desafío {{ desafio.titulo }}"
+          data-challenge-id="{{ desafio.challenge.id|default_if_none:'' }}"
+          data-desafio-id="{{ desafio.id }}"
+          data-title="{{ desafio.titulo|escape }}"
+          data-desc="{{ desafio.challenge.descripcion|default:desafio.historia|default:'Sin descripción'|escape }}"
+          data-video="{% if desafio.challenge and desafio.challenge.video_file %}{{ desafio.challenge.video_file.url }}{% endif %}"
         >
-          <h3>{{ d.titulo }}</h3>
+          <h3>{{ desafio.titulo }}</h3>
         </article>
       {% empty %}
-        <p>No hay desafíos disponibles por ahora.</p>
+        <p>No hay desafíos configurados para este tema. Por favor, pídale al administrador que cree desafíos.</p>
       {% endfor %}
     </section>
   </div>
@@ -88,7 +96,8 @@
       <div class="modal-footer">
         <form id="selectForm" method="post" action="{% url 'etapa2_select' %}">
           {% csrf_token %}
-          <input type="hidden" name="desafio_numero" id="desafioNumeroField">
+          <input type="hidden" name="challenge_id" id="challengeIdField">
+          <input type="hidden" name="desafio_id" id="desafioIdField">
           <button type="submit" class="btn btn-primary" disabled>Escoger este desafío</button>
         </form>
       </div>
@@ -113,18 +122,20 @@
       const video = document.getElementById('modalVideo');
       const btnClose = document.getElementById('btnClose');
       const form = document.getElementById('selectForm');
-      const hiddenField = document.getElementById('desafioNumeroField');
+      const hiddenChallengeField = document.getElementById('challengeIdField');
+      const hiddenDesafioField = document.getElementById('desafioIdField');
       const submitBtn = form?.querySelector('button[type="submit"]');
       if(submitBtn){ submitBtn.disabled = true; }
 
-      function setSelected(num){
-        if(hiddenField){ hiddenField.value = num || ''; }
-        if(submitBtn){ submitBtn.disabled = !num; }
+      function setSelected(challengeId, desafioId){
+        if(hiddenChallengeField){ hiddenChallengeField.value = challengeId || ''; }
+        if(hiddenDesafioField){ hiddenDesafioField.value = desafioId || ''; }
+        if(submitBtn){ submitBtn.disabled = !(challengeId && desafioId); }
       }
       function openModal(data){
         title.textContent = data.title || 'Desafío';
         desc.textContent  = data.desc  || '';
-        setSelected(data.num || '');
+        setSelected(data.challengeId || '', data.desafioId || '');
         try { video.pause(); } catch(e){}
         video.removeAttribute('src');
         while (video.firstChild) video.removeChild(video.firstChild);
@@ -149,10 +160,11 @@
       document.getElementById('listaDesafios')?.addEventListener('click', (e)=>{
         const card = e.target.closest('.challenge-card'); if(!card) return;
         openModal({
-          num:   card.dataset.num,
-          title: card.dataset.title,
-          desc:  card.dataset.desc,
-          video: card.dataset.video
+          challengeId: card.dataset.challengeId,
+          desafioId:   card.dataset.desafioId,
+          title:       card.dataset.title,
+          desc:        card.dataset.desc,
+          video:       card.dataset.video
         });
       });
       document.getElementById('listaDesafios')?.addEventListener('keydown', (e)=>{
@@ -160,10 +172,11 @@
           e.preventDefault();
           const card = e.target;
           openModal({
-            num:   card.dataset.num,
-            title: card.dataset.title,
-            desc:  card.dataset.desc,
-            video: card.dataset.video
+            challengeId: card.dataset.challengeId,
+            desafioId:   card.dataset.desafioId,
+            title:       card.dataset.title,
+            desc:        card.dataset.desc,
+            video:       card.dataset.video
           });
         }
       });
@@ -173,10 +186,9 @@
     })();
   </script>
 
+  <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
   <!-- Cronómetro persistente Etapa 2 (con reset en la raíz) -->
   <script>window.E2_FORCE_RESET = true;</script>
   <script src="{% static 'etapasJuego/js/timer_etapa2.js' %}"></script>
-
-  {% include 'etapasJuego/mascota.html' %}
 </body>
 </html>

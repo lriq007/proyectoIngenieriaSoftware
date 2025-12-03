@@ -15,6 +15,7 @@
 
 <body class="theme-login">
   <div class="app-noise"></div>
+  <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
 
   <div id="progress-bar">
     <div>
@@ -27,7 +28,13 @@
 
   <div class="ws-container">
     <!-- Cronómetro Etapa 2 -->
-    <div id="e2-timer" class="ws-timer" aria-live="polite" aria-label="Tiempo restante">10:00</div>
+    <div
+      id="e2-timer"
+      class="ws-timer"
+      aria-live="polite"
+      aria-label="Tiempo restante"
+      data-duration-seconds="{{ sesion.duracion_etapa2_segundos|default:600 }}"
+    >10:00</div>
 
     <div class="stage-wrapper">
       <h1 class="stage-title">Mapa de Empatía</h1>
@@ -36,10 +43,16 @@
         <div class="summary-copy">
           <span class="badge">Desafío activo</span>
           <h2>{{ desafio.titulo }}</h2>
+          {% if desafio.personaje %}
+            <p class="summary-character">{{ desafio.personaje }}</p>
+          {% endif %}
+          {% if desafio.historia %}
+            <p class="summary-story">{{ desafio.historia }}</p>
+          {% endif %}
         </div>
         {% if desafio_persona_image %}
           <figure class="summary-figure">
-            {% if desafio_persona_image|slice:'0:8' == '/static' %}
+            {% if desafio_persona_image|slice:'0:1' == '/' or desafio_persona_image|slice:'0:4' == 'http' %}
               <img src="{{ desafio_persona_image }}" alt="Ilustración del desafío seleccionado">
             {% else %}
               <img src="{% static desafio_persona_image %}" alt="Ilustración del desafío seleccionado">
@@ -49,20 +62,29 @@
       </div>
 
       <section class="bubble-section">
-        <div id="bubbleMap" class="bubble-map" data-desafio="{{ desafio.numero }}" role="group" aria-label="Mapa de empatía">
-          <div class="bubble central" aria-hidden="true">
-            <span>{{ desafio.titulo }}</span>
+        <div id="bubbleMap" class="empathy-map-container" data-desafio="{{ desafio.numero }}" role="group" aria-label="Mapa de empatía">
+          <div class="map-header">
+            <h2>🎯 Mapa de Empatía</h2>
+            <p>Conoce profundamente a tu usuario: {% if desafio.personaje %}{{ desafio.personaje }}{% else %}{{ desafio.titulo }}{% endif %}</p>
           </div>
-          {% for item in bubble_questions %}
-            <div class="bubble bubble-question pos-{{ forloop.counter }}{% if item.answer %} has-content{% endif %}"
-                 data-key="{{ item.key }}" data-label="{{ item.label }}" role="button" tabindex="0">
-              <span class="bubble-label">{{ item.label }}</span>
-              <div class="bubble-editor">
-                <h3>{{ item.label }}</h3>
-                <textarea name="{{ item.key }}" placeholder="Escribe aquí...">{% if item.answer %}{{ item.answer }}{% endif %}</textarea>
-              </div>
-            </div>
-          {% endfor %}
+          
+          <div class="bubble-grid">
+            {% for item in bubble_questions %}
+              <article class="bubble-card bubble-question{% if item.answer %} has-content{% endif %}" data-key="{{ item.key }}" data-label="{{ item.label }}" tabindex="0">
+                <div class="bubble-icon" aria-hidden="true">
+                  {% if forloop.counter == 1 %}🧠{% elif forloop.counter == 2 %}💭{% elif forloop.counter == 3 %}👁️{% elif forloop.counter == 4 %}💬{% elif forloop.counter == 5 %}🏃{% else %}👂{% endif %}
+                </div>
+                <div class="bubble-question-title">{{ item.label }}</div>
+                <textarea
+                  name="{{ item.key }}"
+                  class="bubble-textarea"
+                  placeholder="Escribe aquí..."
+                  maxlength="300"
+                >{% if item.answer %}{{ item.answer }}{% endif %}</textarea>
+                <div class="char-count">{{ item.answer|default_if_none:''|length }} / 300</div>
+              </article>
+            {% endfor %}
+          </div>
         </div>
 
         <div class="bubble-actions">
@@ -86,11 +108,10 @@
       saveUrl: "{% url 'etapa2_guardar_mapa' %}"
     };
   </script>
+  <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
   <script src="{% static 'etapasJuego/js/bubble-map.js' %}"></script>
 
   <!-- Cronómetro persistente Etapa 2 -->
   <script src="{% static 'etapasJuego/js/timer_etapa2.js' %}"></script>
-  
-  {% include 'etapasJuego/mascota.html' %}
 </body>
 </html>

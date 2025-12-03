@@ -239,6 +239,8 @@
   document.addEventListener("DOMContentLoaded", async () => {
     bindEvents();
     await init();
-    startSimpleTimer(300); // 5 minutos
+    const timerEl = document.getElementById("ws-timer");
+    const dur = parseInt(timerEl?.dataset.durationSeconds, 10);
+    startSimpleTimer(Number.isFinite(dur) ? dur : 300); // 5 minutos por defecto
   });
 })();

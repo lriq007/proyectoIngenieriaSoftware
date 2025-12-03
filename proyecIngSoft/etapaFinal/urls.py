@@ -5,4 +5,6 @@ app_name = "etapaFinal"
 
 urlpatterns = [
     path("", views.coevaluacion_home, name="home"),
+    path("save/", views.save_coevaluacion, name="save_coevaluacion"),
+    path("final/", views.final_resultados, name="final_resultados"),
 ]

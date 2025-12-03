@@ -42,7 +42,7 @@ body {
   inset: 0;
   z-index: -10;
   pointer-events: none;
-  background: linear-gradient(135deg,#06165f 0%,#1d4b99 100%);
+  background: linear-gradient(135deg,#020713 0%,#0b1733 100%);
 }
 
 .app-noise::before{
@@ -118,6 +118,29 @@ h2{
   font-weight:700
 }
 
+/* Títulos grandes de etapas (estilo dorado con trazo) */
+.ws-title{
+  margin:0;
+  font-size:clamp(40px,6vw,72px);
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.5px;
+  color:var(--accent-yellow);
+  -webkit-text-stroke:1px #000;
+  text-shadow:0 1px 0 #000,0 -1px 0 #000,1px 0 0 #000,-1px 0 0 #000;
+  text-align:center
+}
+
+.ws-message{
+  margin:0;
+  font-size:clamp(18px,2vw + 6px,28px);
+  line-height:1.3;
+  font-weight:400;
+  letter-spacing:.2px;
+  color:#ffffff;
+  text-align:center
+}
+
 p{
   color:var(--muted)
 }
@@ -136,6 +159,16 @@ p{
   overflow:hidden;
   clip:rect(0,0,0,0);
   border:0
+}
+
+/* Fondo de grafo animado para etapasJuego */
+.graph-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -9;
+  pointer-events: none;
 }
 
 .section{

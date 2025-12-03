@@ -74,6 +74,12 @@
     color: #000000;
 }
 
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
 .btn-home:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
@@ -172,4 +178,86 @@
 
 .home-estudiante-buttons {
     animation-delay: 0.4s;
+}
+
+.home-estudiante-programas {
+    margin: 10px 0 20px;
+    color: #f6f7fb;
+    text-align: center;
+}
+
+.programas-copy h2 {
+    margin: 0 0 8px;
+    font-size: 1.8rem;
+    color: #f7c843;
+}
+
+.programas-description {
+    margin: 0 0 20px;
+    line-height: 1.6;
+    color: #e4e7f2;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.timeline-steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 18px;
+    align-items: end;
+    justify-items: center;
+}
+
+.timeline-step {
+    text-align: center;
+    color: #f6f7fb;
+    position: relative;
+}
+
+.step-time {
+    display: inline-block;
+    background: #ff62b1;
+    color: #0b1a3f;
+    font-weight: 700;
+    border-radius: 12px;
+    padding: 6px 10px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+}
+
+.step-circle {
+    width: 168px;
+    height: 168px;
+    margin: 0 auto;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    color: #ffffff;
+    box-shadow:
+        0 12px 28px rgba(255, 200, 67, 0.4),
+        0 8px 18px rgba(0, 0, 0, 0.25),
+        0 3px 6px rgba(255, 255, 255, 0.08);
+}
+
+.step-num {
+    font-size: 1.92rem;
+    font-weight: 800;
+}
+
+.step-label {
+    font-size: 1.2rem;
+    line-height: 1.2;
+}
+
+.azul-1 { background: #036aa3; }
+.azul-2 { background: #0a3c80; }
+
+@media (max-width: 768px) {
+    .programas-description {
+        max-width: 100%;
+    }
 }

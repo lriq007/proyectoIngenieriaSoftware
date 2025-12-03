@@ -1,0 +1,35 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Panel{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'login/css/panel.css' %}">
+</head>
+<body class="panel-body">
+    <div class="panel-container">
+        <div class="panel-topbar">
+            <div>
+                <h1>{% block header_title %}Panel{% endblock %}</h1>
+                <p>Hola {{ request.user.get_full_name|default:request.user.username }}</p>
+            </div>
+            <div class="panel-actions">
+                {% if request.user.is_authenticated %}
+                    <a class="btn-link btn-outline" href="{% url 'logout' %}">Cerrar sesión</a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if messages %}
+            <div class="panel-card">
+                {% for message in messages %}
+                    <div class="chip">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

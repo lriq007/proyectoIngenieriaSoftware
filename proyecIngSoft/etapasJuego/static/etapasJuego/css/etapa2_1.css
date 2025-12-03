@@ -127,113 +127,130 @@ body.theme-login {
 }
 
 .bubble-section {
-    display: grid;
-    gap: 32px;
-    justify-items: center;
     width: 100%;
+    display: grid;
+    gap: 24px;
 }
 
-.bubble-map {
-    position: relative;
-    width: min(900px, 100%);
-    height: 820px;
+.empathy-map-container {
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-    isolation: isolate;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.36);
+    border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.bubble {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px)));
-    width: 210px;
-    height: 210px;
+.map-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.map-header h2 {
+    margin: 0 0 8px;
+    color: #FFD700;
+    font-size: clamp(28px, 4vw, 32px);
+    text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3);
+}
+
+.map-header p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 16px;
+}
+
+.bubble-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.bubble-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-radius: 20px;
+    padding: 22px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+}
+
+.bubble-card.is-active {
+    border-color: #FFD700;
+    box-shadow: 0 18px 46px rgba(255, 215, 0, 0.18);
+}
+
+.bubble-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: #FFD700;
+    box-shadow: 0 18px 46px rgba(255, 215, 0, 0.18);
+}
+
+.bubble-card.has-content {
+    border-color: rgba(255, 95, 162, 0.6);
+}
+
+.bubble-icon {
+    width: 50px;
+    height: 50px;
+    background: #FFD700;
     border-radius: 50%;
-    border: 3px solid rgba(0, 0, 0, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    padding: 20px;
-    font-weight: 600;
-    transition: transform .28s cubic-bezier(0.4,0,0.2,1),
-                box-shadow .28s cubic-bezier(0.4,0,0.2,1),
-                border-color .28s cubic-bezier(0.4,0,0.2,1);
+    font-size: 22px;
+    margin-bottom: 14px;
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
 }
 
-.bubble.central {
-    width: 280px;
-    height: 280px;
-    background: #FFD24A;
-    color: #000;
-    border: none;
-    box-shadow: 0 26px 40px rgba(0, 0, 0, 0.18);
-    font-size: 1.1rem;
-    letter-spacing: .04em;
-    transform: translate(-50%, -50%);
-}
-
-.bubble-question {
+.bubble-question-title {
     color: #fff;
-    box-shadow: 0 20px 28px rgba(0, 0, 0, 0.18);
-    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 0.01em;
 }
 
-.bubble-question.pos-1 { background: #23325A; }
-.bubble-question.pos-2 { background: #FF5FA2; color: #071022; }
-.bubble-question.pos-3 { background: #00FFFF; color: #071022; }
-.bubble-question.pos-4 { background: #23325A; }
-.bubble-question.pos-5 { background: #FF5FA2; color: #071022; }
-
-.bubble-question:hover {
-    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) scale(1.06);
-}
-
-.bubble-question.is-active {
-    transform: translate(calc(-50% + var(--tx, 0px)), calc(-50% + var(--ty, 0px))) scale(1.12);
-    border-color: #FFD24A;
-    z-index: 5;
-}
-
-.bubble-question.has-content {
-    border-color: #FF5FA2;
-}
-
-.bubble-editor {
-    display: none;
-    flex-direction: column;
-    gap: 12px;
+.bubble-textarea {
     width: 100%;
-    height: 100%;
-}
-
-.bubble-question.is-active .bubble-label { display: none; }
-.bubble-question.is-active .bubble-editor { display: flex; }
-
-.bubble-editor h3 {
-    margin: 0;
-    font-size: 1rem;
-    color: #000;
-}
-
-.bubble-editor textarea {
-    flex: 1;
-    border: 2px solid rgba(0, 0, 0, 0.18);
+    min-height: 110px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid transparent;
     border-radius: 12px;
-    padding: 12px 14px;
+    color: #333;
+    font-size: 14px;
     font-family: inherit;
-    resize: none;
+    resize: vertical;
+    transition: all 0.3s ease;
 }
 
-.bubble-editor textarea:focus {
-    border-color: #23325A;
+.bubble-textarea:focus {
     outline: none;
+    border-color: #FFD700;
+    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.2);
+    background: rgba(255, 255, 255, 1);
+}
+
+.bubble-textarea::placeholder {
+    color: #999;
+}
+
+.char-count {
+    color: rgba(255, 255, 255, 0.65);
+    font-size: 12px;
+    text-align: right;
+    margin-top: 6px;
 }
 
 .bubble-actions {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: 14px;
     align-items: center;
 }
 
@@ -252,14 +269,14 @@ body.theme-login {
     justify-content: center;
     gap: 12px;
     min-width: 220px;
-    padding: 18px 48px;
-    border-radius: 999px;
-    border: 3px solid rgba(0,0,0,0.22);
+    padding: 16px 38px;
+    border-radius: 14px;
+    border: 2px solid rgba(0,0,0,0.22);
     background: linear-gradient(135deg, #FFD24A 10%, #FFF7D4 90%);
     color: #071022;
-    font-size: 1.3rem;
+    font-size: 1.15rem;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
     cursor: pointer;
     box-shadow: 0 18px 36px rgba(0,0,0,0.22);
@@ -320,42 +337,6 @@ body.theme-login {
     --base-transform: scaleX(-1); 
 }
 
-.pos-1 { --tx: 0px;    --ty: -300px; }
-.pos-2 { --tx: 300px;  --ty: -56px; }
-.pos-3 { --tx: 179px;  --ty: 246px; }
-.pos-4 { --tx: -179px; --ty: 246px; }
-.pos-5 { --tx: -300px; --ty: -45px; }
-
-@media (max-width: 860px) {
-    .bubble-map {
-        width: 100%;
-        height: auto;
-        display: grid;
-        gap: 24px;
-        justify-items: center;
-    }
-    
-    .bubble,
-    .bubble.central {
-        position: relative;
-        transform: none !important;
-        width: 90%;
-        height: auto;
-        border-radius: 20px;
-        margin: 0 auto;
-        left: auto;
-        top: auto;
-    }
-    
-    .bubble-editor { 
-        display: block; 
-    }
-    
-    .bubble-editor textarea { 
-        min-height: 140px; 
-    }
-}
-
 @media (max-width: 720px) {
     .challenge-summary {
         flex-direction: column;
@@ -391,6 +372,27 @@ body.theme-login {
     .stage-wrapper {
         gap: 32px;
         justify-items: center;
+        width: 100%;
+    }
+}
+
+@media (max-width: 960px) {
+    .bubble-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .empathy-map-container {
+        padding: 24px 18px;
+    }
+    
+    .bubble-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    #btnSaveBubble {
         width: 100%;
     }
 }

@@ -117,7 +117,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("e3-timer");
   if (!el) return;
 
-  const DURATION = 15 * 60; // 15 minutos en segundos
+  const dur = parseInt(el.dataset.durationSeconds, 10);
+  const DURATION = Number.isFinite(dur) ? dur : 15 * 60; // 15 minutos en segundos
   let remaining = DURATION;
 
   function fmt(sec){

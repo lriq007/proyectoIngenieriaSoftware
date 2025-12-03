@@ -13,28 +13,44 @@
         <div class="felicitaciones-container">
             <div class="felicitaciones-icon">🎉</div>
             <div class="home-estudiante-welcome">
-            <h1>¡Felicidades {{ estudiante.nombre_apellido }}!</h1>
-            <h2>Has ingresado exitosamente.</h2>
-            </div>
-            
-            <div class="grupo-asignado">
-                <h3>Grupo {{ estudiante.grupo }}</h3>
+                <h1>¡Bienvenido, {{ estudiante.nombre_apellido }}!</h1>
+                <h2>Has ingresado exitosamente.</h2>
             </div>
 
-            <div class="lista-compañeros">
-                <h3>Integrantes del grupo {{ estudiante.grupo }}:</h3>
-                <ul class="integrantes-lista">
-                    <li><strong>{{ estudiante.nombre_apellido }}</strong> - {{ estudiante.carrera }} <em>(Tú)</em></li>
-                    {% for compañero in compañeros %}
-                    <li><strong>{{ compañero.nombre_apellido }}</strong> - {{ compañero.carrera }}</li>
-                    {% empty %}
-                    <li>Esperando más integrantes...</li>
-                    {% endfor %}
-                </ul>
+            {% if team %}
+            <div class="grupo-asignado">
+                <h3>Tu grupo: {{ team.nombre }} (código: {{ team.codigo_grupo }})</h3>
             </div>
+            {% endif %}
 
             <div class="mensaje-ingreso">
-                <p>Reúnase con su grupo en la tableta {{ estudiante.grupo }}</p>
+                {% if tablet %}
+                    <p>Debes dirigirte a la {{ tablet.codigo }}.</p>
+                {% else %}
+                    <p>Tu tablet aún no ha sido asignada. Si este mensaje persiste, consulta a tu profesor.</p>
+                {% endif %}
+            </div>
+
+            {% if en_espera %}
+            <div class="estado-espera">
+                <h2>En espera para emprender en grupo</h2>
+                <p>Actualmente hay {{ num_integrantes }} integrante(s) en tu grupo.</p>
+                <p>El juego comenzará cuando tu grupo alcance al menos {{ min_integrantes_para_empezar }} integrantes.</p>
+            </div>
+            {% else %}
+            <p>Tu grupo ya está listo para comenzar.</p>
+            {% endif %}
+
+            <div class="lista-compañeros">
+                <h3>Tus compañeros de grupo:</h3>
+                <ul class="integrantes-lista">
+                    <li><strong>{{ estudiante.nombre_apellido }}</strong>{% if estudiante.carrera %} — {{ estudiante.carrera }}{% endif %} <em>(Tú)</em></li>
+                    {% for comp in companeros %}
+                    <li><strong>{{ comp.nombre_apellido }}</strong>{% if comp.carrera %} — {{ comp.carrera }}{% endif %}</li>
+                    {% empty %}
+                    <li>No se han registrado aún otros integrantes en tu grupo.</li>
+                    {% endfor %}
+                </ul>
             </div>
         </div>
     </div>

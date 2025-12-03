@@ -14,6 +14,7 @@
 
 <body class="theme-login">
   <div class="app-noise"></div>
+  <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
 
   <div id="progress-bar">
     <div>
@@ -23,65 +24,117 @@
   </div>
 
   <div class="ws-container">
-    <div id="e3-timer" class="ws-timer" aria-live="polite" aria-label="Tiempo restante">15:00</div>
+    <form id="etapa3-form"
+          method="post"
+          enctype="multipart/form-data"
+          action="{% url 'etapa3_guardar_foto' %}">
+      {% csrf_token %}
 
-    <div class="ws-header">
-      <h1 class="ws-title">Etapa 3 — Creatividad</h1>
-    </div>
+      <div
+        id="e3-timer"
+        class="ws-timer"
+        aria-live="polite"
+        aria-label="Tiempo restante"
+        data-duration-seconds="{{ sesion.duracion_etapa3_segundos|default:900 }}"
+      >15:00</div>
 
-    <div class="lego-content-wrapper">
-      <section class="lego-uploader" id="legoUploader">
-        <input id="legoInput" type="file" accept="image/*" capture="environment" hidden>
+      <div class="ws-header">
+        <h1 class="ws-title">Etapa 3 — Creatividad</h1>
+      </div>
 
-        <label for="legoInput" id="legoBtn" class="lego-btn" role="button" tabindex="0">
-          <div class="lego-btn-inner">
-            <span class="lego-icon">📸</span>
-            <span class="lego-text">Haz clic o arrastra una foto de tu LEGO</span>
-            <small>Formatos: JPG o PNG · Máx 8 MB</small>
-          </div>
-          <img id="legoImg" alt="Vista previa del LEGO" hidden>
-        </label>
+      <div class="lego-content-wrapper">
+        <div class="lego-left-column">
+          <section class="lego-uploader" id="legoUploader">
+            <input id="legoInput" name="lego_image" type="file" accept="image/*" capture="environment" hidden>
 
-        <div class="lego-actions">
-          <button type="button" id="legoClear" class="lego-clear" hidden>Quitar foto</button>
+            <label for="legoInput" id="legoBtn" class="lego-btn" role="button" tabindex="0">
+              <div class="lego-btn-inner">
+                <span class="lego-icon">📸</span>
+                <span class="lego-text">Haz clic o arrastra una foto de tu LEGO</span>
+                <small>Formatos: JPG o PNG · Máx 8 MB</small>
+              </div>
+              <img id="legoImg" alt="Vista previa del LEGO" hidden>
+            </label>
+
+            <div class="lego-actions">
+              <button type="button" id="legoClear" class="lego-clear" hidden>Quitar foto</button>
+            </div>
+          </section>
+
+          <section class="instructions-panel idea-summary-panel">
+            <div class="instructions-content">
+              <h3>📝 Resumen de la idea</h3>
+              <textarea
+                id="resumenIdea"
+                name="resumen_idea"
+                minlength="70"
+                maxlength="280"
+                placeholder="Resume la idea en 70–280 caracteres"
+                class="bubble-textarea"
+              >{{ project.resumen_idea|default_if_none:'' }}</textarea>
+              <div class="char-count"><span id="charCount">{{ project.resumen_idea|default_if_none:''|length }}</span> / 280</div>
+              <button type="submit" class="btn btn-primary">Guardar resumen</button>
+            </div>
+          </section>
         </div>
-      </section>
 
-      <section class="instructions-panel">
-        <div class="instructions-content">
+        <section class="instructions-panel">
+          <div class="instructions-content">
 
-          <h3>🎯 Instrucciones de la Actividad</h3>
+            <h3>🎯 Instrucciones de la Actividad</h3>
 
-          <ol class="instructions-list">
-            <li>Construye una figura LEGO que represente tu solución creativa al desafío seleccionado anteriormente</li>
-            <li>Toma una foto clara del LEGO con la tableta</li>
-            <li>Asegúrate de que la imagen muestre todos los detalles importantes</li>
-            <li>¡Sé creativo! Esta es tu oportunidad de pensar fuera de la caja</li>
-          </ol>
+            <ol class="instructions-list">
+              <li>Construye una figura LEGO que represente tu solución creativa al desafío seleccionado anteriormente</li>
+              <li>Toma una foto clara del LEGO con la tableta</li>
+              <li>Asegúrate de que la imagen muestre todos los detalles importantes</li>
+              <li>¡Sé creativo! Esta es tu oportunidad de pensar fuera de la caja</li>
+            </ol>
 
-          <div class="instructions-tips">
-            <h4>💡 Consejos:</h4>
-            <ul>
-              <li>Relación clara con el desafío</li>
-              <li>Creatividad en la construcción</li>
-              <li>Calidad de la fotografía</li>
-            </ul>
+            <div class="instructions-tips">
+              <h4>💡 Consejos:</h4>
+              <ul>
+                <li>Relación clara con el desafío</li>
+                <li>Creatividad en la construcción</li>
+                <li>Calidad de la fotografía</li>
+              </ul>
+            </div>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
+
+      </div>
+
+      <div class="etapa3-footer">
+        <a href="{% url 'etapa2' %}" class="btn-arrow btn-arrow-left" title="Volver">
+          <span class="arrow-icon">➜</span>
+        </a>
+        <button type="submit" class="btn-arrow btn-arrow-right" title="Avanzar">
+          <span class="arrow-icon">➜</span>
+        </button>
+      </div>
+    </form>
   </div>
 
-  <a href="{% url 'etapa2' %}" class="btn-arrow btn-arrow-left" title="Volver">
-    <span class="arrow-icon">➜</span>
-  </a>
-  <a href="{% url 'etapa4' %}" class="btn-arrow btn-arrow-right" title="Avanzar">
-    <span class="arrow-icon">➜</span>
-  </a>
-
+  <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
   <script defer src="{% static 'etapasJuego/js/etapa3.js' %}"></script>
+  <script>
+    (function() {
+      const textarea = document.getElementById('resumenIdea');
+      const counter = document.getElementById('charCount');
+      if (!textarea || !counter) return;
 
-  {% include 'etapasJuego/mascota.html' %}
+      const MAX_LEN = 280;
+
+      const updateCount = () => {
+        if (textarea.value.length > MAX_LEN) {
+          textarea.value = textarea.value.slice(0, MAX_LEN);
+        }
+        counter.textContent = textarea.value.length;
+      };
+
+      textarea.addEventListener('input', updateCount);
+      updateCount();
+    })();
+  </script>
 </body>
   <style>
     .lego-content-wrapper {
@@ -100,6 +153,12 @@
       align-items: center;
       gap: 16px;
     }
+    .lego-left-column {
+      flex: 0 1 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
     .instructions-panel {
       flex: 0 1 500px;
@@ -109,6 +168,24 @@
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
       border: 3px solid #FFD24A;
       min-height: 400px;
+    }
+    .idea-summary-panel {
+      min-height: 380px;
+    }
+    .idea-summary-panel .instructions-content {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      height: 100%;
+    }
+    .idea-summary-panel textarea {
+      flex: 1;
+      min-height: 260px;
+    }
+    .idea-summary-panel .char-count {
+      text-align: right;
+      font-weight: 600;
+      color: #23325A;
     }
 
     .instructions-content h3 {

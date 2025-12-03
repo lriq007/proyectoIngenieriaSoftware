@@ -1,0 +1,48 @@
+{% extends "login/panel_base.html" %}
+{% block title %}Sesiones{% endblock %}
+{% block header_title %}Sesiones de juego{% endblock %}
+
+{% block content %}
+<div class="panel-grid">
+    <div class="panel-card">
+        <h3>Nueva sesión</h3>
+        <form method="post" class="panel-form">
+            {% csrf_token %}
+            {% include "login/admin/_form_fields.html" with form=form %}
+            <button class="btn-link btn-primary" type="submit">Guardar sesión</button>
+        </form>
+    </div>
+    <div class="panel-card">
+        <h3>Listado</h3>
+        <table class="panel-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Código</th>
+                    <th>Profesor</th>
+                    <th>Sección</th>
+                    <th>Modo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in sesiones %}
+                    <tr>
+                        <td>{{ s.nombre }}</td>
+                        <td>{{ s.codigo }}</td>
+                        <td>{{ s.profesor }}</td>
+                        <td>{{ s.seccion }}</td>
+                        <td>{{ s.get_modo_asignacion_display }}</td>
+                        <td class="panel-actions-row">
+                            <a class="btn-link btn-outline" href="{% url 'adminpanel:sesion_editar' s.id %}">Editar</a>
+                            <a class="btn-link btn-danger" href="{% url 'adminpanel:sesion_eliminar' s.id %}">Eliminar</a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6">No hay sesiones registradas.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

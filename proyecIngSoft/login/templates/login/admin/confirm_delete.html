@@ -1,0 +1,16 @@
+{% extends "login/panel_base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block header_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="panel-card">
+    <p>¿Seguro que deseas eliminar <strong>{{ object }}</strong>?</p>
+    <form method="post" class="panel-actions-row">
+        {% csrf_token %}
+        <button class="btn-link btn-danger" type="submit">Eliminar</button>
+        {% if back_url %}
+            <a class="btn-link btn-outline" href="{% url back_url %}">Cancelar</a>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}
