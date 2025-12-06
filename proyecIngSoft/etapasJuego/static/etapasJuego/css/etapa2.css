@@ -224,8 +224,8 @@ body {
     --accent: #ffbe2e;
     position: relative;
     overflow: visible;
-    width: 240px;
-    height: 320px;
+    width: 270px;  /* ~12% más ancho para que el recuadro se sienta más largo */
+    height: 360px; /* ~12% más alto para dar más presencia al tema */
     margin: 0 16px;
     display: flex;
     align-items: center;
@@ -271,8 +271,8 @@ body {
 
 .topic-list .topic-card .topic-content {
     position: relative;
-    width: 220px;
-    height: 280px;
+    width: 250px;
+    height: 320px;
     padding: 20px 18px;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(12px);
