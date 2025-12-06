@@ -1,0 +1,104 @@
+{% extends "login/panel_base.html" %}
+{% block title %}Usuarios{% endblock %}
+{% block header_title %}Usuarios{% endblock %}
+
+{% block content %}
+<div class="panel-card">
+    <div class="card-header">
+        <div>
+            <p class="eyebrow">Administración</p>
+            <h3>Crear usuario y asignar rol</h3>
+        </div>
+        <a class="btn-link btn-outline" href="{% url 'adminpanel:dashboard' %}">Volver al dashboard</a>
+    </div>
+    <form method="post" class="panel-form">
+        {% csrf_token %}
+        <div class="panel-grid two-col">
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Usuario</label>
+                {{ form.username }}
+                {{ form.username.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.first_name.id_for_label }}">Nombre</label>
+                {{ form.first_name }}
+                {{ form.first_name.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.last_name.id_for_label }}">Apellido</label>
+                {{ form.last_name }}
+                {{ form.last_name.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.role.id_for_label }}">Rol</label>
+                {{ form.role }}
+                {{ form.role.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">Contraseña</label>
+                {{ form.password1 }}
+                {{ form.password1.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">Confirmar contraseña</label>
+                {{ form.password2 }}
+                {{ form.password2.errors }}
+            </div>
+        </div>
+        <div class="panel-actions-row" style="margin-top:12px;">
+            <button type="submit" class="btn-link btn-primary">Crear usuario</button>
+        </div>
+    </form>
+</div>
+
+<div class="panel-grid two-col">
+    <div class="panel-card">
+        <div class="card-header">
+            <div>
+                <p class="eyebrow">Usuarios</p>
+                <h3>Administradores</h3>
+            </div>
+        </div>
+        <ul class="panel-list solid">
+            {% for u in usuarios_admin %}
+                <li>
+                    <div>
+                        <strong>{{ u.get_full_name|default:u.username }}</strong>
+                        <p class="muted">{{ u.email|default:"Sin email" }}</p>
+                    </div>
+                    <span class="pill pill-muted">Staff</span>
+                </li>
+            {% empty %}
+                <li>No hay administradores registrados.</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="panel-card">
+        <div class="card-header">
+            <div>
+                <p class="eyebrow">Usuarios</p>
+                <h3>Profesores</h3>
+            </div>
+        </div>
+        <ul class="panel-list solid">
+            {% for u in usuarios_prof %}
+                <li>
+                    <div>
+                        <strong>{{ u.get_full_name|default:u.username }}</strong>
+                        <p class="muted">{{ u.email|default:"Sin email" }}</p>
+                    </div>
+                    <a class="btn-link btn-outline" href="{% url 'adminpanel:usuario_editar' u.id %}">Editar</a>
+                </li>
+            {% empty %}
+                <li>No hay profesores registrados.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

@@ -20,7 +20,8 @@
   const elBoard = qs("#ws-board");
   const elWords = qs("#ws-words");
   const elProgress = qs("#ws-progress");
-  const elComplete = qs("#ws-complete");
+  const elComplete = qs("#complete-overlay");
+  let isComplete = false;
 
   const key = (i,j) => `${i},${j}`;
 
@@ -71,7 +72,11 @@
   }
 
   function showComplete() {
-    elComplete.hidden = false;
+    isComplete = true;
+    if (elComplete) {
+      elComplete.classList.add("is-open");
+      elComplete.setAttribute("aria-hidden", "false");
+    }
   }
 
   // --- EVENTOS POINTER ---
@@ -133,6 +138,9 @@
 
     if (resp.result === "found" && resp.word) {
       markFound(resp.word);
+      if (window.TokenCounter) {
+        window.TokenCounter.addOnce(`ws-word-${resp.word}`, 2);
+      }
       paintWords();
       qsa(".ws-cell").forEach(c => {
         if (c.style.outline && c.style.outline.includes(info.color)) {
@@ -219,8 +227,10 @@
   function startSimpleTimer(durationSeconds = 300) {
     const elTimer = document.getElementById("ws-timer");
     if (!elTimer) return;
+    const nextUrl = elTimer.dataset.nextUrl;
 
     let remaining = durationSeconds;
+    let timeupShown = false;
     const format = (t) => {
       const m = Math.floor(t / 60);
       const s = t % 60;
@@ -232,7 +242,17 @@
     const interval = setInterval(() => {
       remaining = Math.max(remaining - 1, 0);
       elTimer.textContent = format(remaining);
-      if (remaining === 0) clearInterval(interval);
+      if (remaining === 0) {
+        clearInterval(interval);
+        if (isComplete && nextUrl) {
+          window.location.href = nextUrl;
+          return;
+        }
+        if (!timeupShown && typeof window.showTimeupOverlay === "function") {
+          timeupShown = true;
+          window.showTimeupOverlay();
+        }
+      }
     }, 1000);
   }
 

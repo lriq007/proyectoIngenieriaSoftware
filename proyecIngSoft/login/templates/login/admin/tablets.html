@@ -3,6 +3,9 @@
 {% block header_title %}Tablets por sesión{% endblock %}
 
 {% block content %}
+<div class="panel-actions-row" style="margin-bottom:12px;">
+    <a class="btn-link btn-outline" href="{% url 'adminpanel:dashboard' %}">Volver al dashboard</a>
+</div>
 <div class="panel-grid">
     <div class="panel-card">
         <h3>Nueva tablet</h3>
@@ -14,39 +17,47 @@
     </div>
     <div class="panel-card">
         <h3>Listado</h3>
-        <table class="panel-table">
-            <thead>
-                <tr>
-                    <th>Código</th>
-                    <th>PIN</th>
-                    <th>Sesión</th>
-                    <th>Equipo asignado</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for t in tablets %}
+        <form method="get" class="panel-form" style="margin-bottom:12px;">
+            <div class="form-group">
+                <label>Buscar</label>
+                <input type="text" name="q" value="{{ q }}" placeholder="Código, PIN o sesión" class="form-field">
+            </div>
+        </form>
+        <div class="panel-table-wrapper">
+            <table class="panel-table">
+                <thead>
                     <tr>
-                        <td>{{ t.codigo }}</td>
-                        <td>{{ t.codigo_acceso }}</td>
-                        <td>{{ t.sesion }}</td>
-                        <td>
-                            {% if t.team %}
-                                {{ t.team.nombre }} ({{ t.team.codigo_grupo }})
-                            {% else %}
-                                <span class="panel-badge">Libre</span>
-                            {% endif %}
-                        </td>
-                        <td class="panel-actions-row">
-                            <a class="btn-link btn-outline" href="{% url 'adminpanel:tablet_editar' t.id %}">Editar</a>
-                            <a class="btn-link btn-danger" href="{% url 'adminpanel:tablet_eliminar' t.id %}">Eliminar</a>
-                        </td>
+                        <th>Código</th>
+                        <th>PIN</th>
+                        <th>Sesión</th>
+                        <th>Equipo asignado</th>
+                        <th>Acciones</th>
                     </tr>
-                {% empty %}
-                    <tr><td colspan="5">No hay tablets registradas.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for t in tablets %}
+                        <tr>
+                            <td>{{ t.codigo }}</td>
+                            <td>{{ t.codigo_acceso }}</td>
+                            <td>{{ t.sesion }}</td>
+                            <td>
+                                {% if t.team %}
+                                    {{ t.team.nombre }} ({{ t.team.codigo_grupo }})
+                                {% else %}
+                                    <span class="panel-badge">Libre</span>
+                                {% endif %}
+                            </td>
+                            <td class="panel-actions-row">
+                                <a class="btn-link btn-outline" href="{% url 'adminpanel:tablet_editar' t.id %}">Editar</a>
+                                <a class="btn-link btn-danger" href="{% url 'adminpanel:tablet_eliminar' t.id %}">Eliminar</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="5">No hay tablets registradas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

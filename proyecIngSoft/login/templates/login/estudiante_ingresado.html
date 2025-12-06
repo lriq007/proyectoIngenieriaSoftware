@@ -5,54 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>¡Felicidades! - Misión Emprende</title>
     {% load static %}
+    <link rel="stylesheet" href="{% static 'login/css/home.css' %}">
     <link rel="stylesheet" href="{% static 'login/css/ingreso.css' %}">
 </head>
 
 <body class="home-estudiante-body">
     <div class="home-estudiante-container">
-        <div class="felicitaciones-container">
-            <div class="felicitaciones-icon">🎉</div>
+        <div class="home-estudiante-header">
             <div class="home-estudiante-welcome">
                 <h1>¡Bienvenido, {{ estudiante.nombre_apellido }}!</h1>
-                <h2>Has ingresado exitosamente.</h2>
-            </div>
-
-            {% if team %}
-            <div class="grupo-asignado">
-                <h3>Tu grupo: {{ team.nombre }} (código: {{ team.codigo_grupo }})</h3>
-            </div>
-            {% endif %}
-
-            <div class="mensaje-ingreso">
-                {% if tablet %}
-                    <p>Debes dirigirte a la {{ tablet.codigo }}.</p>
-                {% else %}
-                    <p>Tu tablet aún no ha sido asignada. Si este mensaje persiste, consulta a tu profesor.</p>
-                {% endif %}
-            </div>
-
-            {% if en_espera %}
-            <div class="estado-espera">
-                <h2>En espera para emprender en grupo</h2>
-                <p>Actualmente hay {{ num_integrantes }} integrante(s) en tu grupo.</p>
-                <p>El juego comenzará cuando tu grupo alcance al menos {{ min_integrantes_para_empezar }} integrantes.</p>
-            </div>
-            {% else %}
-            <p>Tu grupo ya está listo para comenzar.</p>
-            {% endif %}
-
-            <div class="lista-compañeros">
-                <h3>Tus compañeros de grupo:</h3>
-                <ul class="integrantes-lista">
-                    <li><strong>{{ estudiante.nombre_apellido }}</strong>{% if estudiante.carrera %} — {{ estudiante.carrera }}{% endif %} <em>(Tú)</em></li>
-                    {% for comp in companeros %}
-                    <li><strong>{{ comp.nombre_apellido }}</strong>{% if comp.carrera %} — {{ comp.carrera }}{% endif %}</li>
-                    {% empty %}
-                    <li>No se han registrado aún otros integrantes en tu grupo.</li>
-                    {% endfor %}
-                </ul>
+                <p class="sub-text">Ingreso exitoso · Misión Emprende</p>
             </div>
         </div>
+
+        <div class="status-grid">
+            <article class="status-card">
+                <div class="status-icon">🎉</div>
+                <h2>Listo para jugar</h2>
+                {% if team %}
+                    <p class="status-highlight">Tu grupo: <strong>{{ team.nombre }}</strong> (código: {{ team.codigo_grupo }})</p>
+                {% endif %}
+                <p class="status-note">
+                    {% if tablet %}
+                        Dirígete a la <strong>{{ tablet.codigo }}</strong> para comenzar.
+                    {% else %}
+                        La tablet aún no ha sido asignada. Si persiste, consulta a tu profesor.
+                    {% endif %}
+                </p>
+            </article>
+
+            <article class="status-card">
+                <div class="status-icon">🧭</div>
+                {% if en_espera %}
+                    <h2>Esperando equipo</h2>
+                    <p class="status-highlight">Integrantes actuales: {{ num_integrantes }} / {{ min_integrantes_para_empezar }}</p>
+                    <p class="status-note">El juego comienza al alcanzar el mínimo. Invita a tus compañeros a ingresar.</p>
+                {% else %}
+                    <h2>Equipo completo</h2>
+                    <p class="status-highlight">Tu grupo está listo para iniciar las etapas.</p>
+                {% endif %}
+            </article>
+        </div>
+
+        <section class="lista-compañeros glass-card">
+            <h3>Tus compañeros de grupo</h3>
+            <ul class="integrantes-lista">
+                <li><strong>{{ estudiante.nombre_apellido }}</strong>{% if estudiante.carrera %} — {{ estudiante.carrera }}{% endif %} <em>(Tú)</em></li>
+                {% for comp in companeros %}
+                    <li><strong>{{ comp.nombre_apellido }}</strong>{% if comp.carrera %} — {{ comp.carrera }}{% endif %}</li>
+                {% empty %}
+                    <li>No se han registrado aún otros integrantes en tu grupo.</li>
+                {% endfor %}
+            </ul>
+        </section>
     </div>
 </body>
 </html>

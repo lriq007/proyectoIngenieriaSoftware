@@ -16,10 +16,11 @@
 <body class="theme-login">
   <div class="app-noise"></div>
   <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
+  <button type="button" class="howto-btn" onclick="document.getElementById('howto-overlay').classList.add('is-open')">¿Cómo se juega?</button>
 
   <div id="progress-bar">
     <div>
-      <span>Etapa 2 — Mapa de empatía</span>
+      <span>Paso 2 de 6 · Desafío y empatía</span>
       <div>
         <div style="width:60%;"></div>
       </div>
@@ -38,16 +39,34 @@
 
     <div class="stage-wrapper">
       <h1 class="stage-title">Mapa de Empatía</h1>
+      <section class="game-instructions">
+        <h3>💬 Guía rápida</h3>
+        <p>Escriban respuestas concretas sobre lo que ve, siente, dice y hace el usuario. Mejor breve y claro que largo.</p>
+        <p class="hint">Lo que anoten aquí alimenta el LEGO y el pitch.</p>
+        <div class="help-hint" aria-label="Ayuda rápida etapa 2.1" style="margin-top:10px; position:relative;">
+          <button type="button" class="cyber-btn"><span class="loader is-inline" aria-hidden="true"></span>¿Y ahora qué?</button>
+          <div class="cyber-tooltip">
+            <strong>Empatizar antes que inventar</strong>
+            <div>Imaginen qué siente y piensa la persona. Escriban ejemplos breves de lo que ve, dice, teme o necesita.</div>
+          </div>
+        </div>
+      </section>
 
       <div class="challenge-summary">
         <div class="summary-copy">
           <span class="badge">Desafío activo</span>
-          <h2>{{ desafio.titulo }}</h2>
+          <h2 class="summary-title">{{ desafio.titulo }}</h2>
           {% if desafio.personaje %}
-            <p class="summary-character">{{ desafio.personaje }}</p>
+            <div class="summary-section">
+              <p class="summary-label">¿Quién es nuestro cliente?</p>
+              <p class="summary-persona">{{ desafio.personaje }}</p>
+            </div>
           {% endif %}
           {% if desafio.historia %}
-            <p class="summary-story">{{ desafio.historia }}</p>
+            <div class="summary-section">
+              <p class="summary-label">¿Qué sucede con nuestro cliente?</p>
+              <p class="summary-story">{{ desafio.historia }}</p>
+            </div>
           {% endif %}
         </div>
         {% if desafio_persona_image %}
@@ -61,7 +80,7 @@
         {% endif %}
       </div>
 
-      <section class="bubble-section">
+      <section class="bubble-section" style="max-width:1200px; margin:0 auto; width:100%; display:grid; justify-items:center;">
         <div id="bubbleMap" class="empathy-map-container" data-desafio="{{ desafio.numero }}" role="group" aria-label="Mapa de empatía">
           <div class="map-header">
             <h2>🎯 Mapa de Empatía</h2>
@@ -108,10 +127,64 @@
       saveUrl: "{% url 'etapa2_guardar_mapa' %}"
     };
   </script>
+  <script src="{% static 'etapasJuego/js/token-counter.js' %}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const tokensFromServer = Number("{{ team.tokens_totales|default_if_none:0 }}");
+      if (window.TokenCounter && Number.isFinite(tokensFromServer)) {
+        TokenCounter.set(tokensFromServer);
+      }
+    });
+  </script>
   <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
   <script src="{% static 'etapasJuego/js/bubble-map.js' %}"></script>
 
   <!-- Cronómetro persistente Etapa 2 -->
-  <script src="{% static 'etapasJuego/js/timer_etapa2.js' %}"></script>
+  <script src="{% static 'etapasJuego/js/timeup-overlay.js' %}"></script>
+  <script src="{% static 'etapasJuego/js/etapa2.js' %}"></script>
+
+  <div id="howto-overlay" class="howto-overlay" aria-hidden="true">
+    <div class="howto-card">
+      <h2>¿Cómo se juega?</h2>
+      <p>El mapa de empatía aterriza al usuario. El juego completo tiene 4 etapas más coevaluación y ranking para practicar equipo, empatía, creatividad, comunicación y apoyo.</p>
+      <div class="howto-grid">
+        <div>
+          <strong>Ruta</strong>
+          <ul>
+            <li>Paso 1: Sopa de letras en equipo.</li>
+            <li>Paso 2: Tema/desafío y mapa de empatía.</li>
+            <li>Paso 3: Prototipo LEGO + resumen.</li>
+            <li>Paso 4: Pitch breve.</li>
+            <li>Coevaluación y Ranking final.</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Tokens</strong>
+          <ul>
+            <li>Respuestas claras y completas ayudan a sumar tokens de empatía.</li>
+            <li>Lo escrito se usa luego en LEGO y pitch, facilitando mejor puntaje.</li>
+            <li>La coevaluación también influye; mantengan claridad y justicia.</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:10px;">Reflexionen: ¿qué aprendieron del usuario y cómo eso fortalece su solución?</p>
+      <button type="button" class="howto-close" onclick="document.getElementById('howto-overlay').classList.remove('is-open')">Cerrar</button>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const overlay = document.getElementById('howto-overlay');
+      overlay?.addEventListener('click',(e)=>{ if(e.target===overlay){ overlay.classList.remove('is-open'); }});
+    })();
+  </script>
+  <div id="timeup-overlay" class="timeup-overlay" aria-hidden="true">
+    <div class="timeup-card" role="dialog" aria-modal="true">
+      <div class="timeup-glow"></div>
+      <p class="timeup-chip">Tiempo agotado</p>
+      <h2>Uff, lo siento. Es hora de avanzar</h2>
+      <p class="timeup-text">Pasemos a construir: lleven sus hallazgos al prototipo LEGO.</p>
+      <a class="btn btn-primary" href="{% url 'etapa3' %}">Ir a la Etapa 3</a>
+    </div>
+  </div>
 </body>
 </html>

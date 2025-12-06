@@ -29,6 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dur = parseInt(el.dataset.durationSeconds, 10);
   const DURATION = Number.isFinite(dur) ? dur : 10 * 60; // fallback 10 min
   let remaining = DURATION;
+  let timeupShown = false;
 
   const fmt = (sec) => {
     const m = Math.floor(sec / 60);
@@ -42,7 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const iv = setInterval(() => {
     remaining = Math.max(0, remaining - 1);
     el.textContent = fmt(remaining);
-    if (remaining <= 0) clearInterval(iv);
+    if (remaining <= 0) {
+      clearInterval(iv);
+      if (!timeupShown && typeof window.showTimeupOverlay === "function") {
+        timeupShown = true;
+        window.showTimeupOverlay();
+      }
+    }
   }, 1000);
 });
 
@@ -54,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!btn || !textarea) return;
 
   const saveUrl = btn.dataset.saveUrl;
+  const redirectUrl = btn.dataset.redirectUrl;
 
   const getCsrfToken = () => {
     const value = `; ${document.cookie}`;
@@ -93,6 +101,12 @@ document.addEventListener("DOMContentLoaded", () => {
         showMessage("No se pudo guardar el pitch. Inténtalo nuevamente.", "error");
       } else {
         showMessage("Pitch guardado con éxito.", "success");
+        if (window.TokenCounter) {
+          window.TokenCounter.addOnce("pitch-guardado", 8);
+        }
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        }
       }
     } catch (error) {
       console.error(error);

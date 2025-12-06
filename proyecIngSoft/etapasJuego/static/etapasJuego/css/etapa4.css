@@ -31,7 +31,7 @@ body {
     margin: 88px auto 120px;
     padding: 0 16px;
     display: grid;
-    gap: 48px;
+    gap: 32px;
     position: relative; /* para posicionar el timer como en otras etapas */
 }
 
@@ -102,9 +102,9 @@ body {
     position: relative;
     width: min(980px, 100%);
     min-height: 320px;
-    border-radius: 26px;
+    border-radius: 18px;
     overflow: hidden;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.28);
+    box-shadow: 0 22px 48px rgba(0,0,0,0.26);
     background: linear-gradient(135deg, rgba(255,255,255,0.96) 0%, rgba(214,229,255,0.94) 45%, rgba(173,197,255,0.9) 100%);
     transition: transform .6s cubic-bezier(0.23,1,0.32,1);
 }
@@ -181,9 +181,9 @@ body {
     --base-transform: none;
     position: fixed;
     bottom: 30px;
-    width: 80px;
-    height: 80px;
-    border-radius: 20px;
+    width: 76px;
+    height: 76px;
+    border-radius: 18px;
     background-color: #FF5FA2;
     display: flex;
     align-items: center;
@@ -217,13 +217,13 @@ body {
     top: 12px;
     right: -120px;
     padding: 18px 22px;
-    border-radius: 16px;
+    border-radius: 18px;
     font-weight: 900;
     font-size: 1.6rem;
-    background: #ffffff;
-    color: #000000;
-    border: 4px solid #FFD24A;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    background: linear-gradient(135deg, #0f2c6e 0%, #0ea5e9 100%);
+    color: #ffffff;
+    border: 2px solid rgba(255,255,255,0.28);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.28), 0 0 0 1px rgba(255,255,255,0.1);
     letter-spacing: 0.5px;
     user-select: none;
     z-index: 55;
@@ -232,8 +232,8 @@ body {
 }
 .ws-timer:hover {
     transform: scale(1.05);
-    box-shadow: 0 8px 18px rgba(0,0,0,0.3);
-    border-color: #FFD700;
+    box-shadow: 0 14px 32px rgba(0,0,0,0.32);
+    border-color: rgba(255,255,255,0.5);
 }
 @media (max-width: 1024px) {
     .ws-timer {
@@ -250,6 +250,16 @@ body {
 .btn-arrow-left { 
     left: 40px;  
     --base-transform: scaleX(-1); 
+}
+
+@media (max-width: 1024px){
+    .btn-arrow{
+        width: 68px;
+        height: 68px;
+        bottom: 22px;
+    }
+    .btn-arrow-right{ right: 28px; }
+    .btn-arrow-left{ left: 28px; }
 }
 
 pre {

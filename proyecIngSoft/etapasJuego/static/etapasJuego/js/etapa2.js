@@ -27,6 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   let lastShown = null;
+  let timeupShown = false;
 
   function render() {
     const remainingMs = Math.max(0, endAt - Date.now());
@@ -39,7 +40,13 @@ document.addEventListener("DOMContentLoaded", () => {
       lastShown = remainingSec;
     }
 
-    if (remainingSec <= 0) return false;
+    if (remainingSec <= 0) {
+      if (!timeupShown && typeof window.showTimeupOverlay === "function") {
+        timeupShown = true;
+        window.showTimeupOverlay();
+      }
+      return false;
+    }
     return true;
   }
 

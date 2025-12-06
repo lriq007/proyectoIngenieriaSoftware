@@ -10,118 +10,143 @@
 </head>
 <body class="theme-login">
   <div class="app-noise"></div>
+  <button type="button" class="howto-btn" onclick="document.getElementById('howto-overlay').classList.add('is-open')">¿Cómo se juega?</button>
 
-  <div id="progress-bar">
-    <div>
-      <span>Etapa 4 de 4</span>
-      <div><div style="width:100%;"></div></div>
-    </div>
-  </div>
+
 
   <div class="ws-container">
-    <div class="ws-header">
-      <h1 class="ws-title">Etapa Final — Coevaluación</h1>
-      <p class="ws-subtitle">Evalúa a los demás equipos de tu sesión. No puedes evaluarte a ti mismo.</p>
-    </div>
-
-    <form id="ef-form" data-save-url="{% url 'etapaFinal:save_coevaluacion' %}">
-      {% csrf_token %}
-      <div class="ws-grid ef-eval-grid">
-        {% for equipo in equipos_a_evaluar %}
-          <article class="ws-card ef-eval-card" data-equipo-id="{{ equipo.id }}">
-            <header class="ef-eval-header">
-              <div class="ef-eval-meta">
-                <p class="ef-card-tag">Equipo</p>
-                <h2 class="ef-card-title">{{ equipo.nombre }}</h2>
-              </div>
-              <div class="ef-eval-code">[{{ equipo.codigo_grupo }}]</div>
-            </header>
-
-            <div class="ef-eval-body">
-              <div class="ef-score-row">
-                <label class="ef-label">Equipo</label>
-                <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_equipo" placeholder="1-5" required>
-              </div>
-              <div class="ef-score-row">
-                <label class="ef-label">Empatía</label>
-                <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_empatia" placeholder="1-5" required>
-              </div>
-              <div class="ef-score-row">
-                <label class="ef-label">Creatividad</label>
-                <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_creatividad" placeholder="1-5" required>
-              </div>
-              <div class="ef-score-row">
-                <label class="ef-label">Comunicación</label>
-                <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_comunicacion" placeholder="1-5" required>
-              </div>
-            </div>
-
-            <div class="ef-eval-footer">
-              <label class="ef-field">
-                <span class="ef-label">Comentario (opcional)</span>
-                <textarea class="ef-comment" data-field="comentario" rows="2" placeholder="Feedback breve"></textarea>
-              </label>
-            </div>
-          </article>
-        {% empty %}
-          <p class="ws-empty">No hay otros equipos para evaluar en esta sesión.</p>
-        {% endfor %}
+    <header class="ef-hero">
+      <div class="ef-hero-glow"></div>
+      <div class="ef-hero-meta">
+        <span class="ef-chip">Paso 5 · Coevaluación</span>
+        <span class="ef-chip">Duración breve</span>
+        <span class="ef-chip">Tokens de apoyo</span>
       </div>
-
-      <div class="ef-actions">
-        <button type="button" id="ef-submit" class="btn btn-primary">Enviar coevaluaciones</button>
-        <span id="ef-status" class="ef-status" aria-live="polite"></span>
+      <h1 class="ef-hero-title">Etapa Final — Coevaluación</h1>
+      <p class="ef-hero-subtitle">Evalúen a otros equipos con mirada justa y emprendedora. Sus puntajes suman tokens de apoyo.</p>
+      <div class="ef-meta-grid">
+        <div class="ef-meta-card">
+          <p class="ef-meta-label">Criterio</p>
+          <p class="ef-meta-value">1 – 5</p>
+          <small>1 = mínimo esfuerzo, 3 = cumple, 5 = destaca.</small>
+        </div>
+        <div class="ef-meta-card">
+          <p class="ef-meta-label">Enfoque</p>
+          <p class="ef-meta-value">Equipo · Empatía · Creatividad · Comunicación</p>
+          <small>Puntúen con claridad y respeto.</small>
+        </div>
+        {% if team_actual %}
+        <div class="ef-token-counter ef-meta-token" aria-live="polite">
+          <span class="ef-token-label">Tus tokens</span>
+          <span class="ef-token-value">{{ team_actual.tokens_totales|default:0 }} pts</span>
+        </div>
+        {% endif %}
       </div>
-    </form>
+    </header>
 
-    {% if ranking %}
-      <section class="ws-card ranking-container">
-        <header class="ws-header" style="gap:0.25rem;">
-          <h2 class="ws-title" style="margin-bottom:0;">🏆 Ranking de Equipos</h2>
-          <p class="ws-subtitle">Basado en tokens totales de esta sesión</p>
-        </header>
+    <section class="ef-layout">
+      <form id="ef-form" class="ef-panel" data-save-url="{% url 'etapaFinal:save_coevaluacion' %}">
+        {% csrf_token %}
+        <div class="ef-panel-head">
+          <div>
+            <p class="ef-tag">Coevaluación activa</p>
+            <h2>Evalúa a los otros equipos</h2>
+            <p class="ef-tagline">No pueden evaluarse a sí mismos. Usa la escala 1–5.</p>
+          </div>
+        </div>
 
-        {% with top_three=ranking|slice:":3" rest=ranking|slice:"3:" %}
-          <div class="top-three">
-            {% for team in top_three %}
-              {% if forloop.counter == 1 %}
-                <div class="ranking-item first-place">
-                  <span class="position">1º</span>
-                  <span class="team-name">{{ team.nombre }}</span>
-                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
-                </div>
-              {% elif forloop.counter == 2 %}
-                <div class="ranking-item second-place">
-                  <span class="position">2º</span>
-                  <span class="team-name">{{ team.nombre }}</span>
-                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
-                </div>
-              {% elif forloop.counter == 3 %}
-                <div class="ranking-item third-place">
-                  <span class="position">3º</span>
-                  <span class="team-name">{{ team.nombre }}</span>
-                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
-                </div>
-              {% endif %}
-            {% empty %}
-              <p class="ws-empty">No hay equipos para rankear aún.</p>
+        {% if equipos_a_evaluar %}
+          <div class="ef-team-selector" role="tablist" aria-label="Equipos para coevaluar">
+            {% for equipo in equipos_a_evaluar %}
+              <button
+                type="button"
+                class="ef-team-btn {% if forloop.first %}is-active{% endif %}"
+                data-equipo-id="{{ equipo.id }}"
+                data-foto-url="{% if equipo.proyecto and equipo.proyecto.foto_grupal %}{{ equipo.proyecto.foto_grupal.url }}{% endif %}"
+                aria-selected="{% if forloop.first %}true{% else %}false{% endif %}"
+              >
+                <span class="ef-team-name">{{ equipo.nombre }}</span>
+                <span class="ef-team-code">[{{ equipo.codigo_grupo }}]</span>
+              </button>
             {% endfor %}
           </div>
 
-          {% if rest %}
-            <ul class="remaining-list">
-              {% for team in rest %}
-                <li class="ranking-item">
-                  <span class="position">{{ forloop.counter|add:"3" }}º</span>
-                  <span class="team-name">{{ team.nombre }}</span>
-                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
-                </li>
-              {% endfor %}
-            </ul>
+          <div class="ef-eval-stack">
+            {% for equipo in equipos_a_evaluar %}
+              <article
+                class="ef-eval-card {% if not forloop.first %}is-hidden{% endif %}"
+                data-equipo-id="{{ equipo.id }}"
+                data-foto-url="{% if equipo.proyecto and equipo.proyecto.foto_grupal %}{{ equipo.proyecto.foto_grupal.url }}{% endif %}"
+              >
+                <header class="ef-eval-header">
+                  <div class="ef-eval-meta">
+                    <p class="ef-card-tag">Equipo</p>
+                    <h3 class="ef-card-title">{{ equipo.nombre }}</h3>
+                  </div>
+                  <div class="ef-eval-code">[{{ equipo.codigo_grupo }}]</div>
+                </header>
+
+                <div class="ef-eval-body">
+                  <div class="ef-score-row">
+                    <label class="ef-label">Equipo</label>
+                    <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_equipo" placeholder="1-5" required>
+                  </div>
+                  <div class="ef-score-row">
+                    <label class="ef-label">Empatía</label>
+                    <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_empatia" placeholder="1-5" required>
+                  </div>
+                  <div class="ef-score-row">
+                    <label class="ef-label">Creatividad</label>
+                    <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_creatividad" placeholder="1-5" required>
+                  </div>
+                  <div class="ef-score-row">
+                    <label class="ef-label">Comunicación</label>
+                    <input type="number" min="1" max="5" class="ef-score" data-field="puntaje_comunicacion" placeholder="1-5" required>
+                  </div>
+                </div>
+
+                <div class="ef-eval-footer">
+                  <label class="ef-field">
+                    <span class="ef-label">Comentario (opcional)</span>
+                    <textarea class="ef-comment" data-field="comentario" rows="2" placeholder="Feedback breve"></textarea>
+                  </label>
+                </div>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="ws-empty">No hay otros equipos para evaluar en esta sesión.</p>
+        {% endif %}
+
+        <div class="ef-actions">
+          <button type="button" id="ef-submit" class="btn btn-primary">Enviar coevaluaciones</button>
+          <span id="ef-status" class="ef-status" aria-live="polite"></span>
+        </div>
+      </form>
+
+      <aside class="ef-panel ef-photo-panel">
+        <div class="ef-panel-head">
+          <div>
+            <p class="ef-tag">Foto de equipo</p>
+            <h2>Reconozcan al equipo</h2>
+            <p class="ef-tagline">Mira la foto grupal del equipo seleccionado.</p>
+          </div>
+        </div>
+        <div class="photo-viewer">
+          {% if equipos_a_evaluar %}
+            {% with equipo=equipos_a_evaluar.0 %}
+              {% if equipo.proyecto and equipo.proyecto.foto_grupal %}
+                <img id="ef-photo-preview" src="{{ equipo.proyecto.foto_grupal.url }}" alt="Foto del equipo seleccionado" class="photo-preview">
+              {% else %}
+                <div id="ef-photo-preview" class="photo-placeholder">Sin foto aún</div>
+              {% endif %}
+            {% endwith %}
+          {% else %}
+            <div class="photo-placeholder">No hay equipos para mostrar.</div>
           {% endif %}
-        {% endwith %}
-      </section>
-    {% endif %}
+        </div>
+      </aside>
+    </section>
   </div>
 
   <a href="{% url 'etapaFinal:home' %}" class="btn-arrow btn-arrow-left" title="Volver">
@@ -131,6 +156,38 @@
     <span class="arrow-icon">➜</span>
   </a>
 
+  <div id="howto-overlay" class="howto-overlay" aria-hidden="true">
+    <div class="howto-card">
+      <h2>¿Cómo se juega?</h2>
+      <p>Están en la coevaluación (Paso 5 de 6). El juego combinó 4 etapas previas con esta evaluación y el ranking final para practicar equipo, empatía, creatividad, comunicación y apoyo.</p>
+      <div class="howto-grid">
+        <div>
+          <strong>Qué hacer aquí</strong>
+          <ul>
+            <li>No se autoevalúan: solo puntúan a otros equipos.</li>
+            <li>Escala 1–5: 1 mínimo, 3 cumple bien, 5 sobresale y aporta valor.</li>
+            <li>Sus puntajes entregan tokens de apoyo a los equipos evaluados.</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Sentido de los tokens</strong>
+          <ul>
+            <li>El ranking final mezcla desempeño de etapas y esta coevaluación justa.</li>
+            <li>Apoyar con criterios claros fomenta la cultura emprendedora UDD.</li>
+            <li>Lo central: aprendizaje y reflexión sobre sus propias habilidades.</li>
+          </ul>
+        </div>
+      </div>
+      <button type="button" class="howto-close" onclick="document.getElementById('howto-overlay').classList.remove('is-open')">Cerrar</button>
+    </div>
+  </div>
+
   <script src="{% static 'etapaFinal/js/etapaFinal.js' %}"></script>
+  <script>
+    (function(){
+      const overlay = document.getElementById('howto-overlay');
+      overlay?.addEventListener('click',(e)=>{ if(e.target===overlay){ overlay.classList.remove('is-open'); }});
+    })();
+  </script>
 </body>
 </html>

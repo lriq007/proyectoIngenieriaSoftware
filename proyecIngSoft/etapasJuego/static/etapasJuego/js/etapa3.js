@@ -47,6 +47,10 @@
     if (clear) clear.hidden = false;
     btn.classList.add("has-image");
     
+    if (window.TokenCounter) {
+      window.TokenCounter.addOnce("lego-upload", 6);
+    }
+    
     console.log('Imagen cargada correctamente:', file.name);
   }
 
@@ -120,6 +124,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const dur = parseInt(el.dataset.durationSeconds, 10);
   const DURATION = Number.isFinite(dur) ? dur : 15 * 60; // 15 minutos en segundos
   let remaining = DURATION;
+  let timeupShown = false;
 
   function fmt(sec){
     const m = Math.floor(sec / 60);
@@ -134,6 +139,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const iv = setInterval(() => {
     remaining = Math.max(0, remaining - 1);
     el.textContent = fmt(remaining);
-    if (remaining <= 0) clearInterval(iv);
+    if (remaining <= 0) {
+      clearInterval(iv);
+      if (!timeupShown && typeof window.showTimeupOverlay === "function") {
+        timeupShown = true;
+        window.showTimeupOverlay();
+      }
+    }
   }, 1000);
 });

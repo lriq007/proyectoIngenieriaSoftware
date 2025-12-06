@@ -4,14 +4,22 @@ body.theme-login {
 
 .stage-title {
     margin: 0;
-    font-size: clamp(40px, 6vw, 72px);
-    line-height: 1;
+    font-size: clamp(34px, 4vw, 40px);
+    line-height: 1.05;
     font-weight: 800;
     letter-spacing: 0.5px;
     color: #FFD24A;
     -webkit-text-stroke: 1px #000;
     text-shadow: 0 1px 0 #000, 0 -1px 0 #000, 1px 0 0 #000, -1px 0 0 #000;
     text-align: center;
+}
+
+.game-instructions h3{
+    font-size: 1.5rem;
+}
+.game-instructions p,
+.game-instructions .hint{
+    font-size: 1rem;
 }
 
 .ws-container {
@@ -30,7 +38,8 @@ body.theme-login {
     display: grid;
     gap: 48px;
     justify-items: center;
-    max-width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
 }
 
 #progress-bar {
@@ -78,23 +87,25 @@ body.theme-login {
     background: linear-gradient(180deg,#333333 0%,#3C3C3C 55%,#474747 100%);
     border: 2px solid rgba(255,255,255,0.12);
     border-radius: 22px;
-    padding: 26px 42px;
+    padding: 32px 42px;
     color: #fefefe;
     display: flex;
-    align-items: center;
-    gap: 32px;
-    max-width: 980px;
+    align-items: stretch;
+    gap: 38px;
+    width: 100%;
+    max-width: none;
     min-height: 220px;
     box-shadow: 0 22px 40px rgba(0,0,0,0.32), 0 0 0 1px rgba(255,255,255,0.05) inset;
-    margin: 0 auto;
+    margin: 0;
     justify-content: center;
 }
 
 .challenge-summary .summary-copy {
     flex: 1;
     display: grid;
-    gap: 14px;
+    gap: 12px;
     text-align: left;
+    align-content: center;
 }
 
 .challenge-summary .summary-copy .badge {
@@ -109,8 +120,41 @@ body.theme-login {
     text-transform: uppercase;
 }
 
+.summary-title{
+    margin: 0 0 8px;
+    font-size: clamp(30px, 3.6vw, 38px);
+}
+
+.summary-section{
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.24);
+}
+.summary-label{
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 800;
+    color: #facc15;
+    font-size: 0.95rem;
+}
+.summary-persona{
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #f8fafc;
+}
+.summary-story{
+    margin: 6px 0 0;
+    font-size: 1.08rem;
+    line-height: 1.6;
+    color: #e2e8f0;
+}
+
 .challenge-summary .summary-figure {
-    width: min(320px, 32vw);
+    width: min(340px, 34vw);
     flex-shrink: 0;
     border-radius: 18px;
     overflow: hidden;
@@ -130,12 +174,14 @@ body.theme-login {
     width: 100%;
     display: grid;
     gap: 24px;
+    justify-items: center;
+    margin-top: 12px;
 }
 
 .empathy-map-container {
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: none;
+    margin: 0;
     background: rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(10px);
     border-radius: 20px;
@@ -166,17 +212,24 @@ body.theme-login {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
+    width: 100%;
+    box-sizing: border-box;
+    align-items: stretch;
 }
 
 .bubble-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-    border-radius: 20px;
+    background: rgba(15, 23, 42, 0.78);
+    border-radius: 18px;
     padding: 22px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .bubble-card.is-active {
@@ -185,9 +238,9 @@ body.theme-login {
 }
 
 .bubble-card:hover {
-    transform: translateY(-6px) scale(1.02);
+    transform: translateY(-4px) scale(1.015);
     border-color: #FFD700;
-    box-shadow: 0 18px 46px rgba(255, 215, 0, 0.18);
+    box-shadow: 0 16px 40px rgba(255, 215, 0, 0.18);
 }
 
 .bubble-card.has-content {
@@ -217,7 +270,7 @@ body.theme-login {
 
 .bubble-textarea {
     width: 100%;
-    min-height: 110px;
+    min-height: 140px;
     padding: 12px;
     background: rgba(255, 255, 255, 0.9);
     border: 2px solid transparent;
@@ -227,12 +280,14 @@ body.theme-login {
     font-family: inherit;
     resize: vertical;
     transition: all 0.3s ease;
+    box-sizing: border-box;
+    flex: 1;
 }
 
 .bubble-textarea:focus {
     outline: none;
     border-color: #FFD700;
-    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.2);
+    box-shadow: 0 8px 22px rgba(255, 215, 0, 0.18);
     background: rgba(255, 255, 255, 1);
 }
 
@@ -298,9 +353,9 @@ body.theme-login {
     --base-transform: none;
     position: fixed;
     bottom: 30px;
-    width: 80px;
-    height: 80px;
-    border-radius: 20px;
+    width: 76px;
+    height: 76px;
+    border-radius: 18px;
     background-color: #FF5FA2;
     display: flex;
     align-items: center;
@@ -335,6 +390,16 @@ body.theme-login {
 .btn-arrow-left { 
     left: 40px;  
     --base-transform: scaleX(-1); 
+}
+
+@media (max-width: 1024px){
+    .btn-arrow{
+        width: 68px;
+        height: 68px;
+        bottom: 22px;
+    }
+    .btn-arrow-right{ right: 28px; }
+    .btn-arrow-left{ left: 28px; }
 }
 
 @media (max-width: 720px) {
@@ -373,6 +438,12 @@ body.theme-login {
         gap: 32px;
         justify-items: center;
         width: 100%;
+    }
+}
+
+@media (max-width: 1024px){
+    .stage-wrapper{
+        gap: 18px;
     }
 }
 

@@ -1,19 +1,12 @@
 {% extends "login/panel_base.html" %}
-{% block title %}Mis sesiones{% endblock %}
-{% block header_title %}Mis sesiones{% endblock %}
+{% block title %}Sesiones asignadas{% endblock %}
+{% block header_title %}Sesiones asignadas{% endblock %}
 
 {% block content %}
-<div class="panel-grid">
-    <div class="panel-card">
-        <h3>Nueva sesión</h3>
-        <form method="post" class="panel-form">
-            {% csrf_token %}
-            {% include "login/admin/_form_fields.html" with form=form %}
-            <button class="btn-link btn-primary" type="submit">Guardar sesión</button>
-        </form>
-    </div>
-    <div class="panel-card">
-        <h3>Listado</h3>
+<div class="panel-card">
+    <h3>Sesiones asignadas (solo lectura)</h3>
+    <p class="muted">Solo consulta. La creación o edición de sesiones la realiza el administrador.</p>
+    <div class="panel-table-wrapper">
         <table class="panel-table">
             <thead>
                 <tr>
@@ -21,7 +14,6 @@
                     <th>Código</th>
                     <th>Sección</th>
                     <th>Modo</th>
-                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,13 +23,9 @@
                         <td>{{ s.codigo }}</td>
                         <td>{{ s.seccion }}</td>
                         <td>{{ s.get_modo_asignacion_display }}</td>
-                        <td class="panel-actions-row">
-                            <a class="btn-link btn-outline" href="{% url 'profesorpanel:sesion_editar' s.id %}">Editar</a>
-                            <a class="btn-link btn-danger" href="{% url 'profesorpanel:sesion_eliminar' s.id %}">Eliminar</a>
-                        </td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="5">No tienes sesiones configuradas.</td></tr>
+                    <tr><td colspan="4">No tienes sesiones configuradas.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

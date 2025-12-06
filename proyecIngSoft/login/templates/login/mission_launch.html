@@ -1,0 +1,48 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Preparando Misión Emprende</title>
+  <link rel="stylesheet" href="{% static 'login/css/home.css' %}">
+  <link rel="stylesheet" href="{% static 'login/css/mission_launch.css' %}">
+</head>
+<body class="home-estudiante-body">
+  <div class="app-noise"></div>
+  <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
+
+  <div class="mission-stage">
+    <p class="stage-chip">Transición de equipo</p>
+    <h1 class="stage-title">Estamos alistando tu misión</h1>
+    <p class="stage-subtitle">Mantengan la energía: en breve arrancan con el juego. Si quieren, ya pueden prepararse para colaborar.</p>
+  </div>
+
+  <div id="mission-overlay" class="mission-launch is-waiting" aria-hidden="true">
+    <div class="mission-launch__backdrop"></div>
+    <div class="mission-launch__card" role="dialog" aria-modal="true">
+      <p class="launch-chip">Preparando la misión</p>
+      <h2 class="launch-title">¡Prepárate! En breve comienza Misión Emprende</h2>
+      <div class="launch-spinner">
+        <div class="spinner">
+          <div class="spinner1"></div>
+          <div class="circle"></div>
+        </div>
+      </div>
+      <a href="{% url 'seleccion_modalidad' %}" class="btn-home btn-continue launch-cta">Ir a la selección de modalidad ➜</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const overlay = document.getElementById('mission-overlay');
+      if (!overlay) return;
+      setTimeout(() => {
+        overlay.classList.remove('is-waiting');
+        overlay.classList.add('is-open');
+        overlay.setAttribute('aria-hidden','false');
+      }, 8000);
+    });
+  </script>
+</body>
+</html>

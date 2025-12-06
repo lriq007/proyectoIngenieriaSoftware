@@ -3,6 +3,9 @@
 {% block header_title %}Sesiones de juego{% endblock %}
 
 {% block content %}
+<div class="panel-actions-row" style="margin-bottom:12px;">
+    <a class="btn-link btn-outline" href="{% url 'adminpanel:dashboard' %}">Volver al dashboard</a>
+</div>
 <div class="panel-grid">
     <div class="panel-card">
         <h3>Nueva sesión</h3>
@@ -14,35 +17,43 @@
     </div>
     <div class="panel-card">
         <h3>Listado</h3>
-        <table class="panel-table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Código</th>
-                    <th>Profesor</th>
-                    <th>Sección</th>
-                    <th>Modo</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for s in sesiones %}
+        <form method="get" class="panel-form" style="margin-bottom:12px;">
+            <div class="form-group">
+                <label>Buscar</label>
+                <input type="text" name="q" value="{{ q }}" placeholder="Nombre, código, profesor o sección" class="form-field">
+            </div>
+        </form>
+        <div class="panel-table-wrapper">
+            <table class="panel-table">
+                <thead>
                     <tr>
-                        <td>{{ s.nombre }}</td>
-                        <td>{{ s.codigo }}</td>
-                        <td>{{ s.profesor }}</td>
-                        <td>{{ s.seccion }}</td>
-                        <td>{{ s.get_modo_asignacion_display }}</td>
-                        <td class="panel-actions-row">
-                            <a class="btn-link btn-outline" href="{% url 'adminpanel:sesion_editar' s.id %}">Editar</a>
-                            <a class="btn-link btn-danger" href="{% url 'adminpanel:sesion_eliminar' s.id %}">Eliminar</a>
-                        </td>
+                        <th>Nombre</th>
+                        <th>Código</th>
+                        <th>Profesor</th>
+                        <th>Sección</th>
+                        <th>Modo</th>
+                        <th>Acciones</th>
                     </tr>
-                {% empty %}
-                    <tr><td colspan="6">No hay sesiones registradas.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for s in sesiones %}
+                        <tr>
+                            <td>{{ s.nombre }}</td>
+                            <td>{{ s.codigo }}</td>
+                            <td>{{ s.profesor }}</td>
+                            <td>{{ s.seccion }}</td>
+                            <td>{{ s.get_modo_asignacion_display }}</td>
+                            <td class="panel-actions-row">
+                                <a class="btn-link btn-outline" href="{% url 'adminpanel:sesion_editar' s.id %}">Editar</a>
+                                <a class="btn-link btn-danger" href="{% url 'adminpanel:sesion_eliminar' s.id %}">Eliminar</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6">No hay sesiones registradas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

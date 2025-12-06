@@ -117,6 +117,9 @@
           showMessage('No se pudo guardar. Inténtalo nuevamente.', 'error');
         } else {
           showMessage('Respuestas guardadas correctamente.', 'success');
+          if (window.TokenCounter) {
+            window.TokenCounter.addOnce('bubble-save', 6);
+          }
         }
       } catch (error) {
         console.error(error);

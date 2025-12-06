@@ -17,35 +17,39 @@
 <body class="theme-login">
   <div class="app-noise"></div>
   <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
+  <button type="button" class="howto-btn" onclick="document.getElementById('howto-overlay').classList.add('is-open')">¿Cómo se juega?</button>
 
   <!-- Barra de progreso -->
   <div id="progress-bar">
     <div>
-      <span>Etapa 2 de 4</span>
+      <span>Paso 2 de 6 · Desafío y empatía</span>
       <div><div style="width:50%;"></div></div>
     </div>
   </div>
 
   <!-- Contenido -->
   <div class="ws-container" id="mainContent">
-    <!-- Cronómetro Etapa 2 -->
-    <div
-      id="e2-timer"
-      class="ws-timer"
-      aria-live="polite"
-      aria-label="Tiempo restante"
-      data-duration-seconds="{{ sesion.duracion_etapa2_segundos|default:600 }}"
-    >10:00</div>
-
     <div class="ws-header">
       <h1 class="ws-title">Etapa 2 — Desafío y Empatía</h1>
     </div>
+    <section class="game-instructions">
+      <h3>🎯 Guía rápida</h3>
+      <p>Elijan un solo desafío para el equipo. El video es una referencia para entender el contexto y a la persona afectada.</p>
+      <p class="hint">Definir bien el problema hará más fácil el mapa de empatía, el LEGO y el pitch.</p>
+      <div class="help-hint" aria-label="Ayuda rápida etapa 2" style="margin-top:10px;">
+        <button type="button" class="cyber-btn btn-lost"><span class="loader is-inline" aria-hidden="true"></span>¿Perdidos?</button>
+        <div class="cyber-tooltip">
+          <strong>Elegir con foco</strong>
+          <div>Busquen el desafío que mejor puedan explicar. Piensen en la persona detrás del problema y cómo la ayudarán después.</div>
+        </div>
+      </div>
+    </section>
 
     <!-- Frase -->
     <section class="et2-hero">
       <div class="et2-quote">
         <span class="qmark left">❝</span>
-        <span class="et2-target" aria-hidden="true">🎯</span>
+        <span class="et2-target" aria-hidden="true"></span>
         <p>
           Es importante tener un desafío o problemática en un emprendimiento porque proporciona un propósito claro,
           guía la creatividad y la innovación, y ayuda a identificar oportunidades de negocio al resolver necesidades
@@ -57,22 +61,24 @@
 
     <!-- Lista de desafíos -->
     <section class="challenge-list" id="listaDesafios">
-      {% for desafio in desafios %}
-        <article
-          class="challenge-card"
-          role="button" tabindex="0"
-          aria-label="Abrir información del desafío {{ desafio.titulo }}"
-          data-challenge-id="{{ desafio.challenge.id|default_if_none:'' }}"
-          data-desafio-id="{{ desafio.id }}"
-          data-title="{{ desafio.titulo|escape }}"
-          data-desc="{{ desafio.challenge.descripcion|default:desafio.historia|default:'Sin descripción'|escape }}"
-          data-video="{% if desafio.challenge and desafio.challenge.video_file %}{{ desafio.challenge.video_file.url }}{% endif %}"
-        >
-          <h3>{{ desafio.titulo }}</h3>
-        </article>
-      {% empty %}
-        <p>No hay desafíos configurados para este tema. Por favor, pídale al administrador que cree desafíos.</p>
-      {% endfor %}
+      <div class="topic-grid">
+        {% for desafio in desafios %}
+          <article
+            class="challenge-card"
+            role="button" tabindex="0"
+            aria-label="Abrir información del desafío {{ desafio.titulo }}"
+            data-challenge-id="{{ desafio.challenge.id|default_if_none:'' }}"
+            data-desafio-id="{{ desafio.id }}"
+            data-title="{{ desafio.titulo|escape }}"
+            data-desc="{{ desafio.challenge.descripcion|default:desafio.historia|default:'Sin descripción'|escape }}"
+            data-video="{% if desafio.challenge and desafio.challenge.video_file %}{{ desafio.challenge.video_file.url }}{% endif %}"
+          >
+            <h3>{{ desafio.titulo }}</h3>
+          </article>
+        {% empty %}
+          <p>No hay desafíos configurados para este tema. Por favor, pídale al administrador que cree desafíos.</p>
+        {% endfor %}
+      </div>
     </section>
   </div>
 
@@ -126,10 +132,12 @@
       const hiddenDesafioField = document.getElementById('desafioIdField');
       const submitBtn = form?.querySelector('button[type="submit"]');
       if(submitBtn){ submitBtn.disabled = true; }
+      let currentDesafio = null;
 
       function setSelected(challengeId, desafioId){
         if(hiddenChallengeField){ hiddenChallengeField.value = challengeId || ''; }
         if(hiddenDesafioField){ hiddenDesafioField.value = desafioId || ''; }
+        currentDesafio = desafioId || null;
         if(submitBtn){ submitBtn.disabled = !(challengeId && desafioId); }
       }
       function openModal(data){
@@ -183,12 +191,58 @@
       btnClose.addEventListener('click', closeModal);
       backdrop.addEventListener('click', (e)=>{ if(e.target === backdrop) closeModal(); });
       document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+      form?.addEventListener('submit', ()=>{
+        if (window.TokenCounter && currentDesafio) {
+          window.TokenCounter.addOnce(`desafio-${currentDesafio}`, 6);
+        }
+      });
     })();
   </script>
 
+  <script src="{% static 'etapasJuego/js/token-counter.js' %}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const tokensFromServer = Number("{{ team.tokens_totales|default_if_none:0 }}");
+      if (window.TokenCounter && Number.isFinite(tokensFromServer)) {
+        TokenCounter.set(tokensFromServer);
+      }
+    });
+  </script>
   <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
-  <!-- Cronómetro persistente Etapa 2 (con reset en la raíz) -->
-  <script>window.E2_FORCE_RESET = true;</script>
-  <script src="{% static 'etapasJuego/js/timer_etapa2.js' %}"></script>
+
+  <div id="howto-overlay" class="howto-overlay" aria-hidden="true">
+    <div class="howto-card">
+      <h2>¿Cómo se juega?</h2>
+      <p>En este paso eligen el problema del usuario. El juego completo tiene 4 etapas, coevaluación y ranking para practicar equipo, empatía, creatividad, comunicación y apoyo.</p>
+      <div class="howto-grid">
+        <div>
+          <strong>Ruta</strong>
+          <ul>
+            <li>Paso 1: Sopa de letras en equipo.</li>
+            <li>Paso 2: Tema/desafío y mapa de empatía.</li>
+            <li>Paso 3: Prototipo LEGO + resumen.</li>
+            <li>Paso 4: Pitch breve.</li>
+            <li>Coevaluación y Ranking final.</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Tokens</strong>
+          <ul>
+            <li>Elegir bien el desafío facilita sumar tokens en empatía y creatividad.</li>
+            <li>Tokens mezclan desempeño y coevaluación justa.</li>
+            <li>Busquen claridad y foco más que memorizar el video.</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:10px;">Al final reflexionarán sobre sus habilidades y opciones de emprender con apoyo UDD.</p>
+      <button type="button" class="howto-close" onclick="document.getElementById('howto-overlay').classList.remove('is-open')">Cerrar</button>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const overlay = document.getElementById('howto-overlay');
+      overlay?.addEventListener('click',(e)=>{ if(e.target===overlay){ overlay.classList.remove('is-open'); }});
+    })();
+  </script>
 </body>
 </html>

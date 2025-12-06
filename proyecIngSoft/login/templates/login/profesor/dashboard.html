@@ -3,45 +3,138 @@
 {% block header_title %}Panel Profesor{% endblock %}
 
 {% block content %}
-<div class="panel-card">
-    <div class="panel-stats">
-        <div class="stat-tile"><strong>{{ seccion_count }}</strong> Secciones</div>
-        <div class="stat-tile"><strong>{{ sesion_count }}</strong> Sesiones</div>
+<div class="panel-grid kpi-grid">
+    <div class="panel-card kpi">
+        <p class="kpi-label">Sesiones asignadas</p>
+        <p class="kpi-value">{{ sesion_count }}</p>
+        <span class="kpi-sub">Solo las que te asignó el administrador</span>
+    </div>
+    <div class="panel-card kpi">
+        <p class="kpi-label">Secciones</p>
+        <p class="kpi-value">{{ seccion_count }}</p>
+        <span class="kpi-sub">Vinculadas a tus sesiones</span>
+    </div>
+    <div class="panel-card kpi">
+        <p class="kpi-label">Equipos</p>
+        <p class="kpi-value">{{ equipos_count }}</p>
+        <span class="kpi-sub">Dentro de tus sesiones</span>
+    </div>
+    <div class="panel-card kpi">
+        <p class="kpi-label">Estudiantes</p>
+        <p class="kpi-value">{{ estudiantes_count }}</p>
+        <span class="kpi-sub">Con equipo asignado</span>
     </div>
 </div>
 
+<div class="panel-actions-row" style="margin: 8px 0 16px;">
+    <a class="btn-link btn-primary" href="{% url 'profesorpanel:alumnos' %}">Alumnos</a>
+    <a class="btn-link btn-primary" href="{% url 'profesorpanel:equipos' %}">Equipos</a>
+    <a class="btn-link btn-primary" href="{% url 'profesorpanel:secciones' %}">Secciones</a>
+</div>
+
 <div class="panel-card">
-    <h3>Sesiones</h3>
-    <table class="panel-table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Código</th>
-                <th>Sección</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="card-header">
+        <div>
+            <p class="eyebrow">Ganadores / Destacados</p>
+            <h3>Top equipos por puntaje</h3>
+        </div>
+        <a class="btn-link btn-outline" href="{% url 'profesorpanel:sesiones' %}">Gestionar sesiones</a>
+    </div>
+    <div class="panel-grid winners-grid">
+        {% for t in top_equipos %}
+            <div class="panel-card winner-card">
+                <div class="winner-meta">
+                    <span class="pill">{{ t.sesion.nombre|default:"Sesión sin nombre" }}</span>
+                    <span class="pill pill-muted">Código {{ t.codigo_grupo }}</span>
+                </div>
+                <h4>{{ t.nombre }}</h4>
+                <p class="winner-score">{{ t.tokens_totales|default:0 }} pts</p>
+                <p class="winner-sub">Empatía {{ t.tokens_empatia|default:0 }} · Creatividad {{ t.tokens_creatividad|default:0 }} · Comunicación {{ t.tokens_evaluacion|default:0 }}</p>
+            </div>
+        {% empty %}
+            <p>No hay equipos con puntaje registrado aún.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="panel-grid two-col">
+    <div class="panel-card">
+        <div class="card-header">
+            <div>
+                <p class="eyebrow">Ranking</p>
+                <h3>Top 10 de la sesión</h3>
+            </div>
+        </div>
+        <form method="get" class="panel-form" style="margin-bottom:12px;">
+            <div class="form-group">
+                <label>Buscar</label>
+                <input type="text" name="q" value="{{ q }}" placeholder="Equipo o sesión" class="form-field">
+            </div>
+        </form>
+        <div class="panel-table-wrapper">
+            <table class="panel-table compact">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Equipo</th>
+                        <th>Sesión</th>
+                        <th>Puntaje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in ranking %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ t.nombre }}</td>
+                            <td>{{ t.sesion.nombre }}</td>
+                            <td><strong>{{ t.tokens_totales|default:0 }}</strong></td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4">Aún no hay ranking disponible.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="card-header">
+            <div>
+                <p class="eyebrow">Sesiones</p>
+                <h3>Resumen rápido</h3>
+            </div>
+        </div>
+        <ul class="panel-list solid">
             {% for s in sesiones %}
-                <tr>
-                    <td>{{ s.nombre }}</td>
-                    <td>{{ s.codigo }}</td>
-                    <td>{{ s.seccion }}</td>
-                </tr>
+                <li>
+                    <div>
+                        <strong>{{ s.nombre }}</strong>
+                        <p class="muted">Código {{ s.codigo }} · Sección {{ s.seccion|default:"N/A" }}</p>
+                    </div>
+                    <span class="pill pill-muted">Equipos: {{ s.equipos.count }}</span>
+                </li>
             {% empty %}
-                <tr><td colspan="3">Aún no tienes sesiones asociadas.</td></tr>
+                <li>No tienes sesiones asociadas todavía.</li>
             {% endfor %}
-        </tbody>
-    </table>
-    <div class="panel-actions-row" style="margin-top:12px;">
-        <a class="btn-link btn-primary" href="{% url 'profesorpanel:sesiones' %}">Gestionar sesiones</a>
+        </ul>
     </div>
 </div>
 
 <div class="panel-card">
-    <h3>Secciones</h3>
-    <ul class="panel-list">
+    <div class="card-header">
+        <div>
+            <p class="eyebrow">Secciones</p>
+            <h3>Tus secciones</h3>
+        </div>
+    </div>
+    <ul class="panel-list solid">
         {% for sec in secciones %}
-            <li>{{ sec.nombre }} - {{ sec.carrera }}</li>
+            <li>
+                <div>
+                    <strong>{{ sec.nombre }}</strong>
+                    <p class="muted">{{ sec.carrera|default:"Carrera no informada" }}</p>
+                </div>
+            </li>
         {% empty %}
             <li>No hay secciones asociadas.</li>
         {% endfor %}

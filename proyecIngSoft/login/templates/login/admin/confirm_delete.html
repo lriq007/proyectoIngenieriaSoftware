@@ -3,6 +3,9 @@
 {% block header_title %}{{ title }}{% endblock %}
 
 {% block content %}
+<div class="panel-actions-row" style="margin-bottom:12px;">
+    <a class="btn-link btn-outline" href="{% url 'adminpanel:dashboard' %}">Volver al dashboard</a>
+</div>
 <div class="panel-card">
     <p>¿Seguro que deseas eliminar <strong>{{ object }}</strong>?</p>
     <form method="post" class="panel-actions-row">

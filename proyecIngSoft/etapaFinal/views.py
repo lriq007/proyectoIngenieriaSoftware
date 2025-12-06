@@ -5,18 +5,19 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.http import require_POST
 
 from etapasJuego.context import get_or_create_team_for_request
-from etapasJuego.models import Evaluation, Team
+from etapasJuego.models import Evaluation, Team, Project
 from login.models import Estudiante
 
 # Create your views here.
 
 def coevaluacion_home(request):
     sesion, team = get_or_create_team_for_request(request)
-    equipos_a_evaluar = Team.objects.filter(sesion=sesion).exclude(id=team.id)
-    ranking = (
+    equipos_a_evaluar = (
         Team.objects.filter(sesion=sesion)
-        .order_by("-tokens_totales", "nombre")
+        .exclude(id=team.id)
+        .select_related("proyecto")
     )
+    project = getattr(team, "proyecto", None)
     return render(
         request,
         "etapaFinal/index.html",
@@ -24,7 +25,7 @@ def coevaluacion_home(request):
             "sesion": sesion,
             "team_actual": team,
             "equipos_a_evaluar": equipos_a_evaluar,
-            "ranking": ranking,
+            "project": project,
         },
     )
 
@@ -102,6 +103,7 @@ def final_resultados(request):
     sesion, team = get_or_create_team_for_request(request)
     ranking = (
         Team.objects.filter(sesion=sesion)
+        .prefetch_related("estudiantes")
         .order_by("-tokens_totales", "nombre")
     )
     ganador = ranking.first() if ranking else None
@@ -115,3 +117,26 @@ def final_resultados(request):
             "ganador": ganador,
         },
     )
+
+
+@require_POST
+def upload_foto_grupal(request):
+    """
+    Guarda la foto grupal del proyecto del equipo actual.
+    """
+    sesion, team = get_or_create_team_for_request(request)
+    if team is None:
+        return JsonResponse({"ok": False, "msg": "Equipo no encontrado para esta sesión"}, status=400)
+
+    project = getattr(team, "proyecto", None)
+    if project is None:
+        return JsonResponse({"ok": False, "msg": "No hay proyecto asociado al equipo"}, status=404)
+
+    file = request.FILES.get("foto_grupal")
+    if not file:
+        return JsonResponse({"ok": False, "msg": "No se envió archivo"}, status=400)
+
+    project.foto_grupal = file
+    project.save(update_fields=["foto_grupal"])
+
+    return JsonResponse({"ok": True, "msg": "Foto grupal guardada", "foto_url": project.foto_grupal.url})

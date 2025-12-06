@@ -1,0 +1,166 @@
+.mission-stage{
+    max-width: 880px;
+    margin: 80px auto 0;
+    text-align: center;
+    color: #e5e7fb;
+    padding: 10px 16px;
+}
+.stage-chip{
+    display: inline-block;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.22);
+    color: #facc15;
+    border-radius: 12px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+}
+.stage-title{
+    margin: 0 0 8px;
+    color: #f8fafc;
+    font-size: clamp(28px, 4vw, 40px);
+    text-shadow: 0 10px 32px rgba(0,0,0,0.35);
+}
+.stage-subtitle{
+    margin: 0;
+    color: #dbeafe;
+    opacity: 0.9;
+    line-height: 1.5;
+}
+
+.mission-launch{
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s ease;
+}
+.mission-launch.is-open{
+    opacity: 1;
+    pointer-events: all;
+}
+.mission-launch__backdrop{
+    position: absolute;
+    inset: 0;
+    background: rgba(5,12,32,0.78);
+    backdrop-filter: blur(8px);
+}
+.mission-launch__card{
+    position: relative;
+    max-width: 520px;
+    width: 100%;
+    background: linear-gradient(140deg, rgba(11,21,61,0.92), rgba(15,44,110,0.92));
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 18px;
+    padding: 26px 22px;
+    box-shadow: 0 20px 46px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,210,74,0.28);
+    text-align: center;
+    overflow: hidden;
+}
+.mission-launch__card::before{
+    content:"";
+    position:absolute;
+    inset:-20%;
+    background: radial-gradient(circle, rgba(255,210,74,0.18), transparent 62%);
+    filter: blur(8px);
+    z-index: 0;
+}
+.mission-launch__card > *{ position: relative; z-index: 1; }
+.launch-chip{
+    display: inline-block;
+    padding: 8px 12px;
+    background: rgba(255,210,74,0.2);
+    border: 1px solid rgba(255,210,74,0.45);
+    color: #facc15;
+    border-radius: 999px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+}
+.launch-title{
+    margin: 0 0 18px;
+    color: #f8e6b5;
+    font-size: 1.6rem;
+    text-shadow: 0 8px 26px rgba(0,0,0,0.32);
+    animation: pulseGlow 1.6s ease-in-out infinite;
+}
+.launch-spinner{
+    display: grid;
+    place-items: center;
+    margin-bottom: 16px;
+}
+.launch-cta{
+    margin-top: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    min-width: 220px;
+}
+
+@keyframes pulseGlow{
+    0%,100%{ opacity: 0.92; }
+    50%{ opacity: 0.6; }
+}
+
+.spinner {
+    background-image: linear-gradient(rgb(0, 144, 255) 35%, rgb(0, 0, 255));
+    width: 100px;
+    height: 100px;
+    animation: spinning82341 1.7s linear infinite;
+    text-align: center;
+    border-radius: 50px;
+    filter: blur(1px);
+    box-shadow: 0px -5px 20px 0px rgb(0, 144, 255), 0px 5px 20px 0px rgb(0, 0, 255);
+    position: relative;
+}
+
+.spinner1 {
+    background-color: rgb(0, 0, 255);
+    width: 100px;
+    height: 100px;
+    border-radius: 50px;
+    filter: blur(10px);
+    animation: flickeringGlow 2s linear infinite;
+}
+
+.circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+@keyframes spinning82341 {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes flickeringGlow {
+    0% {
+        box-shadow: 0px -10px 40px 0px rgb(0, 144, 255), 0px 10px 40px 0px rgb(0, 0, 255), 0px 0px 20px 0px white;
+    }
+    25% {
+        box-shadow: 0px -10px 32px 0px rgb(0, 144, 255), 0px 10px 32px 0px rgb(0, 0, 255), 0px 0px 16px 0px white;
+    }
+    50% {
+        box-shadow: 0px -10px 44px 0px rgb(0, 144, 255), 0px 10px 44px 0px rgb(0, 0, 255), 0px 0px 24px 0px white;
+    }
+    75% {
+        box-shadow: 0px -10px 36px 0px rgb(0, 144, 255), 0px 10px 36px 0px rgb(0, 0, 255), 0px 0px 18px 0px white;
+    }
+    100% {
+        box-shadow: 0px -10px 40px 0px rgb(0, 144, 255), 0px 10px 40px 0px rgb(0, 0, 255), 0px 0px 20px 0px white;
+    }
+}

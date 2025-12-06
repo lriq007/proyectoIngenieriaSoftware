@@ -77,8 +77,8 @@ def _ensure_active_session(team_id, words=None, board_size=10):
     return tgs
 
 def etapa1(request):
-    sesion, _team = get_or_create_team_for_request(request)
-    return render(request, "etapasJuego/etapa1.html", {"sesion": sesion})
+    sesion, team = get_or_create_team_for_request(request)
+    return render(request, "etapasJuego/etapa1.html", {"sesion": sesion, "team": team})
 
 
 def etapa2_tema(request):
@@ -422,6 +422,7 @@ def etapa3(request):
         "etapasJuego/etapa3.html",
         {
             "sesion": sesion,
+            "team": team,
             "project": project,
         },
     )
@@ -447,9 +448,10 @@ def etapa3_guardar_foto(request):
     # 3) Obtener el Project asociado a este equipo
     project = get_object_or_404(Project, id=project_id, equipo=team)
 
-    # 4) Obtener el archivo de imagen desde request.FILES
-    #    El nombre del campo debe coincidir con el atributo "name" del input file en la template
+    # 4) Obtener los archivos de imagen desde request.FILES
+    #    Los nombres deben coincidir con los atributos "name" de los inputs en la template
     image_file = request.FILES.get("lego_image")
+    group_photo = request.FILES.get("foto_grupal")
     resumen_idea = (request.POST.get("resumen_idea", "") or "").strip()
     if resumen_idea and len(resumen_idea) < 70:
         resumen_idea = ""
@@ -461,6 +463,9 @@ def etapa3_guardar_foto(request):
         # 5) Guardar la imagen en foto_prototipo sin alterar otros campos
         project.foto_prototipo = image_file
         campos.append("foto_prototipo")
+    if group_photo:
+        project.foto_grupal = group_photo
+        campos.append("foto_grupal")
     if resumen_idea:
         project.resumen_idea = resumen_idea
         campos.append("resumen_idea")
@@ -532,6 +537,7 @@ def etapa4(request):
     }
 
     sesion = getattr(project.equipo, "sesion", None)
+    team = getattr(project, "equipo", None)
     return render(
         request,
         "etapasJuego/etapa4.html",
@@ -540,6 +546,7 @@ def etapa4(request):
             "pitch_tips": sugerencias,
             "pitch_payload": pitch_payload,
             "pitch_text": pitch.guion,
+            "team": team,
         },
     )
 
@@ -683,6 +690,7 @@ def etapa2_1(request):
             "etapasJuego/etapa2_1.html",
             {
                 "sesion": sesion_ctx,
+                "team": team,
                 "desafio": desafio,
                 "bubble_questions": bubble_items,
                 "bubble_responses": respuestas,
@@ -728,6 +736,7 @@ def etapa2_1(request):
         "etapasJuego/etapa2_1.html",
         {
             "sesion": sesion_ctx,
+            "team": team,
             "desafio": desafio,
             "bubble_questions": bubble_items,
             "bubble_responses": respuestas,

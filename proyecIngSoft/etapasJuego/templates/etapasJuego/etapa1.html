@@ -17,11 +17,12 @@
 <body>
   <div class="app-noise"></div>
   <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
+  <button type="button" class="howto-btn" onclick="document.getElementById('howto-overlay').classList.add('is-open')">¿Cómo se juega?</button>
 
   <!-- Barra de progreso -->
   <div id="progress-bar">
     <div>
-      <span>Etapa 1 de 4</span>
+      <span>Paso 1 de 6 · Trabajo en equipo</span>
       <div>
         <div style="width:25%;"></div>
       </div>
@@ -37,15 +38,25 @@
       aria-live="polite"
       aria-label="Tiempo restante"
       data-duration-seconds="{{ sesion.duracion_etapa1_segundos|default:300 }}"
+      data-next-url="{% url 'etapa2_tema' %}"
     >05:00</div>
 
     <div class="ws-header">
       <h1 class="ws-title">Etapa 1 — Sopa de Letras</h1>
     </div><br>
 
-    <div class="ws-header">
-      <h3 class="ws-message">¡Encuentren como grupo las palabras de emprendimiento en la sopa de letras!</h3>
-    </div>
+    <section class="game-instructions" style="text-align:left; max-width:780px;">
+      <h3>🧠 Guía rápida</h3>
+      <p>Encuentren como grupo las palabras de emprendimiento. Toquen y arrastren; hablen para dividirse palabras y probar direcciones.</p>
+      <p class="hint">El tiempo y el trabajo en equipo mejoran sus tokens en esta etapa.</p>
+      <div class="help-hint" aria-label="Ayuda rápida etapa 1" style="margin-top:10px;">
+        <button type="button" class="cyber-btn btn-lost"><span class="loader is-inline" aria-hidden="true"></span>¿Perdidos?</button>
+        <div class="cyber-tooltip">
+          <strong>Emprender es explorar juntos</strong>
+          <div>Busquen palabras en distintas direcciones y compartan pistas entre ustedes. Completar rápido sube sus tokens.</div>
+        </div>
+      </div>
+    </section>
 
     <main class="ws-main">
       <div id="ws-board" class="ws-board" aria-label="Sopa de letras"></div>
@@ -67,11 +78,12 @@
   </div>
 
   <!-- Modal de etapa completada -->
-  <div id="ws-complete" class="ws-complete" hidden>
-    <div>
-      <h2>¡Etapa completada! 🎉</h2>
-      <p>Excelente trabajo en equipo. Pueden avanzar a la siguiente etapa.</p>
-      <a href="{% url 'etapa2_tema' %}" class="ws-button">Ir a la Etapa 2 →</a>
+  <div id="complete-overlay" class="timeup-overlay" aria-hidden="true">
+    <div class="timeup-card" role="dialog" aria-modal="true">
+      <div class="timeup-glow"></div>
+      <p class="timeup-chip">¡Felicidades!</p>
+      <h2>Has terminado la sopa de letras</h2>
+      <p class="timeup-text">Espera a que termine el tiempo para continuar automáticamente a la siguiente etapa.</p>
     </div>
   </div>
 
@@ -93,6 +105,59 @@
   </script>
 
   <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
+  <script src="{% static 'etapasJuego/js/token-counter.js' %}"></script>
+  <script src="{% static 'etapasJuego/js/timeup-overlay.js' %}"></script>
   <script src="{% static 'etapasJuego/js/wordsearch.js' %}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const tokensFromServer = Number("{{ team.tokens_totales|default_if_none:0 }}");
+      if (window.TokenCounter && Number.isFinite(tokensFromServer)) {
+        TokenCounter.set(tokensFromServer);
+      }
+    });
+  </script>
+  <div id="timeup-overlay" class="timeup-overlay" aria-hidden="true">
+    <div class="timeup-card" role="dialog" aria-modal="true">
+      <div class="timeup-glow"></div>
+      <p class="timeup-chip">Tiempo agotado</p>
+      <h2>Uff, lo siento. Es hora de avanzar</h2>
+      <p class="timeup-text">Pasemos al Paso 2: elijan un tema para su desafío y sigan sumando tokens.</p>
+      <a class="btn btn-primary" href="{% url 'etapa2_tema' %}">Ir a la Etapa 2</a>
+    </div>
+  </div>
+  <div id="howto-overlay" class="howto-overlay" aria-hidden="true">
+    <div class="howto-card">
+      <h2>¿Cómo se juega?</h2>
+      <p>En 60 minutos pasan por 4 etapas, coevaluación y ranking para practicar equipo, empatía, creatividad, comunicación y apoyo.</p>
+      <div class="howto-grid">
+        <div>
+          <strong>Ruta</strong>
+          <ul>
+            <li>Paso 1: Sopa de letras en equipo.</li>
+            <li>Paso 2: Tema/desafío y mapa de empatía.</li>
+            <li>Paso 3: Prototipo LEGO + resumen.</li>
+            <li>Paso 4: Pitch corto.</li>
+            <li>Coevaluación y Ranking final.</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Tokens</strong>
+          <ul>
+            <li>Se ganan por completar bien y a tiempo cada paso.</li>
+            <li>La coevaluación aporta al ranking; no se autoevalúan.</li>
+            <li>Lo valioso es aprender y ver su progreso emprendedor.</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:10px;">Reflexionen al final: ¿qué habilidad les queda fuerte y cuál quieren trabajar más? La UDD los apoya si quieren emprender.</p>
+      <button type="button" class="howto-close" onclick="document.getElementById('howto-overlay').classList.remove('is-open')">Cerrar</button>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const overlay = document.getElementById('howto-overlay');
+      overlay?.addEventListener('click',(e)=>{ if(e.target===overlay){ overlay.classList.remove('is-open'); }});
+    })();
+  </script>
 </body>
 </html>

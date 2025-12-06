@@ -10,101 +10,197 @@
 <body class="theme-login">
   <div class="app-noise"></div>
   <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
+  <button type="button" class="howto-btn" onclick="document.getElementById('howto-overlay').classList.add('is-open')">¿Cómo se juega?</button>
 
-  <div class="ws-container">
-    <div class="ws-header" style="margin-top:24px;">
-      <h1 class="ws-title">Cierre — Resultados finales</h1>
-      <p class="ws-subtitle">Gracias por participar. Aquí están los resultados de tu sesión.</p>
-    </div>
+  <div class="ws-container final-container">
+    <header class="final-hero">
+      <div class="final-hero-glow"></div>
+      <div class="final-hero-top">
+        <div class="final-hero-chips">
+          <span class="ef-chip">Paso 6 · Final</span>
+          <span class="ef-chip">Ranking Épico</span>
+          <span class="ef-chip">Celebración</span>
+        </div>
+      </div>
+      <h1 class="final-title">Cierre — Resultados finales</h1>
+      <p class="final-subtitle">El ranking combina desempeño de las 4 etapas + coevaluación. Fin de misión: reconozcan al ganador, celebren y elijan qué habilidad quieren seguir fortaleciendo.</p>
+      {% if ranking %}
+        {% with ganador=ranking.0 %}
+          <div class="final-hero-meta">
+            <div class="meta-card">
+              <p class="meta-label">Equipo campeón</p>
+              <p class="meta-value">{{ ganador.nombre }}</p>
+              <small>Se lleva la copa y el reconocimiento de la sesión.</small>
+            </div>
+            <div class="meta-card">
+              <p class="meta-label">Tokens del ganador</p>
+              <p class="meta-value">{{ ganador.tokens_totales|default:0 }}</p>
+              <small>Suma de etapas + coevaluación.</small>
+            </div>
+            <div class="meta-card">
+              <p class="meta-label">Qué hacer ahora</p>
+              <p class="meta-value">Aplaudir · Tomar foto · Compartir</p>
+              <small>Cierren con feedback breve y celebren el trabajo.</small>
+            </div>
+          </div>
+        {% endwith %}
+      {% endif %}
+    </header>
 
     {% if ranking %}
-      <section class="ws-card ranking-container">
-        <header class="ws-header" style="gap:0.25rem;">
-          <h2 class="ws-title" style="margin-bottom:0;">🏆 Ranking de Equipos</h2>
-          <p class="ws-subtitle">Basado en tokens totales</p>
-        </header>
+      <section class="ef-panel final-ranking">
+        <div class="final-section-head">
+          <div>
+            <p class="ef-tag">Ranking final</p>
+            <h2>Equipos y tokens</h2>
+            <p class="ef-tagline">Basado en tokens totales de todas las etapas + coevaluación.</p>
+          </div>
+          <div class="final-badge">Cierre épico</div>
+        </div>
 
         {% with top_three=ranking|slice:":3" rest=ranking|slice:"3:" %}
-          <div class="top-three">
+          <div class="final-podium">
             {% for team in top_three %}
-              {% if forloop.counter == 1 %}
-                <div class="ranking-item first-place">
-                  <span class="position">1º</span>
-                  <span class="team-name">{{ team.nombre }}</span>
-                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
-                  <span class="ef-card-tag" style="margin-left:auto;">Ganador 🏆</span>
-                </div>
-              {% elif forloop.counter == 2 %}
-                <div class="ranking-item second-place">
-                  <span class="position">2º</span>
-                  <span class="team-name">{{ team.nombre }}</span>
-                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
-                </div>
-              {% elif forloop.counter == 3 %}
-                <div class="ranking-item third-place">
-                  <span class="position">3º</span>
-                  <span class="team-name">{{ team.nombre }}</span>
-                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
-                </div>
-              {% endif %}
+              <div class="podium-card podium-{{ forloop.counter }}">
+                <div class="podium-glow"></div>
+                <div class="podium-rank">{{ forloop.counter }}º</div>
+                <div class="podium-name">{{ team.nombre }}</div>
+                <div class="podium-points">{{ team.tokens_totales|default:0 }} pts</div>
+                {% if forloop.counter == 1 %}<span class="podium-badge">🏆 Campeón</span>{% endif %}
+                {% if forloop.counter == 2 %}<span class="podium-badge">⭐</span>{% endif %}
+                {% if forloop.counter == 3 %}<span class="podium-badge">🔥</span>{% endif %}
+              </div>
             {% empty %}
               <p class="ws-empty">No hay equipos para rankear aún.</p>
             {% endfor %}
           </div>
 
           {% if rest %}
-            <ul class="remaining-list">
+            <ul class="final-list">
               {% for team in rest %}
-                <li class="ranking-item">
-                  <span class="position">{{ forloop.counter|add:"3" }}º</span>
-                  <span class="team-name">{{ team.nombre }}</span>
-                  <span class="points">{{ team.tokens_totales|default:0 }} pts</span>
+                <li class="final-list-item">
+                  <div class="final-list-rank">{{ forloop.counter|add:"3" }}º</div>
+                  <div class="final-list-name">{{ team.nombre }}</div>
+                  <div class="final-list-points">{{ team.tokens_totales|default:0 }} pts</div>
                 </li>
               {% endfor %}
             </ul>
           {% endif %}
         {% endwith %}
+
+        <div class="final-full-list">
+          <div class="final-full-head">
+            <p class="ef-tag">Detalle completo</p>
+            <h3>Todos los equipos</h3>
+            <p class="ef-tagline">Ordenados por posición, con integrantes y puntaje.</p>
+          </div>
+          <div class="final-full-grid">
+            {% for team in ranking %}
+              <div class="final-full-item">
+                <div class="final-full-rank">{{ forloop.counter }}º</div>
+                <div class="final-full-body">
+                  <div class="final-full-name">{{ team.nombre }}</div>
+                  <div class="final-full-members">
+                    {% with miembros=team.estudiantes.all %}
+                      {% if miembros %}
+                        {% for est in miembros %}{{ est.nombre_apellido }}{% if not forloop.last %}, {% endif %}{% endfor %}
+                      {% else %}
+                        Sin integrantes registrados
+                      {% endif %}
+                    {% endwith %}
+                  </div>
+                </div>
+                <div class="final-full-points">{{ team.tokens_totales|default:0 }} pts</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
       </section>
     {% else %}
       <p class="ws-empty">No hay resultados para esta sesión.</p>
     {% endif %}
 
-    <section class="ws-card" style="display:grid;gap:12px;">
-      <h2 class="ws-title" style="margin:0;">Mensaje final</h2>
-      <p class="ws-subtitle" style="color:#0f172a;">Este juego fortaleció habilidades clave: Trabajo en equipo, Empatía, Creatividad, Comunicación y Apoyo. El emprendimiento es un pilar en la UDD porque impulsa innovación y soluciones reales con impacto.</p>
-      <div class="ws-grid" style="gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));">
-        <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
-          <strong>Equipo</strong>
-          <p style="margin:6px 0 0 0;">Coordinar y ejecutar juntos.</p>
+    <section class="ef-panel final-message">
+      <div class="final-section-head">
+        <div>
+          <p class="ef-tag">Mensaje final</p>
+          <h2>Cerrando la misión</h2>
+          <p class="ef-tagline">El juego fortaleció Trabajo en equipo, Empatía, Creatividad, Comunicación y Apoyo.</p>
         </div>
-        <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
-          <strong>Empatía</strong>
-          <p style="margin:6px 0 0 0;">Entender al usuario antes de proponer.</p>
+        <div class="final-badge final-badge-soft">UDD · Emprendimiento</div>
+      </div>
+      <div class="final-journey">
+        <div class="journey-note">
+          <p class="final-paragraph">El emprendimiento es un pilar en la UDD porque impulsa innovación y soluciones reales con impacto. Llévense este aprendizaje a próximos cursos y proyectos: lo central es la red que construyen y cómo la activan.</p>
+          <div class="journey-steps">
+            <div class="journey-step">
+              <span class="journey-dot">1</span>
+              <div>
+                <p class="journey-title">Celebrar</p>
+                <p class="journey-desc">Aplaudan al podio y capturen la foto final.</p>
+              </div>
+            </div>
+            <div class="journey-step">
+              <span class="journey-dot">2</span>
+              <div>
+                <p class="journey-title">Aprender</p>
+                <p class="journey-desc">Detecten una habilidad a reforzar y compartan feedback breve.</p>
+              </div>
+            </div>
+            <div class="journey-step">
+              <span class="journey-dot">3</span>
+              <div>
+                <p class="journey-title">Conectar</p>
+                <p class="journey-desc">Sigan en contacto: la comunidad de hoy es la red de mañana.</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
-          <strong>Creatividad</strong>
-          <p style="margin:6px 0 0 0;">Diseñar soluciones originales.</p>
-        </div>
-        <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
-          <strong>Comunicación</strong>
-          <p style="margin:6px 0 0 0;">Contar la historia con claridad.</p>
-        </div>
-        <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
-          <strong>Apoyo</strong>
-          <p style="margin:6px 0 0 0;">Invertir y dar feedback constructivo.</p>
+        <div class="journey-skills">
+          <div class="skill-chip">
+            <p class="skill-title">Equipo</p>
+            <p class="skill-desc">Coordinar y ejecutar juntos.</p>
+          </div>
+          <div class="skill-chip">
+            <p class="skill-title">Empatía</p>
+            <p class="skill-desc">Entender al usuario antes de proponer.</p>
+          </div>
+          <div class="skill-chip">
+            <p class="skill-title">Creatividad</p>
+            <p class="skill-desc">Diseñar soluciones originales.</p>
+          </div>
+          <div class="skill-chip">
+            <p class="skill-title">Comunicación</p>
+            <p class="skill-desc">Contar la historia con claridad.</p>
+          </div>
+          <div class="skill-chip">
+            <p class="skill-title">Apoyo</p>
+            <p class="skill-desc">Dar tokens y feedback constructivo.</p>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="ws-card" style="display:grid;gap:16px;">
-      <h2 class="ws-title" style="margin:0;">Encuesta y programas</h2>
-      <div class="ws-grid" style="gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+    <section class="ef-panel final-cta">
+      <div class="final-section-head">
+        <div>
+          <p class="ef-tag">Encuesta y redes</p>
+          <h2>Seguir la conversación</h2>
+          <p class="ef-tagline">Dejen feedback, conecten con la comunidad y sigan explorando.</p>
+        </div>
+        <div class="final-badge final-badge-soft">Gracias por jugar</div>
+      </div>
+      <div class="final-cta-grid">
         {% if sesion.qr_encuesta_url %}
-          <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
-            <h3 class="ws-subtitle" style="margin:0 0 6px 0;color:#0f172a;">Encuesta de satisfacción</h3>
+          <div class="cta-card">
+            <div class="cta-head">
+              <span class="cta-chip">Feedback</span>
+              <h3>Encuesta de satisfacción</h3>
+              <p>Cuéntanos qué funcionó y qué mejorar.</p>
+            </div>
             {% with url=sesion.qr_encuesta_url|lower %}
               {% if url|slice:"-4:" == ".png" or url|slice:"-4:" == ".jpg" or url|slice:"-5:" == ".jpeg" or url|slice:"-4:" == ".svg" %}
-                <img src="{{ sesion.qr_encuesta_url }}" alt="QR Encuesta" style="max-width:100%;border-radius:12px;">
+                <img src="{{ sesion.qr_encuesta_url }}" alt="QR Encuesta" class="cta-img">
               {% else %}
                 <a class="btn btn-primary" href="{{ sesion.qr_encuesta_url }}" target="_blank" rel="noopener noreferrer">Responder encuesta</a>
               {% endif %}
@@ -113,11 +209,15 @@
         {% endif %}
 
         {% if sesion.qr_instagram_url %}
-          <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
-            <h3 class="ws-subtitle" style="margin:0 0 6px 0;color:#0f172a;">Instagram</h3>
+          <div class="cta-card">
+            <div class="cta-head">
+              <span class="cta-chip">Comunidad</span>
+              <h3>Instagram</h3>
+              <p>Comparte la foto final y etiqueta a tu equipo.</p>
+            </div>
             {% with url=sesion.qr_instagram_url|lower %}
               {% if url|slice:"-4:" == ".png" or url|slice:"-4:" == ".jpg" or url|slice:"-5:" == ".jpeg" or url|slice:"-4:" == ".svg" %}
-                <img src="{{ sesion.qr_instagram_url }}" alt="QR Instagram" style="max-width:100%;border-radius:12px;">
+                <img src="{{ sesion.qr_instagram_url }}" alt="QR Instagram" class="cta-img">
               {% else %}
                 <a class="btn btn-primary" href="{{ sesion.qr_instagram_url }}" target="_blank" rel="noopener noreferrer">Abrir Instagram</a>
               {% endif %}
@@ -126,11 +226,15 @@
         {% endif %}
 
         {% if sesion.qr_linkedin_url %}
-          <div class="ws-card" style="box-shadow:none;border:1px solid #e5e7eb;">
-            <h3 class="ws-subtitle" style="margin:0 0 6px 0;color:#0f172a;">LinkedIn / Sitio institucional</h3>
+          <div class="cta-card">
+            <div class="cta-head">
+              <span class="cta-chip">Red profesional</span>
+              <h3>LinkedIn / Sitio</h3>
+              <p>Conecta con programas y oportunidades UDD.</p>
+            </div>
             {% with url=sesion.qr_linkedin_url|lower %}
               {% if url|slice:"-4:" == ".png" or url|slice:"-4:" == ".jpg" or url|slice:"-5:" == ".jpeg" or url|slice:"-4:" == ".svg" %}
-                <img src="{{ sesion.qr_linkedin_url }}" alt="QR LinkedIn" style="max-width:100%;border-radius:12px;">
+                <img src="{{ sesion.qr_linkedin_url }}" alt="QR LinkedIn" class="cta-img">
               {% else %}
                 <a class="btn btn-primary" href="{{ sesion.qr_linkedin_url }}" target="_blank" rel="noopener noreferrer">Ver más</a>
               {% endif %}
@@ -145,6 +249,32 @@
     <span class="arrow-icon">➜</span>
   </a>
 
+  <div id="howto-overlay" class="howto-overlay" aria-hidden="true">
+    <div class="howto-card">
+      <h2>¿Cómo se juega?</h2>
+      <p>Este es el cierre (Paso 6 de 6). El ranking refleja sus tokens por las 4 etapas y la coevaluación. Más allá de ganar, importa lo que aprendieron.</p>
+      <div class="howto-grid">
+        <div>
+          <strong>Qué mirar ahora</strong>
+          <ul>
+            <li>Tokens = desempeño en equipo, empatía, creatividad, comunicación y apoyo.</li>
+            <li>Identifiquen en qué fueron fuertes y qué podrían mejorar.</li>
+            <li>Revisen la coevaluación como feedback constructivo.</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Mensaje final</strong>
+          <ul>
+            <li>La UDD los acompaña si quieren emprender o seguir explorando.</li>
+            <li>Usen lo aprendido para próximos cursos y proyectos.</li>
+            <li>Sigan colaborando: la red que construyen hoy es clave mañana.</li>
+          </ul>
+        </div>
+      </div>
+      <button type="button" class="howto-close" onclick="document.getElementById('howto-overlay').classList.remove('is-open')">Cerrar</button>
+    </div>
+  </div>
+
   <script>
     // Pequeño efecto de confeti opcional (placeholder simple)
     document.addEventListener("DOMContentLoaded", () => {
@@ -154,5 +284,11 @@
     });
   </script>
   <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
+  <script>
+    (function(){
+      const overlay = document.getElementById('howto-overlay');
+      overlay?.addEventListener('click',(e)=>{ if(e.target===overlay){ overlay.classList.remove('is-open'); }});
+    })();
+  </script>
 </body>
 </html>

@@ -26,7 +26,6 @@ urlpatterns = [
     path('admin-panel/', include('login.admin_urls')),
     path('profesor/', include('login.profesor_urls')),
     path('etapasJuego/', include('etapasJuego.urls')),
-    path('logout/', auth_views.LogoutView.as_view(next_page='/login/'), name='logout'),
     path('etapa-final/', include('etapaFinal.urls', namespace='etapaFinal')),  # ← nuevo
 ]
 

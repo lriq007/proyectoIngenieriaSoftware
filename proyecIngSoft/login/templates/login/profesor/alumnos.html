@@ -1,0 +1,76 @@
+{% extends "login/panel_base.html" %}
+{% block title %}Alumnos{% endblock %}
+{% block header_title %}Alumnos{% endblock %}
+
+{% block content %}
+<div class="panel-actions-row" style="margin-bottom:12px;">
+    <a class="btn-link btn-outline" href="{% url 'profesorpanel:dashboard' %}">Volver al dashboard</a>
+    <a class="btn-link btn-outline" href="{% url 'profesorpanel:equipos' %}">Ir a equipos</a>
+    <a class="btn-link btn-outline" href="{% url 'profesorpanel:secciones' %}">Ir a secciones</a>
+    <a class="btn-link btn-outline" href="{% url 'profesorpanel:sesiones' %}">Sesiones</a>
+</div>
+
+<div class="panel-card">
+    <div class="card-header">
+        <div>
+            <p class="eyebrow">Alumnos</p>
+            <h3>Gestiona estudiantes de tus sesiones</h3>
+        </div>
+    </div>
+    <form method="post" class="panel-form" style="margin-bottom:12px;">
+        {% csrf_token %}
+        <div class="panel-grid two-col">
+            <div class="form-group">
+                <label for="{{ form.nombre_apellido.id_for_label }}">Nombre</label>
+                {{ form.nombre_apellido }}
+                {{ form.nombre_apellido.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.carrera.id_for_label }}">Carrera</label>
+                {{ form.carrera }}
+                {{ form.carrera.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.seccion.id_for_label }}">Sección</label>
+                {{ form.seccion }}
+                {{ form.seccion.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.team.id_for_label }}">Equipo</label>
+                {{ form.team }}
+                {{ form.team.errors }}
+            </div>
+        </div>
+        <div class="panel-actions-row">
+            <button type="submit" class="btn-link btn-primary">Agregar alumno</button>
+        </div>
+    </form>
+
+    <div class="panel-table-wrapper">
+        <table class="panel-table compact">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Carrera</th>
+                    <th>Sección</th>
+                    <th>Equipo</th>
+                    <th>Sesión</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for est in estudiantes %}
+                    <tr>
+                        <td>{{ est.nombre_apellido }}</td>
+                        <td>{{ est.carrera|default:"-" }}</td>
+                        <td>{{ est.seccion.nombre|default:"-" }}</td>
+                        <td>{{ est.team.nombre|default:"Sin equipo" }}</td>
+                        <td>{{ est.team.sesion.nombre|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5">No hay estudiantes registrados en tus sesiones.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

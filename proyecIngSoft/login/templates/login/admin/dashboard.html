@@ -3,71 +3,182 @@
 {% block header_title %}Panel Admin{% endblock %}
 
 {% block content %}
-<div class="panel-card">
-    <h2>Accesos rápidos</h2>
-    <div class="panel-grid">
-        <a class="panel-card" href="{% url 'adminpanel:secciones' %}">
-            <h3>Secciones</h3>
-            <p>Gestiona todas las secciones.</p>
-        </a>
-        <a class="panel-card" href="{% url 'adminpanel:sesiones' %}">
-            <h3>Sesiones</h3>
-            <p>Configura las GameSession y asigna profesores.</p>
-        </a>
-        <a class="panel-card" href="{% url 'adminpanel:tablets' %}">
-            <h3>Tablets</h3>
-            <p>Administra tablets por sesión.</p>
-        </a>
-        <a class="panel-card" href="{% url 'adminpanel:topics' %}">
-            <h3>Catálogo de temas</h3>
-            <p>Temas y desafíos base del juego.</p>
-        </a>
-        <a class="panel-card" href="{% url 'adminpanel:challenges' %}">
-            <h3>Desafíos</h3>
-            <p>Desafíos vinculados a cada tema.</p>
-        </a>
-        <a class="panel-card" href="{% url 'adminpanel:evaluaciones' %}">
-            <h3>Evaluaciones</h3>
-            <p>Puntajes y parámetros de evaluación.</p>
-        </a>
+<div class="panel-grid two-col" style="margin-bottom: 16px;">
+    <div class="panel-card chart-card">
+        <div class="card-header">
+            <div>
+                <p class="eyebrow">Participación</p>
+                <h3>Estudiantes por carrera</h3>
+            </div>
+        </div>
+        <div class="chart-wrapper">
+            <div class="pie" style="background: conic-gradient({{ carrera_gradient }});"></div>
+            <div class="legend">
+                {% for seg in carrera_segments %}
+                    <div class="legend-item">
+                        <span class="legend-color" style="background: {{ seg.color }};"></span>
+                        <div>
+                            <strong>{{ seg.label }}</strong>
+                            <p class="muted">{{ seg.count }} · {{ seg.pct|floatformat:1 }}%</p>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="muted">Sin datos de estudiantes.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="panel-card highlight-card">
+        <p class="eyebrow">Actividad</p>
+        <div class="highlight-number">{{ sesion_count }}</div>
+        <p class="muted">Sesiones realizadas</p>
+        <div class="halo"></div>
+    </div>
+</div>
+
+<div class="panel-grid kpi-grid">
+    <div class="panel-card kpi">
+        <p class="kpi-label">Sesiones</p>
+        <p class="kpi-value">{{ sesion_count }}</p>
+        <span class="kpi-sub">Configuradas en la plataforma</span>
+    </div>
+    <div class="panel-card kpi">
+        <p class="kpi-label">Secciones</p>
+        <p class="kpi-value">{{ seccion_count }}</p>
+        <span class="kpi-sub">Con jugadores inscritos</span>
+    </div>
+    <div class="panel-card kpi">
+        <p class="kpi-label">Profesores</p>
+        <p class="kpi-value">{{ profesor_count }}</p>
+        <span class="kpi-sub">Con sesiones asignadas</span>
+    </div>
+    <div class="panel-card kpi">
+        <p class="kpi-label">Equipos</p>
+        <p class="kpi-value">{{ equipos_count }}</p>
+        <span class="kpi-sub">Activos en sesiones</span>
+    </div>
+    <div class="panel-card kpi">
+        <p class="kpi-label">Estudiantes</p>
+        <p class="kpi-value">{{ estudiantes_count }}</p>
+        <span class="kpi-sub">Vinculados a un equipo</span>
+    </div>
+    <div class="panel-card kpi">
+        <p class="kpi-label">Tablets</p>
+        <p class="kpi-value">{{ tablet_count }}</p>
+        <span class="kpi-sub">Disponibles y asignadas</span>
     </div>
 </div>
 
 <div class="panel-card">
-    <h2>Resumen</h2>
-    <div class="panel-stats">
-        <div class="stat-tile"><strong>{{ seccion_count }}</strong> Secciones</div>
-        <div class="stat-tile"><strong>{{ sesion_count }}</strong> Sesiones</div>
-        <div class="stat-tile"><strong>{{ tablet_count }}</strong> Tablets</div>
-        <div class="stat-tile"><strong>{{ topic_count }}</strong> Temas</div>
-        <div class="stat-tile"><strong>{{ challenge_count }}</strong> Desafíos</div>
-        <div class="stat-tile"><strong>{{ evaluation_count }}</strong> Evaluaciones</div>
+    <div class="card-header">
+        <div>
+            <p class="eyebrow">Accesos rápidos</p>
+            <h3>Orquestación</h3>
+        </div>
+    </div>
+    <div class="panel-grid quick-links">
+        <a class="panel-card link-card" href="{% url 'adminpanel:usuarios' %}">
+            <div class="chip ghost">Usuarios</div>
+            <h4>Gestionar usuarios</h4>
+            <p>Crear administradores, profesores y ajustar permisos.</p>
+        </a>
+        <a class="panel-card link-card" href="{% url 'adminpanel:sesiones' %}">
+            <div class="chip ghost">Sesiones</div>
+            <h4>Gestionar GameSession</h4>
+            <p>Crear, asignar profesor y modo de asignación.</p>
+        </a>
+        <a class="panel-card link-card" href="{% url 'adminpanel:secciones' %}">
+            <div class="chip ghost">Secciones</div>
+            <h4>Administrar secciones</h4>
+            <p>Crear secciones base y asociarlas a sesiones.</p>
+        </a>
+        <a class="panel-card link-card" href="{% url 'adminpanel:tablets' %}">
+            <div class="chip ghost">Tablets</div>
+            <h4>Asignar tablets</h4>
+            <p>Controlar disponibilidad y asignación a equipos.</p>
+        </a>
+        <a class="panel-card link-card" href="{% url 'adminpanel:equipos' %}">
+            <div class="chip ghost">Equipos</div>
+            <h4>Equipos y puntos</h4>
+            <p>Listar equipos, integrantes y tablets asignadas.</p>
+        </a>
+        <a class="panel-card link-card" href="{% url 'adminpanel:estudiantes' %}">
+            <div class="chip ghost">Estudiantes</div>
+            <h4>Alumnos</h4>
+            <p>Explorar estudiantes, secciones y equipos.</p>
+        </a>
+        <a class="panel-card link-card" href="{% url 'adminpanel:topics' %}">
+            <div class="chip ghost">Temas</div>
+            <h4>Temas y desafíos</h4>
+            <p>Catalogar contenido base para las partidas.</p>
+        </a>
+        <a class="panel-card link-card" href="{% url 'adminpanel:challenges' %}">
+            <div class="chip ghost">Desafíos</div>
+            <h4>Gestionar desafíos</h4>
+            <p>Orden y material asociado a cada tema.</p>
+        </a>
+        <a class="panel-card link-card" href="{% url 'adminpanel:evaluaciones' %}">
+            <div class="chip ghost">Evaluaciones</div>
+            <h4>Control de puntajes</h4>
+            <p>Registrar evaluaciones y parámetros.</p>
+        </a>
     </div>
 </div>
 
-<div class="panel-card">
-    <h3>Sesiones recientes</h3>
-    <table class="panel-table">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Código</th>
-                <th>Profesor</th>
-                <th>Sección</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for s in sesiones_recientes %}
-                <tr>
-                    <td>{{ s.nombre }}</td>
-                    <td>{{ s.codigo }}</td>
-                    <td>{{ s.profesor }}</td>
-                    <td>{{ s.seccion }}</td>
-                </tr>
+<div class="panel-grid two-col">
+    <div class="panel-card">
+        <div class="card-header">
+            <div>
+                <p class="eyebrow">Sesiones recientes</p>
+                <h3>Últimas 5</h3>
+            </div>
+        </div>
+        <div class="panel-table-wrapper">
+            <table class="panel-table compact">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Profesor</th>
+                        <th>Sección</th>
+                        <th>Equipos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in sesiones_recientes %}
+                        <tr>
+                            <td>{{ s.nombre }}<br><span class="muted">Código {{ s.codigo }}</span></td>
+                            <td>{{ s.profesor|default:"Sin asignar" }}</td>
+                            <td>{{ s.seccion|default:"N/A" }}</td>
+                            <td>{{ s.equipos.count }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4">Sin sesiones registradas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel-card">
+        <div class="card-header">
+            <div>
+                <p class="eyebrow">Ranking global</p>
+                <h3>Equipos destacados</h3>
+            </div>
+        </div>
+        <ul class="panel-list solid">
+            {% for t in top_equipos %}
+                <li>
+                    <div>
+                        <strong>{{ t.nombre }}</strong>
+                        <p class="muted">{{ t.sesion.nombre|default:"Sesión" }} · {{ t.sesion.profesor|default:"Profesor" }}</p>
+                    </div>
+                    <span class="pill">{{ t.tokens_totales|default:0 }} pts</span>
+                </li>
             {% empty %}
-                <tr><td colspan="4">Sin sesiones registradas.</td></tr>
+                <li>No hay equipos con puntaje registrado aún.</li>
             {% endfor %}
-        </tbody>
-    </table>
+        </ul>
+    </div>
 </div>
 {% endblock %}

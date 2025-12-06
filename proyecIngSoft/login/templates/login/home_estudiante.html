@@ -8,74 +8,139 @@
     <link rel="stylesheet" href="{% static 'login/css/home.css' %}">
 </head>
 <body class="home-estudiante-body">
+    <button type="button" class="howto-btn" onclick="document.getElementById('howto-overlay').classList.add('is-open')">¿Cómo se juega?</button>
     <div class="home-estudiante-container">
-        <div class="home-estudiante-header">
-            <div class="home-estudiante-welcome">
-                <h1>¡Bienvenidos a Misión Emprende!</h1>
-                <p>El juego está por comenzar</p>
+        <header class="home-hero">
+            <div class="hero-grid">
+                <div class="hero-copy">
+                    <div class="hero-badge">Misión en equipo · 60'</div>
+                    <h1>¡Bienvenidos a Misión Emprende!</h1>
+                    <p class="hero-lead">Activen la energía, conecten como equipo y recorran los 6 pasos que suman tokens de empatía, creatividad y apoyo.</p>
+                    <div class="hero-tags">
+                        <span>6 pasos intensos</span>
+                        <span>Tokens por claridad</span>
+                        <span>Pitch final</span>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="{% url 'login:mission_launch' %}" class="btn-home btn-continue">Comenzar la misión ➜</a>
+                        <button type="button" class="btn-ghost open-howto">Ver guía rápida</button>
+                    </div>
+                </div>
+                <div class="hero-panel">
+                    <div class="panel-top">
+                        <div>
+                            <p class="panel-label">Ruta express</p>
+                            <p class="panel-title">60 minutos para brillar</p>
+                        </div>
+                        <div class="panel-chip">Paso 1 · Activación</div>
+                    </div>
+                    <div class="panel-meter">
+                        <div class="panel-meter-bar">
+                            <span style="width:20%;"></span>
+                        </div>
+                        <div class="panel-meter-legend">
+                            <span>Inicio</span>
+                            <span>Ranking final</span>
+                        </div>
+                    </div>
+                    <div class="panel-steps">
+                        <div class="panel-step">
+                            <div class="step-id">01</div>
+                            <div class="step-copy">
+                                <strong>Activación</strong>
+                                <small>5 min · Sopa de letras en equipo</small>
+                            </div>
+                        </div>
+                        <div class="panel-step">
+                            <div class="step-id">02</div>
+                            <div class="step-copy">
+                                <strong>Desafío y empatía</strong>
+                                <small>8 min · Elegir tema y mapa del usuario</small>
+                            </div>
+                        </div>
+                        <div class="panel-step">
+                            <div class="step-id">03</div>
+                            <div class="step-copy">
+                                <strong>Creatividad LEGO</strong>
+                                <small>10 min · Prototipo rápido</small>
+                            </div>
+                        </div>
+                        <div class="panel-step">
+                            <div class="step-id">04</div>
+                            <div class="step-copy">
+                                <strong>Pitch breve</strong>
+                                <small>6 min · Presentación clara</small>
+                            </div>
+                        </div>
+                        <div class="panel-step">
+                            <div class="step-id">05</div>
+                            <div class="step-copy">
+                                <strong>Apoyo y ranking</strong>
+                                <small>8 min · Coevaluación y resultados</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel-footer">
+                        <div>Entre más preciso y colaborativo, más tokens.</div>
+                        <div class="footer-chip">Equipo listo ✅</div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </header>
 
         <div class="home-estudiante-video-container">
             <div class="home-estudiante-video-wrapper">
+                <div class="video-header">
+                    <div>
+                        <p class="video-label">Video de bienvenida</p>
+                        <p class="video-title">Lo que viene en la misión</p>
+                    </div>
+                    <div class="video-pill">Duración total: ~60'</div>
+                </div>
                 <video controls width="100%" id="video-bienvenida">
                     <source src="{% static 'videos/bienvenida.mp4' %}" type="video/mp4">
                 </video>
             </div>
         </div>
 
-        <section class="home-estudiante-programas">
+        <section class="home-estudiante-programas" id="programas-section">
             <div class="programas-copy">
-                <h2>¿Qué es Emprendimiento UDD?</h2>
+                <div class="programas-eyebrow">Emprendimiento UDD</div>
+                <h2>Un viaje corto, intenso y entretenido</h2>
                 <p class="programas-description">
-                    Desarrollamos programas, cursos y concursos para formar, apoyar y fomentar el emprendimiento,
-                    impulsando a emprendedores del ecosistema nacional. Hay rutas para alumnos, alumni y emprendedores
-                    externos en distintas etapas.
+                    Cada paso está pensado para trabajar la colaboración, la empatía y la comunicación. Lo que escriban y construyan suma tokens y hace más fácil el pitch final. Mantengan el foco y apoyen a su equipo.
                 </p>
             </div>
-            <div class="timeline-steps">
-                <div class="timeline-step">
-                    <span class="step-time">5 min</span>
-                    <div class="step-circle azul-1">
-                        <div class="step-num">01</div>
-                        <div class="step-label">Trabajo en equipo</div>
-                    </div>
+        </section>
+    </div>
+
+    <div id="howto-overlay" class="howto-overlay" aria-hidden="true">
+        <div class="howto-card">
+            <h2>¿Cómo se juega?</h2>
+            <p>Ustedes vivirán una experiencia de 60 minutos que refuerza el sello emprendedor UDD. Cada paso suma tokens según cómo colaboran, empatizan, crean y comunican.</p>
+            <div class="howto-grid">
+                <div>
+                    <strong>Ruta en 6 pasos</strong>
+                    <ul>
+                        <li>Paso 1: Sopa de letras para activarse en equipo.</li>
+                        <li>Paso 2: Elegir tema/desafío y mapa de empatía del usuario.</li>
+                        <li>Paso 3: Construir un LEGO que represente la solución.</li>
+                        <li>Paso 4: Escribir el pitch breve.</li>
+                        <li>Coevaluación: Puntúan a otros equipos (sin autoevaluarse).</li>
+                        <li>Ranking: Ven resultados y reflexionan.</li>
+                    </ul>
                 </div>
-                <div class="timeline-step">
-                    <span class="step-time">8 min</span>
-                    <div class="step-circle azul-2">
-                        <div class="step-num">02</div>
-                        <div class="step-label">Desafío y empatía</div>
-                    </div>
-                </div>
-                <div class="timeline-step">
-                    <span class="step-time">10 min</span>
-                    <div class="step-circle azul-1">
-                        <div class="step-num">03</div>
-                        <div class="step-label">Creatividad</div>
-                    </div>
-                </div>
-                <div class="timeline-step">
-                    <span class="step-time">6 min</span>
-                    <div class="step-circle azul-2">
-                        <div class="step-num">04</div>
-                        <div class="step-label">Comunicación</div>
-                    </div>
-                </div>
-                <div class="timeline-step">
-                    <span class="step-time">8 min</span>
-                    <div class="step-circle azul-1">
-                        <div class="step-num">05</div>
-                        <div class="step-label">Apoyo</div>
-                    </div>
+                <div>
+                    <strong>Tokens y sentido</strong>
+                    <ul>
+                        <li>Más tokens = mejor ejecución y apoyo entre equipos.</li>
+                        <li>Se consiguen al completar bien cada paso y por coevaluación justa.</li>
+                        <li>Importa más aprender y detectar sus fortalezas que “ganar”.</li>
+                    </ul>
                 </div>
             </div>
-        </section>
-
-        <div class="home-estudiante-buttons">
-            <a href="{% url 'seleccion_modalidad' %}" class="btn-home btn-continue">
-                Avanzar a la selección de modalidad ➜
-            </a>
+            <p style="margin-top:10px;">Cierre: piensen qué habilidad fortalecieron y cuál quieren seguir trabajando. La UDD los acompaña si quieren emprender.</p>
+            <button type="button" class="howto-close" onclick="document.getElementById('howto-overlay').classList.remove('is-open')">Cerrar</button>
         </div>
     </div>
 
@@ -91,6 +156,14 @@
                 button.addEventListener('mouseleave', function() {
                     this.style.transform = 'translateY(0)';
                 });
+            });
+
+            const overlay = document.getElementById('howto-overlay');
+            overlay?.addEventListener('click', function(e){
+                if(e.target === overlay){ overlay.classList.remove('is-open'); }
+            });
+            document.querySelectorAll('.open-howto').forEach(btn=>{
+                btn.addEventListener('click', ()=> overlay?.classList.add('is-open'));
             });
 
             const logoutBtn = document.querySelector('.btn-logout');

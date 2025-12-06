@@ -1,0 +1,72 @@
+{% extends "login/panel_base.html" %}
+{% block title %}Secciones{% endblock %}
+{% block header_title %}Secciones{% endblock %}
+
+{% block content %}
+<div class="panel-actions-row" style="margin-bottom:12px;">
+    <a class="btn-link btn-outline" href="{% url 'profesorpanel:dashboard' %}">Volver al dashboard</a>
+    <a class="btn-link btn-outline" href="{% url 'profesorpanel:alumnos' %}">Ir a alumnos</a>
+    <a class="btn-link btn-outline" href="{% url 'profesorpanel:equipos' %}">Ir a equipos</a>
+    <a class="btn-link btn-outline" href="{% url 'profesorpanel:sesiones' %}">Sesiones</a>
+</div>
+
+<div class="panel-card">
+    <div class="card-header">
+        <div>
+            <p class="eyebrow">Secciones</p>
+            <h3>Gestiona secciones relacionadas</h3>
+        </div>
+    </div>
+    <form method="post" class="panel-form" style="margin-bottom:12px;">
+        {% csrf_token %}
+        <div class="panel-grid two-col">
+            <div class="form-group">
+                <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+                {{ form.nombre }}
+                {{ form.nombre.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.carrera.id_for_label }}">Carrera (texto)</label>
+                {{ form.carrera }}
+                {{ form.carrera.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.carrera_fk.id_for_label }}">Carrera (catálogo)</label>
+                {{ form.carrera_fk }}
+                {{ form.carrera_fk.errors }}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.anio_ingreso.id_for_label }}">Año de ingreso</label>
+                {{ form.anio_ingreso }}
+                {{ form.anio_ingreso.errors }}
+            </div>
+        </div>
+        <div class="panel-actions-row">
+            <button type="submit" class="btn-link btn-primary">Agregar sección</button>
+        </div>
+    </form>
+
+    <div class="panel-table-wrapper">
+        <table class="panel-table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Carrera</th>
+                    <th>Año</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for s in secciones %}
+                    <tr>
+                        <td>{{ s.nombre }}</td>
+                        <td>{{ s.carrera|default:s.carrera_fk.nombre|default:"-" }}</td>
+                        <td>{{ s.anio_ingreso|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3">No hay secciones registradas relacionadas a tus sesiones.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

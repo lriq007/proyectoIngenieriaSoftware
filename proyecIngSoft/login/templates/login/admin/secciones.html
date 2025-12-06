@@ -3,6 +3,9 @@
 {% block header_title %}Secciones{% endblock %}
 
 {% block content %}
+<div class="panel-actions-row" style="margin-bottom:12px;">
+    <a class="btn-link btn-outline" href="{% url 'adminpanel:dashboard' %}">Volver al dashboard</a>
+</div>
 <div class="panel-grid">
     <div class="panel-card">
         <h3>Nueva sección</h3>
@@ -14,31 +17,39 @@
     </div>
     <div class="panel-card">
         <h3>Listado</h3>
-        <table class="panel-table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Carrera</th>
-                    <th>Año</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for s in secciones %}
+        <form method="get" class="panel-form" style="margin-bottom:12px;">
+            <div class="form-group">
+                <label>Buscar</label>
+                <input type="text" name="q" value="{{ q }}" placeholder="Nombre o carrera" class="form-field">
+            </div>
+        </form>
+        <div class="panel-table-wrapper">
+            <table class="panel-table">
+                <thead>
                     <tr>
-                        <td>{{ s.nombre }}</td>
-                        <td>{{ s.carrera }}</td>
-                        <td>{{ s.anio_ingreso }}</td>
-                        <td class="panel-actions-row">
-                            <a class="btn-link btn-outline" href="{% url 'adminpanel:seccion_editar' s.id %}">Editar</a>
-                            <a class="btn-link btn-danger" href="{% url 'adminpanel:seccion_eliminar' s.id %}">Eliminar</a>
-                        </td>
+                        <th>Nombre</th>
+                        <th>Carrera</th>
+                        <th>Año</th>
+                        <th>Acciones</th>
                     </tr>
-                {% empty %}
-                    <tr><td colspan="4">No hay secciones registradas.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for s in secciones %}
+                        <tr>
+                            <td>{{ s.nombre }}</td>
+                            <td>{{ s.carrera }}</td>
+                            <td>{{ s.anio_ingreso }}</td>
+                            <td class="panel-actions-row">
+                                <a class="btn-link btn-outline" href="{% url 'adminpanel:seccion_editar' s.id %}">Editar</a>
+                                <a class="btn-link btn-danger" href="{% url 'adminpanel:seccion_eliminar' s.id %}">Eliminar</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4">No hay secciones registradas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

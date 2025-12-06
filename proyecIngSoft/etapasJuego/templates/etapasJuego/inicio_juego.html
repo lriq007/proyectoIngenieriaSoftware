@@ -17,9 +17,11 @@
 <body>
   <div class="app-noise"></div>
   <canvas id="graphCanvas" class="graph-canvas" aria-hidden="true"></canvas>
+  <button type="button" class="howto-btn" onclick="document.getElementById('howto-overlay').classList.add('is-open')">¿Cómo se juega?</button>
   
   <div class="ws-header">
     <h1 class="ws-title">¡Antes de empezar!</h1>
+    <p class="ws-message">Pronto recorrerán 6 pasos: Trabajo en equipo, Desafío y empatía, Creatividad, Pitch, Coevaluación y Ranking.</p>
   </div>
 
   <div class="welcome-container">
@@ -74,8 +76,8 @@
     <div class="token-info">
       <h3>🏆 Tu Misión 🏆</h3>
       <p><strong>¡Trabaja en equipo para competir con otros grupos en cada una de las actividades!</strong></p>
-      <p>💎 <strong>Consigue tokens al ganar actividades</strong> 💎</p>
-      <p>Cada token representa tu progreso en el desarrollo de habilidades emprendedoras</p>
+      <p>💎 <strong>Consiguen tokens al completar bien cada paso</strong> 💎</p>
+      <p>Cada token representa su progreso en habilidades emprendedoras; al final verán el ranking.</p>
     </div>
 
     <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 10px;">
@@ -90,6 +92,41 @@
       <span class="arrow-icon">➜</span>
     </a>
   </div>
+  <div id="howto-overlay" class="howto-overlay" aria-hidden="true">
+    <div class="howto-card">
+      <h2>¿Cómo se juega?</h2>
+      <p>Esta experiencia de 60 minutos refuerza el sello emprendedor UDD. Ustedes pasan por 4 etapas + coevaluación + ranking, trabajando equipo, empatía, creatividad, comunicación y apoyo.</p>
+      <div class="howto-grid">
+        <div>
+          <strong>Pasos</strong>
+          <ul>
+            <li>Paso 1: Sopa de letras para activar el equipo.</li>
+            <li>Paso 2: Elegir tema/desafío y crear mapa de empatía.</li>
+            <li>Paso 3: Prototipo LEGO + resumen de la idea.</li>
+            <li>Paso 4: Preparar el pitch breve.</li>
+            <li>Coevaluación: Puntúan a otros equipos.</li>
+            <li>Ranking: Ven resultados y reflexionan.</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Tokens y sentido</strong>
+          <ul>
+            <li>Ganan tokens al completar cada paso con calidad y a tiempo.</li>
+            <li>Los tokens combinan desempeño y coevaluación; definen el ranking.</li>
+            <li>Lo importante: aprender, colaborar y ver su progreso emprendedor.</li>
+          </ul>
+        </div>
+      </div>
+      <p style="margin-top:10px;">Al cerrar, piensen en qué habilidad se sienten fuertes y cuál quieren seguir trabajando. La UDD los apoya si quieren emprender.</p>
+      <button type="button" class="howto-close" onclick="document.getElementById('howto-overlay').classList.remove('is-open')">Cerrar</button>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const overlay = document.getElementById('howto-overlay');
+      overlay?.addEventListener('click', (e)=>{ if(e.target === overlay){ overlay.classList.remove('is-open'); }});
+    })();
+  </script>
   <script src="{% static 'etapasJuego/js/graph-background.js' %}"></script>
 </body>
   <style>

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from .permissions import (
     ensure_default_groups,
@@ -40,6 +40,13 @@ def estudiante_ingresado(request, estudiante_id):
 
 def home_estudiante(request):
     return render(request, 'login/home_estudiante.html')
+
+def mission_launch(request):
+    return render(request, 'login/mission_launch.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('login:login')
 
 def login_view(request):
     ensure_default_groups()
